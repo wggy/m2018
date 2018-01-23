@@ -2,6 +2,9 @@
 target
 *.class
 
+.idea/
+*.iml
+
 # Log file
 *.log
 
