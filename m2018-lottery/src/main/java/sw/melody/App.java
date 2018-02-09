@@ -1,5 +1,8 @@
 package sw.melody;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /**
  * Hello world!
  * <p>
@@ -27,8 +30,9 @@ package sw.melody;
  * 提交到github仓库
  * git push -u origin master
  */
+@SpringBootApplication
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SpringApplication.run(App.class, args);
     }
 }
