@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 2.从本地仓库提交到已知github仓库
  * …or push an existing repository from the command line
  * <p>
- * 关联githu远程仓库
+ * 关联github远程仓库
  * git remote add origin https://github.com/year201412/m2018.git
  * 提交到github仓库
  * git push -u origin master
