@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sw.melody.config.GlobalException;
 import sw.melody.modules.member.entity.MemberEntity;
-import sw.melody.modules.member.service.MemberService;
+import sw.melody.modules.member.mapper.MemberMapper;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /***
  * Created by ping on 2018/2/26
@@ -21,12 +19,12 @@ import java.util.Map;
 public class MemberController {
 
     @Autowired
-    private MemberService memberService;
+    private MemberMapper memberMapper;
 
     @ApiOperation(value="获取成员列表")
     @RequestMapping(value="/list", method= RequestMethod.GET)
-    public List<Map<String, Object>> getUserList() {
-        return memberService.queryAllMembers();
+    public List<MemberEntity> getUserList() {
+        return memberMapper.queryAllMembers();
     }
 
     @ApiOperation(value="创建成员", notes="根据Member对象创建成员")
@@ -36,7 +34,7 @@ public class MemberController {
         if (StringUtils.isEmpty(user.getMember()) || user.getStatus() == null) {
             throw new GlobalException("参数不能为空");
         }
-        memberService.create(user.getMember(), user.getStatus());
+        memberMapper.create(user.getMember(), user.getStatus());
         return "success";
     }
 
@@ -47,7 +45,7 @@ public class MemberController {
         if (id == null) {
             throw new GlobalException("参数不能为空");
         }
-        return memberService.queryById(id);
+        return memberMapper.queryById(id);
     }
 
     @ApiOperation(value="删除成员", notes="根据url的id来指定删除对象")
@@ -57,7 +55,7 @@ public class MemberController {
         if (id == null) {
             throw new GlobalException("参数不能为空");
         }
-        memberService.deleteById(id);
+        memberMapper.deleteById(id);
         return "success";
     }
 
