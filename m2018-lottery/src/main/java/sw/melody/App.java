@@ -2,6 +2,7 @@ package sw.melody;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Hello world!
@@ -30,6 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 提交到github仓库
  * git push -u origin master
  */
+@ComponentScan("sw.melody")
 @SpringBootApplication
 public class App {
     public static void main(String[] args) {
