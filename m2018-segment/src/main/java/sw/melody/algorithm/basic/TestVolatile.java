@@ -1,7 +1,5 @@
 package sw.melody.algorithm.basic;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 /***
  * Created by ping on 2018/3/30
  * volatile关键字的使用、线程interrupt方法的特性
