@@ -1,4 +1,4 @@
-package sw.melody.algorithm.leetcode1;
+package sw.melody.algorithm.leetcode1.array;
 
 /***
  * Created by ping on 2018/4/13
