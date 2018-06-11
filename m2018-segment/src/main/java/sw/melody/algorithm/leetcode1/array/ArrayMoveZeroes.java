@@ -21,14 +21,15 @@ public class ArrayMoveZeroes {
     }
 
     static void moveZeroes(int[] nums) {
-        int length = nums.length;
-        for (int i=length-1; i>=0; i++) {
-            if (nums[i] != 0) {
-                for (int j=i; j<length-1; j++) {
-                    nums[j] = nums[j+1];
-                }
-                nums[length - 1] = 0;
+        int len = nums.length;
+        int cnt = 0;
+        for (int i=0; i<len; i++) {
+            if (nums[i] !=0) {
+                nums[cnt++] = nums[i];
             }
+        }
+        for (int i=cnt; i<len; i++) {
+            nums[i] = 0;
         }
     }
 }
