@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sw.melody.modules.job.dao.SnpFormatDao">
+	<select id="queryObject" resultType="sw.melody.modules.job.entity.SnpFormatEntity" >
+		select * from tbl_snp_format where id = #{value}
+	</select> 
+
+	<select id="queryList" resultType="sw.melody.modules.job.entity.SnpFormatEntity" >
+		select * from tbl_snp_format
+		<where>
+			<if test="snpId != null">
+				snp_id = #{chrom}
+			</if>
+		</where>
+		<if test="offset != null and limit != null ">
+		limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(1) from tbl_snp_format
+		<where>
+			<if test="snpId != null">
+				snp_id = #{chrom}
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="sw.melody.modules.job.entity.SnpFormatEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tbl_snp_format
+		(
+			`snp_id`,
+			`sick`,
+			`format`,
+			`format_val`,
+			`format_rate`
+		)
+		values
+		(
+			#{snpId},
+			#{sick},
+			#{format},
+			#{formatVal},
+			#{formatRate}
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+		insert into tbl_snp_format
+		(
+		`snp_id`,
+		`sick`,
+		`format`,
+		`format_val`,
+		`format_rate`
+		)
+		values
+		<foreach item="item" collection="list" index="index" separator=",">
+		(
+		#{item.snpId},
+		#{item.sick},
+		#{item.format},
+		#{item.formatVal},
+		#{item.formatRate}
+		)
+		</foreach>
+	</insert>
+	
+	<delete id="deleteBatch">
+		delete from tbl_snp_format where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

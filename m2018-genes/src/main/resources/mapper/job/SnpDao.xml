@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sw.melody.modules.job.dao.SnpDao">
+	<select id="queryObject" resultType="sw.melody.modules.job.entity.SnpEntity" >
+		select * from tbl_snp where id = #{value}
+	</select> 
+
+	<select id="queryList" resultType="sw.melody.modules.job.entity.SnpEntity" >
+		select * from tbl_snp
+		<where>
+			<if test="chrom != null and chrom.trim() != ''">
+				chrom like concat('%', #{chrom}, '%')
+			</if>
+		</where>
+		<if test="offset != null and limit != null ">
+		limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(1) from tbl_snp
+		<where>
+			<if test="chrom != null and chrom.trim() != ''">
+				chrom like concat('%', #{chrom}, '%')
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="sw.melody.modules.job.entity.SnpEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tbl_snp
+		(
+			`chrom`,
+			`pos`,
+			`pos_id`,
+			`ref`,
+			`alt`,
+			`qual`,
+			`filter`,
+			`info`,
+			`create_time`
+		)
+		values
+		(
+			#{chrom},
+			#{pos},
+			#{posId},
+			#{ref},
+			#{alt},
+			#{qual},
+			#{filter},
+			#{info},
+			#{createTime}
+		)
+	</insert>
+	
+	<delete id="deleteBatch">
+		delete from tbl_snp where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>
