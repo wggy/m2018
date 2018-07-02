@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /***
  * Created by ping on 2018/6/20
@@ -27,16 +29,31 @@ public class GeneSnpTask {
     private static final String BEGIN = "#CHROM";
     private static final String TAB = "\t";
     private static final String LF = "\n";
+    // 固定表头
+    private static String[] fixed_cols = new String[]{"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"};
+    private static final Map<String, String> cols_map = new HashMap<>();
+
+    static {
+        cols_map.put("func.refgene", "func_refgene");
+        cols_map.put("gene.refgene", "gene_refgene");
+        cols_map.put("genedetail.refgene", "genedetail_refgene");
+        cols_map.put("exonicfunc.refgene", "exonicfunc_refgene");
+        cols_map.put("aachange.refgene", "aachange_refgene");
+        cols_map.put("1000g_all", "a1000g_all");
+        cols_map.put("1000g_afr", "a1000g_afr");
+        cols_map.put("1000g_amr", "a1000g_amr");
+        cols_map.put("1000g_eas", "a1000g_eas");
+        cols_map.put("1000g_eur", "a1000g_eur");
+        cols_map.put("1000g_sas", "a1000g_sas");
+        cols_map.put("fathmm-mkl_coding_score", "fathmm_mkl_coding_score");
+        cols_map.put("fathmm-mkl_coding_pred", "fathmm_mkl_coding_pred");
+        cols_map.put("gerp++_rs", "gerp_rs");
+    }
 
     @Autowired
     private SnpService snpService;
     @Autowired
     private SnpFormatService snpFormatService;
-
-
-    // 固定表头
-    private static String[] fixed_cols = new String[]{"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"};
-
 
     public void parseSnp(String fileName) throws Exception {
         File f = new File(fileName);
@@ -116,4 +133,28 @@ public class GeneSnpTask {
         }
         return list;
     }
+
+    public static void main(String[] args) {
+        String sql = "CREATE TABLE `NewTable` (\n" +
+                "`id`  int NOT NULL AUTO_INCREMENT ,";
+        String endSql = "PRIMARY KEY (`id`))\n;";
+
+        String col = "AC=2;AF=1.00;AN=2;DP=7;ExcessHet=3.0103;FS=0.000;MLEAC=2;MLEAF=1.00;MQ=60.00;QD=28.40;SOR=0.941;ANNOVAR_DATE=2017-07-17;Func.refGene=upstream;Gene.refGene=RNR1;GeneDetail.refGene=dist\\x3d500;ExonicFunc.refGene=.;AAChange.refGene=.;Xref.refGene=.;cytoBand=.;avsnp147=.;CLINSIG=.;CLNDBN=.;CLNACC=.;CLNDSDB=.;CLNDSDBID=.;PopFreqMax=.;PopFreqMax=.;1000G_ALL=.;1000G_AFR=.;1000G_AMR=.;1000G_EAS=.;1000G_EUR=.;1000G_SAS=.;ExAC_ALL=.;ExAC_AFR=.;ExAC_AMR=.;ExAC_EAS=.;ExAC_FIN=.;ExAC_NFE=.;ExAC_OTH=.;ExAC_SAS=.;ESP6500siv2_ALL=.;ESP6500siv2_AA=.;ESP6500siv2_EA=.;CG46=.;SIFT_score=.;SIFT_pred=.;Polyphen2_HDIV_score=.;Polyphen2_HDIV_pred=.;Polyphen2_HVAR_score=.;Polyphen2_HVAR_pred=.;LRT_score=.;LRT_pred=.;MutationTaster_score=.;MutationTaster_pred=.;MutationAssessor_score=.;MutationAssessor_pred=.;FATHMM_score=.;FATHMM_pred=.;PROVEAN_score=.;PROVEAN_pred=.;VEST3_score=.;CADD_raw=.;CADD_phred=.;DANN_score=.;fathmm-MKL_coding_score=.;fathmm-MKL_coding_pred=.;MetaSVM_score=.;MetaSVM_pred=.;MetaLR_score=.;MetaLR_pred=.;integrated_fitCons_score=.;integrated_confidence_value=.;GERP++_RS=.;phyloP7way_vertebrate=.;phyloP20way_mammalian=.;phastCons7way_vertebrate=.;phastCons20way_mammalian=.;SiPhy_29way_logOdds=.;ALLELE_END";
+        String[] colsArray = StringUtils.split(col, ";");
+        String obj = "";
+        for (String str : colsArray) {
+            String[] kv = StringUtils.split(str, "=");
+            if (kv == null || kv.length != 2) {
+                continue;
+            }
+            String key = kv[0].toLowerCase();
+//            String val = kv[1];
+            String colSql = MessageFormat.format("`{0}` varchar(50) NULL, \n", key);
+            sql += colSql;
+            obj += MessageFormat.format("private String {0};\n", key);
+        }
+//        System.out.println(sql + endSql);
+        System.out.println(obj);
+    }
+
 }

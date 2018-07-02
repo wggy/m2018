@@ -42,6 +42,7 @@ public class SnpServiceImpl implements SnpService {
     public void save(SnpEntity snpEntity, List<SnpFormatEntity> list) {
         snpDao.save(snpEntity);
         list.forEach(item -> item.setSnpId(snpEntity.getId()));
+
         snpFormatDao.saveBatch(list);
     }
 }
