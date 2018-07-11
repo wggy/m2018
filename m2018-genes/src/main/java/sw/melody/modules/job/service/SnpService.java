@@ -4,6 +4,7 @@ import io.swagger.models.auth.In;
 import sw.melody.modules.job.entity.ScheduleJobEntity;
 import sw.melody.modules.job.entity.SnpEntity;
 import sw.melody.modules.job.entity.SnpFormatEntity;
+import sw.melody.modules.job.entity.SnpInfoEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -35,5 +36,5 @@ public interface SnpService {
 	/**
 	 * 保存
 	 */
-	void save(SnpEntity snpEntity, List<SnpFormatEntity> list);
+	void save(SnpEntity snpEntity, SnpInfoEntity entity, List<SnpFormatEntity> list);
 }

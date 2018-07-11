@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.melody.modules.job.dao.SnpDao;
 import sw.melody.modules.job.dao.SnpFormatDao;
+import sw.melody.modules.job.dao.SnpInfoDao;
 import sw.melody.modules.job.entity.SnpEntity;
 import sw.melody.modules.job.entity.SnpFormatEntity;
+import sw.melody.modules.job.entity.SnpInfoEntity;
 import sw.melody.modules.job.service.SnpService;
 
 import java.util.List;
@@ -21,6 +23,8 @@ public class SnpServiceImpl implements SnpService {
     private SnpDao snpDao;
     @Autowired
     private SnpFormatDao snpFormatDao;
+    @Autowired
+    private SnpInfoDao snpInfoDao;
 
     @Override
     public SnpEntity queryObject(Integer id) {
@@ -39,10 +43,11 @@ public class SnpServiceImpl implements SnpService {
 
     @Transactional
     @Override
-    public void save(SnpEntity snpEntity, List<SnpFormatEntity> list) {
+    public void save(SnpEntity snpEntity, SnpInfoEntity infoEntity, List<SnpFormatEntity> list) {
         snpDao.save(snpEntity);
         list.forEach(item -> item.setSnpId(snpEntity.getId()));
-
+        infoEntity.setSnpId(snpEntity.getId());
+        snpInfoDao.save(infoEntity);
         snpFormatDao.saveBatch(list);
     }
 }

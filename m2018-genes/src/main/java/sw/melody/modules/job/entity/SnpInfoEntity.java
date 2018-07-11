@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 public class SnpInfoEntity {
     private Integer id;
+    private Integer snpId;
     private String ac;
     private String af;
     private String an;
@@ -88,4 +89,8 @@ public class SnpInfoEntity {
     private String phastcons7way_vertebrate;
     private String phastcons20way_mammalian;
     private String siphy_29way_logodds;
+    private String baseqranksum;
+    private String clippingranksum;
+    private String mqranksum;
+    private String readposranksum;
 }
