@@ -13,8 +13,8 @@ package sw.melody.algorithm.leetcode1.array;
 public class RemoveArrayDuplicates {
 
     public static void main(String[] args) {
-        int[] nums = {};
-        System.out.println(myRemoveDuplicates(nums));
+        int[] nums = {0, 1, 2, 2, 3, 3};
+        System.out.println(removeDuplicates(nums));
     }
 
 
