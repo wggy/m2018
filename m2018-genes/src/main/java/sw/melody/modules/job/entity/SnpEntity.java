@@ -1,6 +1,5 @@
 package sw.melody.modules.job.entity;
 
-import io.swagger.models.auth.In;
 import lombok.Getter;
 import lombok.Setter;
 import sw.melody.common.exception.RRException;

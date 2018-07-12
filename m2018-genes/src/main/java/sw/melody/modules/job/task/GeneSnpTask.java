@@ -154,12 +154,12 @@ public class GeneSnpTask {
         while ((str = reader.readLine()) != null) {
             if (StringUtils.isEmpty(str)) {
                 continue;
-            } else if (str.startsWith(BEGIN)) {
-                // 解析表头
-                // 去掉开始#
-                str = str.replace("#", "");
-                if (!checkHeader(str)) {
-                    String fixedColsStr = StringUtils.join(fixed_cols, TAB);
+                } else if (str.startsWith(BEGIN)) {
+                    // 解析表头
+                    // 去掉开始#
+                    str = str.replace("#", "");
+                    if (!checkHeader(str)) {
+                        String fixedColsStr = StringUtils.join(fixed_cols, TAB);
                     String msg = MessageFormat.format("VCF固定标题不匹配，该文件标题为：{0}，固定格式标题为：{1}", str, fixedColsStr);
                     throw new RRException(msg);
                 }
