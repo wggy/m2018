@@ -8,7 +8,15 @@
 	</select>
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.SickEntity">
-		select * from tbl_sick order by id desc
+		select * from tbl_sick
+		<where>
+			<if test="key != null and key.trim() != ''">
+				sick_name like concat('%', #{key}, '%')
+				or
+				sick_code like concat('%', #{key}, '%')
+			</if>
+		</where>
+		order by id desc
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
 		</if>
@@ -16,6 +24,13 @@
 	
  	<select id="queryTotal" resultType="int">
 		select count(*) from tbl_sick
+		<where>
+			<if test="key != null and key.trim() != ''">
+				sick_name like concat('%', #{key}, '%')
+				or
+				sick_code like concat('%', #{key}, '%')
+			</if>
+		</where>
 	</select>
 	 
 	<insert id="save" parameterType="sw.melody.modules.docker.entity.SickEntity" useGeneratedKeys="true" keyProperty="id">
@@ -53,7 +68,7 @@
 			<if test="sickName != null">`sick_name` = #{sickName}, </if>
 			<if test="sex != null">`sex` = #{sex},</if>
 			<if test="family != null">`family` = #{family},</if>
-			<if test="diseaseGeneFocused != null">`diseas_gene_focused` = #{diseaseGeneFocused},</if>
+			<if test="diseaseGeneFocused != null">`disease_gene_focused` = #{diseaseGeneFocused},</if>
 			<if test="medicalHistory != null">`medical_history` = #{medicalHistory},</if>
 			<if test="familyHistory != null">`family_history` = #{familyHistory},</if>
 			<if test="panelName != null">`panel_name` = #{panelName},</if>

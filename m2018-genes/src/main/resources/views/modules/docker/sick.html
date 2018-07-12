@@ -17,6 +17,7 @@
 <script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
 <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
 <script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+<script src="../../libs/ajaxupload.js"></script>
 <script src="../../js/common.js"></script>
 </head>
 <body>
@@ -31,6 +32,7 @@
 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			<a class="btn btn-primary" id="upload"><i class="fa fa-plus"></i>&nbsp;上传文件</a>
 		</div>
 	    <table id="jqGrid"></table>
 	    <div id="jqGridPager"></div>
@@ -60,25 +62,25 @@
 			<div class="form-group">
 				<div class="col-sm-2 control-label">疾病基因</div>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.disease_gene_focused" placeholder="疾病基因"/>
+					<input type="text" class="form-control" v-model="sick.diseaseGeneFocused" placeholder="疾病基因"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<div class="col-sm-2 control-label">病史药史</div>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.medical_history" placeholder="病史药史"/>
+					<input type="text" class="form-control" v-model="sick.medicalHistory" placeholder="病史药史"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<div class="col-sm-2 control-label">家族病史</div>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.family_history" placeholder="家族病史"/>
+					<input type="text" class="form-control" v-model="sick.familyHistory" placeholder="家族病史"/>
 				</div>
 			</div>
 			<div class="form-group">
 				<div class="col-sm-2 control-label">病情描述</div>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.panel_name" placeholder="病情描述"/>
+					<input type="text" class="form-control" v-model="sick.panelName" placeholder="病情描述"/>
 				</div>
 			</div>
 			<div class="form-group">

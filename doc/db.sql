@@ -146,3 +146,17 @@ CREATE TABLE `tbl_sick`  (
   `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `tbl_sick`
+MODIFY COLUMN `create_time`  datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `panel_name`;
+
+CREATE TABLE `tbl_sample` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sick_id` int(11) NOT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `upload_time` datetime DEFAULT NULL COMMENT '上传时间',
+  `handler_status` varchar(20) DEFAULT NULL COMMENT '执行状态',
+  `handler_time` datetime DEFAULT NULL COMMENT '执行时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
