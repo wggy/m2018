@@ -6,10 +6,11 @@ $(function () {
             {label: 'ID', name: 'id', width: 30, key: true},
             {label: '病患编码', name: 'sickCode', width: 60},
             {label: '病患姓名', name: 'sickName', width: 60},
-            {label: '原始文件', name: 'originName', width: 30},
-            {label: '存储文件', name: 'location', width: 80},
-            {label: '上传时间', name: 'uploadTime', width: 80},
-            {label: '执行状态', name: 'handlerStatus', width: 90},
+            {label: '原始文件', name: 'originName', width: 80},
+            {label: '存储文件', name: 'location', width: 120},
+            {label: '上传时间', name: 'uploadTime', width: 90},
+            {label: '调度时间', name: 'triggerTime', width: 90},
+            {label: '执行状态', name: 'handlerStatus', width: 70},
             {label: '执行时间', name: 'handlerTime', width: 90}
         ],
         viewrecords: true,
@@ -50,8 +51,26 @@ var vm = new Vue({
         query: function () {
             vm.reload();
         },
-        upload: function () {
-
+        execute: function () {
+            var id = getSelectedRow();
+            if (id == null) {
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/sample/execute/" + id,
+                contentType: "application/json",
+                data: JSON.stringify(vm.config),
+                success: function(r){
+                    if(r.code === 0){
+                        alert('操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
         },
         reload: function () {
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');

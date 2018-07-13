@@ -8,13 +8,16 @@
 	</select>
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.SampleEntity">
-		select * from tbl_sample
+		select t.*, s.sick_code, s.sick_name from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
 		<where>
 			<if test="sickId != null">
-				and sick_id = #{sickId}
+				and t.sick_id = #{sickId}
+			</if>
+			<if test="location != null">
+				and t.location = #{location}
 			</if>
 			<if test="handlerStatus != null">
-				and handler_status = #{handlerStatus}
+				and t.handler_status = #{handlerStatus}
 			</if>
 		</where>
 		order by id desc
@@ -24,13 +27,13 @@
 	</select>
 	
  	<select id="queryTotal" resultType="int">
-		select count(*) from tbl_sample
+		select count(1) from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
 		<where>
 			<if test="sickId != null">
-				and sick_id = #{sickId}
+				and t.sick_id = #{sickId}
 			</if>
 			<if test="handlerStatus != null">
-				and handler_status = #{handlerStatus}
+				and t.handler_status = #{handlerStatus}
 			</if>
 		</where>
 	</select>
@@ -61,6 +64,9 @@
 		<set>
 			<if test="handlerStatus != null">`handler_status` = #{handlerStatus}, </if>
 			<if test="handlerTime != null">`handler_time` = #{handlerTime},</if>
+			<if test="uploadTime != null">`upload_time` = #{uploadTime},</if>
+			<if test="originName != null">`origin_name` = #{originName},</if>
+			<if test="triggerTime != null">`trigger_time` = #{triggerTime},</if>
 		</set>
 		where id = #{id}
 	</update>

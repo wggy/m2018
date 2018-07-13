@@ -10,6 +10,8 @@ public interface SampleService {
 
     List<SampleEntity> queryList(Map<String, Object> map);
 
+    SampleEntity queryObjectByLocationSick(String location, Long sickId);
+
     int queryTotal(Map<String, Object> map);
 
     void save(SampleEntity sampleEntity);

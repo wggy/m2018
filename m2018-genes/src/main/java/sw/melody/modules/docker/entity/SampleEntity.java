@@ -26,4 +26,8 @@ public class SampleEntity implements Serializable {
     private String handlerStatus;
     //更新时间
     private Date handlerTime;
+    //触发时间
+    private Date triggerTime;
+    private String sickName;
+    private String sickCode;
 }

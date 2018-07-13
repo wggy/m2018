@@ -41,15 +41,16 @@ $(function () {
     });
 
     new AjaxUpload('#upload', {
-        action: baseURL + 'docker/sample/upload?token=' + token,
+        action: null,
         name: 'file',
         autoSubmit: true,
         responseType: "json",
         onSubmit: function (file, extension) {
-            if (vm.config.type == null) {
-                alert("云存储配置未配置");
+            var id = getSelectedRow();
+            if (id == null) {
                 return false;
             }
+            this._settings.action = baseURL + 'docker/sample/upload/' + id +'?token=' + token;
             if (!(extension && /^(xls|jpg|png)$/.test(extension.toLowerCase()))) {
                 alert('只支持jpg、png、gif格式的图片！');
                 return false;
@@ -57,7 +58,7 @@ $(function () {
         },
         onComplete: function (file, r) {
             if (r.code == 0) {
-                alert(r.url);
+                alert("上传成功，路径：" + r.url);
                 vm.reload();
             } else {
                 alert(r.msg);

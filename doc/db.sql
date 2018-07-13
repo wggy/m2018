@@ -132,31 +132,30 @@ CREATE TABLE `tbl_snp_info` (
 ) ENGINE=InnoDB AUTO_INCREMENT=20693 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `tbl_sick`;
-CREATE TABLE `tbl_sick`  (
+CREATE TABLE `tbl_sick` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `sick_code` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `sick_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '病人姓名',
-  `sex` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '性别',
-  `family` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '家庭成员',
-  `disease_gene_focused` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '疾病基因',
-  `medical_history` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '病史药史',
-  `family_history` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '家族病史',
-  `panel_name` varchar(400) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '病情描述',
-  `create_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '创建时间',
-  `update_time` datetime(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  `sick_code` varchar(100) DEFAULT NULL,
+  `sick_name` varchar(100) DEFAULT NULL COMMENT '病人姓名',
+  `sex` varchar(10) DEFAULT NULL COMMENT '性别',
+  `family` varchar(100) DEFAULT NULL COMMENT '家庭成员',
+  `disease_gene_focused` varchar(100) DEFAULT NULL COMMENT '疾病基因',
+  `medical_history` varchar(200) DEFAULT NULL COMMENT '病史药史',
+  `family_history` varchar(200) DEFAULT NULL COMMENT '家族病史',
+  `panel_name` varchar(400) DEFAULT NULL COMMENT '病情描述',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
-
-ALTER TABLE `tbl_sick`
-MODIFY COLUMN `create_time`  datetime NULL DEFAULT NULL COMMENT '创建时间' AFTER `panel_name`;
-
+DROP TABLE IF EXISTS `tbl_sample`;
 CREATE TABLE `tbl_sample` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sick_id` int(11) NOT NULL,
+  `origin_name` varchar(255) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `upload_time` datetime DEFAULT NULL COMMENT '上传时间',
+  `trigger_time` datetime DEFAULT NULL,
   `handler_status` varchar(20) DEFAULT NULL COMMENT '执行状态',
   `handler_time` datetime DEFAULT NULL COMMENT '执行时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;

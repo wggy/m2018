@@ -2,12 +2,12 @@ package sw.melody.modules.docker.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import sw.melody.modules.docker.dao.SampleDao;
 import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.service.SampleService;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SampleServiceImpl implements SampleService {
@@ -21,6 +21,25 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public List<SampleEntity> queryList(Map<String, Object> map) {
         return sampleDao.queryList(map);
+    }
+
+    @Override
+    public SampleEntity queryObjectByLocationSick(String location, Long sickId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("location", location);
+        map.put("sickId", sickId);
+        List<SampleEntity> list = sampleDao.queryList(map);
+        if (CollectionUtils.isEmpty(list))
+            return null;
+        list.sort((o1, o2) -> {
+            if (o1.getUploadTime() == null || o2.getUploadTime() == null) {
+                return 0;
+            }
+            long t1 = o1.getUploadTime().getTime();
+            long t2 = o2.getUploadTime().getTime();
+            return Long.compare(t2, t1);
+        });
+        return list.get(0);
     }
 
     @Override

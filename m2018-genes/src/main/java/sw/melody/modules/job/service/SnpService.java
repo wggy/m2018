@@ -1,7 +1,5 @@
 package sw.melody.modules.job.service;
 
-import io.swagger.models.auth.In;
-import sw.melody.modules.job.entity.ScheduleJobEntity;
 import sw.melody.modules.job.entity.SnpEntity;
 import sw.melody.modules.job.entity.SnpFormatEntity;
 import sw.melody.modules.job.entity.SnpInfoEntity;

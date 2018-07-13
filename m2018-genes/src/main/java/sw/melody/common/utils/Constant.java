@@ -99,4 +99,19 @@ public class Constant {
         }
     }
 
+    public enum SampleStatus {
+
+        Running("running"),
+        Success("success"),
+        Fail("fail");
+
+        SampleStatus(String status) {
+            this.status = status;
+        }
+        private String status;
+
+        public String getStatus() {
+            return status;
+        }
+    }
 }
