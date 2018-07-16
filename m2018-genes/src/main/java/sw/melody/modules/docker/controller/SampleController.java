@@ -1,6 +1,7 @@
 package sw.melody.modules.docker.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,14 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.sys.entity.SysConfigEntity;
 import sw.melody.modules.sys.service.SysConfigService;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +78,17 @@ public class SampleController {
 
         //上传文件
         String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+
+        // 匹配文件名
+        Map<String, Object> map = new HashMap<>();
+        map.put("key", ConfigConstant.File_Allowed);
+        List<SysConfigEntity> configList = sysConfigService.queryList(map);
+        if (CollectionUtils.isNotEmpty(configList)) {
+            String allowFile = configList.get(0).getValue();
+            if (StringUtils.isEmpty(suffix) || StringUtils.isEmpty(allowFile) || !allowFile.contains(suffix)) {
+                throw new RRException("请上传符合条件的文件：" + allowFile);
+            }
+        }
         String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
         SickEntity sickEntity = sickService.queryObject(id);
         if (sickEntity == null) {

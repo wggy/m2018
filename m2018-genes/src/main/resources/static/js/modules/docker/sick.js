@@ -40,6 +40,11 @@ $(function () {
         }
     });
 
+    var allowedFile = null;
+    $.get(baseURL + "sys/config/get_key?key=FILE_ALLOWED", function (r) {
+         allowedFile = r.config;
+    });
+
     new AjaxUpload('#upload', {
         action: null,
         name: 'file',
@@ -51,8 +56,11 @@ $(function () {
                 return false;
             }
             this._settings.action = baseURL + 'docker/sample/upload/' + id +'?token=' + token;
-            if (!(extension && /^(xls|jpg|png)$/.test(extension.toLowerCase()))) {
-                alert('只支持jpg、png、gif格式的图片！');
+
+            allowedFile = allowedFile ? allowedFile.value : /^(xls|jpg|png)$/;
+            var reg = new RegExp(allowedFile);
+            if (!(extension && reg.test(extension.toLowerCase()))) {
+                alert('只支持' + allowedFile + '的文件！');
                 return false;
             }
         },

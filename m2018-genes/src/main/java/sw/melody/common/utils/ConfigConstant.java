@@ -34,6 +34,11 @@ public class ConfigConstant {
     public static final String File_Separator = File.separator;
 
     /***
+     * 可上传的文件
+     */
+    public static final String File_Allowed = "FILE_ALLOWED";
+
+    /***
      * 上传文件短路径
      * @param sickCode ： 病患编码
      * @param suffix ：文件拓展名

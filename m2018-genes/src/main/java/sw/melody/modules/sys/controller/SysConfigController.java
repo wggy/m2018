@@ -1,5 +1,6 @@
 package sw.melody.modules.sys.controller;
 
+import org.apache.commons.collections.CollectionUtils;
 import sw.melody.common.annotation.SysLog;
 import sw.melody.common.utils.PageUtils;
 import sw.melody.common.utils.Query;
@@ -11,6 +12,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +55,18 @@ public class SysConfigController extends AbstractController {
 		SysConfigEntity config = sysConfigService.queryObject(id);
 		
 		return R.ok().put("config", config);
+	}
+
+	@RequestMapping("/get_key")
+	@RequiresPermissions("sys:config:info")
+	public R getKey(String key){
+		Map<String, Object> map = new HashMap<>();
+		map.put("key", key);
+		List<SysConfigEntity> configList = sysConfigService.queryList(map);
+		if (CollectionUtils.isEmpty(configList)) {
+			return R.error("查无数据");
+		}
+		return R.ok().put("config", configList.get(0));
 	}
 	
 	/**
