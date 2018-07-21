@@ -78,7 +78,7 @@ public class SampleController {
 
         //上传文件
         String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-
+        suffix = suffix.replace(".", "");
         // 匹配文件名
         Map<String, Object> map = new HashMap<>();
         map.put("key", ConfigConstant.File_Allowed);

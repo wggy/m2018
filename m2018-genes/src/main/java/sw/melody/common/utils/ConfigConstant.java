@@ -47,7 +47,7 @@ public class ConfigConstant {
     public static String getShortPath(String sickCode, String suffix) {
         //文件路径
         String path = DateUtils.format(new Date(), "yyyyMMdd") + File_Separator + sickCode;
-        return path + suffix;
+        return path + "." + suffix;
     }
 
     /***

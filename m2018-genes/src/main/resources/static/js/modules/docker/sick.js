@@ -57,7 +57,7 @@ $(function () {
             }
             this._settings.action = baseURL + 'docker/sample/upload/' + id +'?token=' + token;
 
-            allowedFile = allowedFile ? allowedFile.value : /^(xls|jpg|png)$/;
+            allowedFile = allowedFile ? allowedFile.value : "(fq|fastq|gz)$";
             var reg = new RegExp(allowedFile);
             if (!(extension && reg.test(extension.toLowerCase()))) {
                 alert('只支持' + allowedFile + '的文件！');
