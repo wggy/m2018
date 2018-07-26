@@ -38,6 +38,9 @@ public class ConfigConstant {
      */
     public static final String File_Allowed = "FILE_ALLOWED";
 
+    public static final String Result_Indel_File_Prefix = "_sorted_dedup_recal_raw_variants_indel.vcf";
+    public static final String Result_Snp_File_Prefix   = "_sorted_dedup_recal_raw_variants_snp.vcf";
+
     /***
      * 上传文件短路径
      * @param sickCode ： 病患编码

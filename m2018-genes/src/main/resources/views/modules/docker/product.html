@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>病人管理</title>
+<title>产品管理</title>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -16,8 +16,6 @@
 <script src="../../libs/vue.min.js"></script>
 <script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
 <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
-<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
-<script src="../../libs/ajaxupload.js"></script>
 <script src="../../js/common.js"></script>
 </head>
 <body>
@@ -25,14 +23,13 @@
 	<div v-show="showList">
 		<div class="grid-btn">
 			<div class="form-group col-sm-2">
-				<input type="text" class="form-control" v-model="q.key" @keyup.enter="query" placeholder="姓名或编码">
+				<input type="text" class="form-control" v-model="q.key" @keyup.enter="query" placeholder="参数名">
 			</div>
 			<a class="btn btn-default" @click="query">查询</a>
 			
 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
-			<a class="btn btn-primary" id="upload"><i class="fa fa-plus"></i>&nbsp;上传文件</a>
 		</div>
 	    <table id="jqGrid"></table>
 	    <div id="jqGridPager"></div>
@@ -42,54 +39,22 @@
 		<div class="panel-heading">{{title}}</div>
 		<form class="form-horizontal">
 			<div class="form-group">
-			   	<div class="col-sm-2 control-label">病人姓名</div>
+			   	<div class="col-sm-2 control-label">产品编码</div>
 			   	<div class="col-sm-10">
-			      <input type="text" class="form-control" v-model="sick.sickName" placeholder="姓名"/>
+			      <input type="text" class="form-control" v-model="product.productCode" placeholder="产品编码"/>
 			    </div>
 			</div>
 			<div class="form-group">
-			   	<div class="col-sm-2 control-label">性别</div>
+			   	<div class="col-sm-2 control-label">产品名称</div>
 			   	<div class="col-sm-10">
-			      <input type="text" class="form-control" v-model="sick.sex" placeholder="性别"/>
+			      <input type="text" class="form-control" v-model="product.productName" placeholder="产品名称"/>
 			    </div>
 			</div>
 			<div class="form-group">
-			   	<div class="col-sm-2 control-label">家庭成员</div>
+			   	<div class="col-sm-2 control-label">关联基因组</div>
 			   	<div class="col-sm-10">
-			      <input type="text" class="form-control" v-model="sick.family" placeholder="家庭成员"/>
+					<textarea class="form-control" v-model="product.genes" rows="3" placeholder="关联基因组"></textarea>
 			    </div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-2 control-label">疾病基因</div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.diseaseGeneFocused" placeholder="疾病基因"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-2 control-label">病史药史</div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.medicalHistory" placeholder="病史药史"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-2 control-label">家族病史</div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.familyHistory" placeholder="家族病史"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-2 control-label">病情描述</div>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" v-model="sick.panelName" placeholder="病情描述"/>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-2 control-label">检验产品</div>
-				<div class="col-sm-10">
-					<label v-for="product in productList" class="checkbox-inline">
-						<input type="checkbox" :value="product.id" v-model="sick.productIdList">{{product.productName}}
-					</label>
-				</div>
 			</div>
 			<div class="form-group">
 				<div class="col-sm-2 control-label"></div> 
@@ -100,6 +65,6 @@
 	</div>
 </div>
 
-<script src="../../js/modules/docker/sick.js"></script>
+<script src="../../js/modules/docker/product.js"></script>
 </body>
 </html>

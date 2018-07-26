@@ -72,6 +72,27 @@ var vm = new Vue({
                 }
             });
         },
+        store: function () {
+            var id = getSelectedRow();
+            if (id == null) {
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/sample/store/" + id,
+                contentType: "application/json",
+                data: JSON.stringify(vm.config),
+                success: function(r){
+                    if(r.code === 0){
+                        alert(r.msg || '操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
         reload: function () {
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {

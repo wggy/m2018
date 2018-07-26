@@ -159,3 +159,20 @@ CREATE TABLE `tbl_sample` (
   `handler_time` datetime DEFAULT NULL COMMENT '执行时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `tbl_sample`
+ADD COLUMN `store_time`  datetime NULL AFTER `handler_time`;
+
+ALTER TABLE `tbl_sample`
+ADD COLUMN `store_status`  varchar(20) NULL AFTER `store_time`,
+ADD COLUMN `finish_time`  datetime NULL AFTER `store_status`;
+
+
+CREATE TABLE `tbl_product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_code` varchar(255) DEFAULT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `genes` text,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

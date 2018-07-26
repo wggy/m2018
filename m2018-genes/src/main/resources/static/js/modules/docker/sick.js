@@ -42,7 +42,7 @@ $(function () {
 
     var allowedFile = null;
     $.get(baseURL + "sys/config/get_key?key=FILE_ALLOWED", function (r) {
-         allowedFile = r.config;
+        allowedFile = r.config;
     });
 
     new AjaxUpload('#upload', {
@@ -55,7 +55,7 @@ $(function () {
             if (id == null) {
                 return false;
             }
-            this._settings.action = baseURL + 'docker/sample/upload/' + id +'?token=' + token;
+            this._settings.action = baseURL + 'docker/sample/upload/' + id + '?token=' + token;
 
             allowedFile = allowedFile ? allowedFile.value : "(fq|fastq|gz)$";
             var reg = new RegExp(allowedFile);
@@ -83,7 +83,10 @@ var vm = new Vue({
         },
         showList: true,
         title: null,
-        sick: {}
+        productList: {},
+        sick: {
+            productIdList: []
+        }
     },
     methods: {
         query: function () {
@@ -93,17 +96,23 @@ var vm = new Vue({
             vm.showList = false;
             vm.title = "新增";
             vm.sick = {};
+            this.getProductList();
         },
         update: function () {
             var id = getSelectedRow();
             if (id == null) {
                 return;
             }
-
+            this.getProductList();
             $.get(baseURL + "docker/sick/info/" + id, function (r) {
                 vm.showList = false;
                 vm.title = "修改";
                 vm.sick = r.info;
+            });
+        },
+        getProductList: function () {
+            $.get(baseURL + "docker/product/getall", function (r) {
+                vm.productList = r.list;
             });
         },
         del: function (event) {

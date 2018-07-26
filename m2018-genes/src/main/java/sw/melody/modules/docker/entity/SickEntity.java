@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -33,4 +34,5 @@ public class SickEntity implements Serializable {
     private Date createTime;
     //更新时间
     private Date updateTime;
+    private List<Long> productIdList;
 }

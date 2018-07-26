@@ -30,4 +30,7 @@ public class SampleEntity implements Serializable {
     private Date triggerTime;
     private String sickName;
     private String sickCode;
+    private Date storeTime;
+    private String storeStatus;
+    private Date finishTime;
 }

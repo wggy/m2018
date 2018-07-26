@@ -1,6 +1,7 @@
 package sw.melody.common.aspect;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 import sw.melody.common.annotation.SysLog;
 import sw.melody.common.utils.HttpContextUtils;
 import sw.melody.common.utils.IPUtils;
@@ -73,6 +74,9 @@ public class SysLogAspect {
 		Object[] args = joinPoint.getArgs();
 		try{
 			String params = new Gson().toJson(args[0]);
+			if (StringUtils.isNotEmpty(params) && params.length() > 4900) {
+				params = params.substring(0, 4900);
+			}
 			sysLog.setParams(params);
 		}catch (Exception e){
 

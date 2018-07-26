@@ -17,6 +17,7 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.job.task.GeneSnpTask;
 import sw.melody.modules.sys.entity.SysConfigEntity;
 import sw.melody.modules.sys.service.SysConfigService;
 
@@ -42,6 +43,8 @@ public class SampleController {
     private SysConfigService sysConfigService;
     @Autowired
     private SickService sickService;
+    @Autowired
+    private GeneSnpTask geneSnpTask;
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sample:query")
@@ -132,6 +135,8 @@ public class SampleController {
         }
         if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getHandlerStatus())) {
             throw new RRException("正在解析样本中...");
+        } else if (Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getHandlerStatus())) {
+            throw new RRException("样本已解析完成...");
         } else if (StringUtils.isEmpty(sampleEntity.getHandlerStatus())) {
             sampleEntity.setHandlerStatus(Constant.SampleStatus.Running.getStatus());
             sampleEntity.setTriggerTime(new Date());
@@ -169,4 +174,41 @@ public class SampleController {
         return R.ok("调度成功");
 
     }
+
+    @SysLog("样本入库")
+    @RequestMapping("/store/{id}")
+    @RequiresPermissions("docker:sample:edit")
+    public R store(@PathVariable("id") Long id) throws Exception {
+        SampleEntity sampleEntity = sampleService.queryObject(id);
+        if (sampleEntity == null) {
+            throw new RRException("查无上传记录");
+        }
+        if (!Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getHandlerStatus())) {
+            throw new RRException("样本未成功解析，无法入库...");
+        }
+        if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getStoreStatus())) {
+            throw new RRException("样本入库中...");
+        } else if (Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getStoreStatus())) {
+            throw new RRException("样本已入库...");
+        }
+        sampleEntity.setStoreStatus(Constant.SampleStatus.Running.getStatus());
+        sampleEntity.setStoreTime(new Date());
+        sampleService.update(sampleEntity);
+
+        String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
+        String fullPath = ConfigConstant.getFullPath(prefix, sampleEntity.getLocation());
+        String newPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Indel_File_Prefix;
+        try {
+            geneSnpTask.parseSnp(newPath);
+            sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
+            sampleEntity.setFinishTime(new Date());
+            return R.ok("入库成功...");
+        } catch (Exception e) {
+            sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
+            sampleEntity.setFinishTime(new Date());
+            e.printStackTrace();
+            return R.ok("入库失败...");
+        }
+    }
+
 }
