@@ -78,13 +78,19 @@
 	</update>
 	
 	<delete id="delete">
-		delete from tbl_sick where id = #{value}
+		delete from tbl_sick where id = #{value};
+		delete from tbl_sick_product where sick_id = #{value}
 	</delete>
 	
 	<delete id="deleteBatch">
 		delete from tbl_sick where id in
-		<foreach item="id" collection="array" open="(" separator="," close=")">
-			#{id}
+		<foreach item="sickId" collection="array" open="(" separator="," close=")">
+			#{sickId}
+		</foreach>
+		;
+		delete from tbl_sick_product where sick_id in
+		<foreach item="sickId" collection="array" open="(" separator="," close=")">
+			#{sickId}
 		</foreach>
 	</delete>
 

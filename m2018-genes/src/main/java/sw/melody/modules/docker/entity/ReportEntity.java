@@ -3,12 +3,14 @@ package sw.melody.modules.docker.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /***
  * Created by ping on 2018-7-26
  */
 @Setter
 @Getter
-public class ReportEntity {
+public class ReportEntity implements Serializable {
     // 报告编号，即病患编号
     private String sickCode;
     // 检验产品

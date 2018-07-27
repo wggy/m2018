@@ -176,3 +176,10 @@ CREATE TABLE `tbl_product` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `tbl_sick_product` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`sick_id`  int(11) NULL ,
+`product_id`  int(11) NULL ,
+PRIMARY KEY (`id`)
+);

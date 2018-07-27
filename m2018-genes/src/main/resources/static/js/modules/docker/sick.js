@@ -95,7 +95,7 @@ var vm = new Vue({
         add: function () {
             vm.showList = false;
             vm.title = "新增";
-            vm.sick = {};
+            vm.sick = {productIdList: []};
             this.getProductList();
         },
         update: function () {

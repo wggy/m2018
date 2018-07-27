@@ -3,6 +3,7 @@ package sw.melody.modules.docker.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /***
@@ -10,7 +11,7 @@ import java.util.Date;
  */
 @Setter
 @Getter
-public class ProductEntity {
+public class ProductEntity implements Serializable {
     private Long id;
     private String productCode;
     private String productName;

@@ -10,6 +10,7 @@ import sw.melody.common.utils.Query;
 import sw.melody.common.utils.R;
 import sw.melody.common.validator.ValidatorUtils;
 import sw.melody.modules.docker.entity.SickEntity;
+import sw.melody.modules.docker.service.SickProductService;
 import sw.melody.modules.docker.service.SickService;
 
 import java.util.Date;
@@ -22,6 +23,8 @@ public class SickController {
 
     @Autowired
     private SickService sickService;
+    @Autowired
+    private SickProductService sickProductService;
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sick:query")
@@ -41,6 +44,8 @@ public class SickController {
     @RequiresPermissions("docker:sick:query")
     public R info(@PathVariable("id") Long id){
         SickEntity sick = sickService.queryObject(id);
+        List<Long> productIdList = sickProductService.queryProductIdList(id);
+        sick.setProductIdList(productIdList);
         return R.ok().put("info", sick);
     }
 

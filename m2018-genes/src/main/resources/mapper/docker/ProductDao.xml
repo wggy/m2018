@@ -45,8 +45,13 @@
 
 	<delete id="deleteBatch" parameterType="int">
 		delete from tbl_product where id in 
-		<foreach item="id" collection="array" open="(" separator="," close=")">
-			#{id}
+		<foreach item="productId" collection="array" open="(" separator="," close=")">
+			#{productId}
+		</foreach>
+		;
+		delete from tbl_sick_product where product_id in
+		<foreach item="productId" collection="array" open="(" separator="," close=")">
+			#{productId}
 		</foreach>
 	</delete>
 	
