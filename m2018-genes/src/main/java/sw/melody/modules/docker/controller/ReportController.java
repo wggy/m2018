@@ -2,13 +2,16 @@ package sw.melody.modules.docker.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sw.melody.common.utils.PageUtils;
 import sw.melody.common.utils.Query;
 import sw.melody.common.utils.R;
+import sw.melody.modules.docker.entity.ReportEntity;
 import sw.melody.modules.docker.entity.SampleEntity;
+import sw.melody.modules.docker.service.ReportService;
 
 import java.util.List;
 import java.util.Map;
@@ -20,9 +23,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("docker/report")
 public class ReportController {
+    @Autowired
+    private ReportService reportService;
+
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
-
-        return R.ok();
+        Query query = new Query(params);
+        List<ReportEntity> sysOssList = reportService.queryList(query);
+        int total = reportService.queryTotal(query);
+        PageUtils pageUtil = new PageUtils(sysOssList, total, query.getLimit(), query.getPage());
+        return R.ok().put("page", pageUtil);
     }
 }

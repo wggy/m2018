@@ -4,32 +4,45 @@
 <mapper namespace="sw.melody.modules.docker.dao.ReportDao">
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.ReportEntity">
-		select t.*, s.sick_code, s.sick_name from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
+		SELECT sa.sick_id, s.sick_name, s.sick_code, sa.id as sample_id,
+		sa.upload_time, sa.trigger_time, sa.handler_time, sa.store_time, sa.finish_time,
+		sa.handler_status, sa.store_status, p.product_name
+		FROM tbl_sick s
+		JOIN tbl_sample sa ON s.id=sa.sick_id
+		JOIN tbl_sick_product sp ON s.id=sp.sick_id
+		JOIN tbl_product p ON sp.product_id=p.id
 		<where>
 			<if test="sickId != null">
-				and t.sick_id = #{sickId}
+				and sa.sick_id = #{sickId}
 			</if>
-			<if test="location != null">
-				and t.location = #{location}
+			<if test="sickCode != null">
+				and s.sick_code = #{sickCode}
 			</if>
-			<if test="handlerStatus != null">
-				and t.handler_status = #{handlerStatus}
+			<if test="sampleId != null">
+				and sa.id = #{sampleId}
 			</if>
 		</where>
-		order by id desc
+		order by sa.finish_time desc, sa.sick_id desc
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
 		</if>
 	</select>
 	
  	<select id="queryTotal" resultType="int">
-		select count(1) from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
+		SELECT count(1)
+		FROM tbl_sick s
+		JOIN tbl_sample sa ON s.id=sa.sick_id
+		JOIN tbl_sick_product sp ON s.id=sp.sick_id
+		JOIN tbl_product p ON sp.product_id=p.id
 		<where>
 			<if test="sickId != null">
-				and t.sick_id = #{sickId}
+				and sa.sick_id = #{sickId}
 			</if>
-			<if test="handlerStatus != null">
-				and t.handler_status = #{handlerStatus}
+			<if test="sickCode != null">
+				and s.sick_code = #{sickCode}
+			</if>
+			<if test="sampleId != null">
+				and sa.id = #{sampleId}
 			</if>
 		</where>
 	</select>
