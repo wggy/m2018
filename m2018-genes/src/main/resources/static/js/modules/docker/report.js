@@ -4,7 +4,7 @@ $(function () {
         datatype: "json",
         colModel: [			
 			{ label: '报告编号', name: 'sickCode', width: 60, formatter: function (cellvalue, options, rowObject) {
-                    return '<a class="sickcode" href="javascript:;" arrcode="' + rowObject.sickCode + '">' + rowObject.sickCode + '</a>';
+                    return '<a class="sickcode" href="javascript:;" attrcode="' + rowObject.sickCode + '">' + rowObject.sickCode + '</a>';
                 }},
 			{ label: '检测产品', name: 'productName', width: 60 },
 			{ label: '送样时间', name: 'uploadTime', width: 60 },
@@ -38,23 +38,12 @@ $(function () {
         gridComplete:function(){
         	//隐藏grid底部滚动条
         	$("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
-            var router = new Router();
-            router.add('#modules/docker/gene_search.html', function() {
-                var url = window.location.hash;
-
-                //替换iframe的url
-                // vm.main = url.replace('#', '');
-                //
-                // vm.navTitle = $("a[href='"+url+"']").text();
-            });
-            router.start();
         }
     });
 
     $('#jqGrid').on('click', '.sickcode', function () {
-        var code = $(this).attr('attrcode');
-        location.href = 'moudule/docker/gene_search.html?id=' + code;
-    })
+        window.parent.location.hash = '#modules/docker/gene_search.html?m=' + $(this).attr('attrcode');
+    });
 });
 
 var vm = new Vue({

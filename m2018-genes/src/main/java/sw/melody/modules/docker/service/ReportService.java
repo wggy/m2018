@@ -11,4 +11,5 @@ import java.util.Map;
 public interface ReportService {
     List<ReportEntity> queryList(Map<String, Object> map);
     int queryTotal(Map<String, Object> map);
+    List<String> queryDyUrlList();
 }

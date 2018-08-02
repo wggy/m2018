@@ -4,7 +4,7 @@
 <mapper namespace="sw.melody.modules.docker.dao.ReportDao">
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.ReportEntity">
-		SELECT sa.sick_id, s.sick_name, s.sick_code, sa.id as sample_id,
+		SELECT sa.sick_id, s.sick_name, CONCAT(s.sick_code, '-', p.id) as sick_code, sa.id as sample_id,
 		sa.upload_time, sa.trigger_time, sa.handler_time, sa.store_time, sa.finish_time,
 		sa.handler_status, sa.store_status, p.product_name
 		FROM tbl_sick s
@@ -45,6 +45,12 @@
 				and sa.id = #{sampleId}
 			</if>
 		</where>
+	</select>
+
+	<select id="queryDyUrlList" resultType="java.lang.String">
+		SELECT DISTINCT CONCAT(s.sick_code, '-', p.id) as dy_url FROM tbl_sick s
+		JOIN tbl_sick_product sp ON s.id=sp.sick_id
+		JOIN tbl_product p ON sp.product_id=p.id
 	</select>
 
 </mapper>

@@ -27,4 +27,9 @@ public class ReportServiceImpl implements ReportService {
     public int queryTotal(Map<String, Object> map) {
         return reportDao.queryTotal(map);
     }
+
+    @Override
+    public List<String> queryDyUrlList() {
+        return reportDao.queryDyUrlList();
+    }
 }

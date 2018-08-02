@@ -18,6 +18,7 @@ import java.util.Map;
 
 /***
  * Created by ping on 2018-7-26
+ * @author ping
  */
 @Slf4j
 @RestController
@@ -33,5 +34,10 @@ public class ReportController {
         int total = reportService.queryTotal(query);
         PageUtils pageUtil = new PageUtils(sysOssList, total, query.getLimit(), query.getPage());
         return R.ok().put("page", pageUtil);
+    }
+
+    @RequestMapping("/get_dy_url")
+    public R getDyUrl() {
+        return R.ok().put("list", reportService.queryDyUrlList());
     }
 }
