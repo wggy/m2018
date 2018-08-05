@@ -183,3 +183,7 @@ CREATE TABLE `tbl_sick_product` (
 `product_id`  int(11) NULL ,
 PRIMARY KEY (`id`)
 );
+
+--- 2018-08-04
+ALTER TABLE `xhl_db`.`tbl_snp` 
+ADD COLUMN `data_type` varchar(50) NULL AFTER `create_time`;

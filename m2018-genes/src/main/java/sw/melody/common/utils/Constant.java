@@ -114,4 +114,14 @@ public class Constant {
             return status;
         }
     }
+
+    public enum DataType {
+        Snp("snp"),
+        Index("index");
+
+        DataType(String type) {
+            this.type = type;
+        }
+        private String type;
+    }
 }

@@ -38,7 +38,8 @@
 			`qual`,
 			`filter`,
 			`info`,
-			`create_time`
+			`create_time`,
+			`data_type`
 		)
 		values
 		(
@@ -50,7 +51,8 @@
 			#{qual},
 			#{filter},
 			#{info},
-			#{createTime}
+			#{createTime},
+			#{dataType}
 		)
 	</insert>
 	

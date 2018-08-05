@@ -79,7 +79,7 @@ public class SampleController {
             throw new RRException("上传文件或参数不能为空");
         }
 
-        //上传文件
+        // 上传文件
         String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
         suffix = suffix.replace(".", "");
         // 匹配文件名
@@ -99,6 +99,7 @@ public class SampleController {
         }
         String shortPath = ConfigConstant.getShortPath(sickEntity.getSickCode(), suffix);
         String fullPath = ConfigConstant.getFullPath(prefix, shortPath);
+        String fullPathNoFile = ConfigConstant.getFullPathNoFile(prefix);
 
         SampleEntity sampleEntity = sampleService.queryObjectByLocationSick(shortPath, id);
 
@@ -106,7 +107,17 @@ public class SampleController {
         if (newFile == null) {
             throw new RRException("上传文件失败，请联系管理员");
         }
-
+        String bashFilePath = sysConfigService.getValue(ConfigConstant.SAMPLE_SHELL_PATH);
+        File bashFile = new File(bashFilePath);
+        if (bashFile == null) {
+            throw new RRException("bash文件不存在");
+        }
+//        FileUtils.copyFile(bashFile, new File(fullPathNoFile + ConfigConstant.File_Separator + ConfigConstant.Shell_Bwa));
+        Process ps = Runtime.getRuntime().exec("cp -pf " + bashFilePath + " " + fullPathNoFile);
+        int status = ps.waitFor();
+        if (status != 0) {
+            throw new RRException("中间文件拷贝失败");
+        }
         if (sampleEntity == null) {
             //保存上传文件信息
             sampleEntity = new SampleEntity();
@@ -143,14 +154,22 @@ public class SampleController {
             sampleService.update(sampleEntity);
         }
         Thread exeThread = new Thread(() -> {
-            String bash = sysConfigService.getValue(ConfigConstant.SAMPLE_SHELL_PATH);
             String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
             SampleEntity entity = sampleService.queryObject(id);
+            String fullPath = ConfigConstant.getFullPath(prefix, entity.getLocation());
+            File fullPathFile = new File(fullPath);
+            if (fullPathFile == null) {
+                log.error("fullPathFile 不存在。。。。");
+                return;
+            }
+//            String bwaFile = fullPathFile.getParent() + ConfigConstant.File_Separator + ConfigConstant.Shell_Bwa;
             Process ps = null;
+            String command = "cd " + fullPathFile.getParent() + " &&  nohup ./" + ConfigConstant.Shell_Bwa + " " + fullPathFile.getName() + " >log.out 2>&1 &";
+            log.info("command: {}", command);
             try {
-                ps = Runtime.getRuntime().exec(bash + " " + ConfigConstant.getFullPath(prefix, entity.getLocation()));
-//                ps = Runtime.getRuntime().exec("jps -m");
+                ps = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
                 int status = ps.waitFor();
+                log.info("status: {}", status);
                 if (status != 0) {
                     log.error("Failed to call shell's command ");
                     sampleEntity.setHandlerStatus(Constant.SampleStatus.Fail.getStatus());
@@ -161,6 +180,7 @@ public class SampleController {
                         log.info(line);
                     }
                     sampleEntity.setHandlerStatus(Constant.SampleStatus.Success.getStatus());
+                    br.close();
                 }
             } catch (Exception e) {
                 sampleEntity.setHandlerStatus(Constant.SampleStatus.Fail.getStatus());
@@ -197,9 +217,13 @@ public class SampleController {
 
         String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
         String fullPath = ConfigConstant.getFullPath(prefix, sampleEntity.getLocation());
-        String newPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Indel_File_Prefix;
+        String indelPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Indel_File_Prefix;
+        String snpPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Snp_File_Prefix;
         try {
-            geneSnpTask.parseSnp(newPath);
+            log.info("indel store: {}", indelPath);
+            geneSnpTask.parseSnp(indelPath, Constant.DataType.Index.name());
+            log.info("snp store: {}", snpPath);
+            geneSnpTask.parseSnp(snpPath, Constant.DataType.Snp.name());
             sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
             sampleEntity.setFinishTime(new Date());
             return R.ok("入库成功...");

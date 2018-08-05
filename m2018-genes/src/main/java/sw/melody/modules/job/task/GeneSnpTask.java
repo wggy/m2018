@@ -144,7 +144,7 @@ public class GeneSnpTask {
     @Autowired
     private SnpFormatService snpFormatService;
 
-    public void parseSnp(String fileName) throws Exception {
+    public void parseSnp(String fileName, String type) throws Exception {
         File f = new File(fileName);
         BufferedReader reader = new BufferedReader(new FileReader(f));
         String str = null;
@@ -154,12 +154,12 @@ public class GeneSnpTask {
         while ((str = reader.readLine()) != null) {
             if (StringUtils.isEmpty(str)) {
                 continue;
-                } else if (str.startsWith(BEGIN)) {
-                    // 解析表头
-                    // 去掉开始#
-                    str = str.replace("#", "");
-                    if (!checkHeader(str)) {
-                        String fixedColsStr = StringUtils.join(fixed_cols, TAB);
+            } else if (str.startsWith(BEGIN)) {
+                // 解析表头
+                // 去掉开始#
+                str = str.replace("#", "");
+                if (!checkHeader(str)) {
+                    String fixedColsStr = StringUtils.join(fixed_cols, TAB);
                     String msg = MessageFormat.format("VCF固定标题不匹配，该文件标题为：{0}，固定格式标题为：{1}", str, fixedColsStr);
                     throw new RRException(msg);
                 }
@@ -168,12 +168,16 @@ public class GeneSnpTask {
                 continue;
             }
             if (flag) {
-                SnpEntity snpEntity = parseLine(str);
+                SnpEntity snpEntity = parseLine(str, type);
+                if (snpEntity == null) {
+                    log.error("snpEntity is null...");
+                    continue;
+                }
                 String[] dynamicRow = parseDynamicRow(str);
                 List<SnpFormatEntity> formatList = parseFormatList(dynamicHeader, dynamicRow);
                 SnpInfoEntity infoEntity;
                 try {
-                     infoEntity = parseInfo(snpEntity.getInfo());
+                    infoEntity = parseInfo(snpEntity.getInfo());
                 } catch (Exception e) {
                     log.error("解析Info出错，{}", e);
                     continue;
@@ -184,12 +188,21 @@ public class GeneSnpTask {
         log.info("length_map : {}", leng_map);
     }
 
-    private SnpEntity parseLine(String line) {
+    private SnpEntity parseLine(String line, String dataType) {
         if (StringUtils.isEmpty(line)) {
             return null;
         }
         String[] cols = StringUtils.split(line, TAB);
-        SnpEntity entity = new SnpEntity(cols);
+        log.info("title: {}", line);
+
+        SnpEntity entity = null;
+        try {
+            entity = new SnpEntity(cols, dataType);
+        } catch (Exception e) {
+            log.error("数据行不合法： {}", line);
+            e.getMessage();
+            return null;
+        }
         return entity;
     }
 
@@ -198,7 +211,7 @@ public class GeneSnpTask {
         int size = fixed_cols.length;
         String[] vcfFixedHeaders = new String[size];
         System.arraycopy(headers, 0, vcfFixedHeaders, 0, size);
-        for (int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             if (!fixed_cols[i].equals(vcfFixedHeaders[i])) {
                 return false;
             }
@@ -254,12 +267,12 @@ public class GeneSnpTask {
             return list;
         }
         int sickNum = dynamicHeader.length - 1;
-        for (int i=0; i<sickNum; i++) {
+        for (int i = 0; i < sickNum; i++) {
             SnpFormatEntity entity = new SnpFormatEntity();
-            entity.setSick(dynamicHeader[i+1]);
+            entity.setSick(dynamicHeader[i + 1]);
             entity.setFormat(dynamicRow[0]);
-            entity.setFormatVal(dynamicRow[i+1]);
-            entity.setFormatRate(dynamicRow[i+1]);
+            entity.setFormatVal(dynamicRow[i + 1]);
+            entity.setFormatRate(dynamicRow[i + 1]);
             list.add(entity);
         }
         return list;

@@ -37,9 +37,10 @@ public class ConfigConstant {
      * 可上传的文件
      */
     public static final String File_Allowed = "FILE_ALLOWED";
+    public static final String Shell_Bwa = "run_bwa.sh";
 
-    public static final String Result_Indel_File_Prefix = "_sorted_dedup_recal_raw_variants_indel.vcf";
-    public static final String Result_Snp_File_Prefix   = "_sorted_dedup_recal_raw_variants_snp.vcf";
+    public static final String Result_Indel_File_Prefix = "_sorted_dedup_recal_raw_variants_indel_marker_filtered_annovar.hg19_multianno.vcf";
+    public static final String Result_Snp_File_Prefix   = "_sorted_dedup_recal_raw_variants_snp_marked_filtered_annovar.hg19_multianno.vcf";
 
     /***
      * 上传文件短路径
@@ -51,6 +52,10 @@ public class ConfigConstant {
         //文件路径
         String path = DateUtils.format(new Date(), "yyyyMMdd") + File_Separator + sickCode;
         return path + "." + suffix;
+    }
+
+    public static String getFullPathNoFile(String prefix) {
+        return prefix + File_Separator + DateUtils.format(new Date(), "yyyyMMdd");
     }
 
     /***

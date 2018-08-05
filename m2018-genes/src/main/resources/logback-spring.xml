@@ -15,7 +15,7 @@
     <springProfile name="pro">
         <logger name="org.springframework.web" level="ERROR"/>
         <logger name="org.springboot.sample" level="ERROR" />
-        <logger name="sw.melody" level="ERROR" />
+        <logger name="sw.melody" level="INFO" />
     </springProfile>
 
 </configuration>

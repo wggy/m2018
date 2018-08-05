@@ -20,11 +20,12 @@ public class SnpEntity {
     private String filter;
     private String info;
     private Integer createTime;
+    private String dataType;
 
     public SnpEntity() {
     }
 
-    public SnpEntity(String[] cols) {
+    public SnpEntity(String[] cols, String dataType) {
         if (cols == null || cols.length < 9) {
             throw new RRException("数据行不匹配");
         }
@@ -37,5 +38,6 @@ public class SnpEntity {
         this.filter = cols[6];
         this.info = cols[7];
         this.createTime = (int) (System.currentTimeMillis() / 1000);
+        this.dataType = dataType;
     }
 }
