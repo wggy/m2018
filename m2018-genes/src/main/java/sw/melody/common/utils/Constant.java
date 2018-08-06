@@ -117,7 +117,7 @@ public class Constant {
 
     public enum DataType {
         Snp("snp"),
-        Index("index");
+        Indel("indel");
 
         DataType(String type) {
             this.type = type;

@@ -17,6 +17,7 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.job.task.GeneIndelTask;
 import sw.melody.modules.job.task.GeneSnpTask;
 import sw.melody.modules.sys.entity.SysConfigEntity;
 import sw.melody.modules.sys.service.SysConfigService;
@@ -45,6 +46,8 @@ public class SampleController {
     private SickService sickService;
     @Autowired
     private GeneSnpTask geneSnpTask;
+    @Autowired
+    private GeneIndelTask geneIndelTask;
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sample:query")
@@ -221,9 +224,9 @@ public class SampleController {
         String snpPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Snp_File_Prefix;
         try {
             log.info("indel store: {}", indelPath);
-            geneSnpTask.parseSnp(indelPath, Constant.DataType.Index.name());
+            geneSnpTask.parse(indelPath);
             log.info("snp store: {}", snpPath);
-            geneSnpTask.parseSnp(snpPath, Constant.DataType.Snp.name());
+            geneIndelTask.parse(snpPath);
             sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
             sampleEntity.setFinishTime(new Date());
             return R.ok("入库成功...");
