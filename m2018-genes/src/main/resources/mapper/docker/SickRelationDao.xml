@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sw.melody.modules.docker.dao.SickRelationDao">
+
+	<select id="queryList" resultType="sw.melody.modules.docker.entity.SickRelationEntity">
+		SELECT DISTINCT
+		CONCAT(s.sick_code, '-', p.id) AS  report_code, p.product_name, s.sick_name
+		FROM tbl_sick s
+		JOIN tbl_sick_product sp ON s.id = sp.sick_id
+		JOIN tbl_product p ON sp.product_id = p.id
+		<where>
+			<if test="sickCode != null">
+				and s.sick_code = #{sickCode}
+			</if>
+			<if test="productId != null">
+				and p.id = #{productId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

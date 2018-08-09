@@ -66,6 +66,12 @@
 		)
 		</foreach>
 	</insert>
+
+	<update id="updateBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+		<foreach item="item" collection="list" index="index" separator=";">
+			UPDATE tbl_snp_format SET mutation_mode = #{item.mutationMode}, mutation_ad = #{item.mutationAd}, mutation_rate = #{item.mutationRate} WHERE id = #{item.id}
+		</foreach>
+	</update>
 	
 	<delete id="deleteBatch">
 		delete from tbl_snp_format where id in

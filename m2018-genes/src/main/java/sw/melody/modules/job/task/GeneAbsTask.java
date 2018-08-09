@@ -24,11 +24,14 @@ import java.util.Map;
 public abstract class GeneAbsTask {
 
     // 表头开始标记
+
     private static final String BEGIN = "#CHROM";
     private static final String TAB = "\t";
     private static final String INFO_SIGN = ";";
     private static final String EQUAL_SIGN = "=";
+
     // 固定表头
+
     private static String[] fixed_cols = new String[]{"CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"};
     private static final Map<String, String> cols_map = new HashMap<>();
     private static final Map<String, Integer> leng_map = new HashMap<>();
@@ -138,6 +141,8 @@ public abstract class GeneAbsTask {
     private SnpService snpService;
     @Autowired
     private SnpFormatService snpFormatService;
+    @Autowired
+    private SickFormatTask sickFormatTask;
 
     public void parse(String fileName) throws Exception {
         File f = new File(fileName);
@@ -170,6 +175,7 @@ public abstract class GeneAbsTask {
                 }
                 String[] dynamicRow = parseDynamicRow(str);
                 List<SnpFormatEntity> formatList = parseFormatList(dynamicHeader, dynamicRow);
+                sickFormatTask.parserMutation(formatList);
                 SnpInfoEntity infoEntity;
                 try {
                     infoEntity = parseInfo(snpEntity.getInfo());

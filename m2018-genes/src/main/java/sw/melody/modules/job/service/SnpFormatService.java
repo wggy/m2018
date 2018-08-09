@@ -33,4 +33,5 @@ public interface SnpFormatService {
 	void save(SnpFormatEntity snpEntity);
 
 	void saveBatch(List<SnpFormatEntity> snpEntity);
+	void updateBatch(List<SnpFormatEntity> snpEntity);
 }

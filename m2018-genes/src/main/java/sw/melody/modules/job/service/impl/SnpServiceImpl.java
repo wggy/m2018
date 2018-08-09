@@ -41,8 +41,8 @@ public class SnpServiceImpl implements SnpService {
         return snpDao.queryTotal(map);
     }
 
-    @Transactional
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(SnpEntity snpEntity, SnpInfoEntity infoEntity, List<SnpFormatEntity> list) {
         snpDao.save(snpEntity);
         list.forEach(item -> item.setSnpId(snpEntity.getId()));

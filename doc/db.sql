@@ -187,3 +187,9 @@ PRIMARY KEY (`id`)
 --- 2018-08-04
 ALTER TABLE `xhl_db`.`tbl_snp` 
 ADD COLUMN `data_type` varchar(50) NULL AFTER `create_time`;
+
+--- 2018-08-09
+ALTER TABLE `tbl_snp_format`
+ADD COLUMN `mutation_mode`  varchar(50) NULL COMMENT '突变类型，GT的值进行判断 hex 杂合突变 或者  hom 纯合突变 0/0：hom，0/1：hex，1/1: hom' AFTER `format_rate`,
+ADD COLUMN `mutation_ad`  varchar(50) NULL COMMENT 'AD=0,7 逗号转为斜杠/' AFTER `mutation_mode`,
+ADD COLUMN `mutation_rate`  varchar(50) NULL COMMENT 'AD第二个数字除以DP的取值' AFTER `mutation_ad`;

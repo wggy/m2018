@@ -1,5 +1,7 @@
 package sw.melody.common.utils;
 
+import org.springframework.util.StringUtils;
+
 /**
  * 常量
  * 
@@ -123,5 +125,35 @@ public class Constant {
             this.type = type;
         }
         private String type;
+    }
+
+    /***
+     * 基因突变类型
+     */
+    public enum MutationMode {
+        M_0_0("0/0", "hom"),
+        M_0_1("0/1", "hex"),
+        M_1_1("1/1", "hom"),
+        ;
+
+        MutationMode(String val, String mode) {
+            this.val = val;
+            this.mode = mode;
+        }
+
+        public static String getMode(String val) {
+            if (StringUtils.isEmpty(val)) {
+                return null;
+            }
+            for (MutationMode mm : MutationMode.values()) {
+                if (mm.val.equals(val)) {
+                    return mm.mode;
+                }
+            }
+            return null;
+        }
+
+        private String val;
+        private String mode;
     }
 }
