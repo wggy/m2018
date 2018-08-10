@@ -21,7 +21,7 @@
     <script src="../../js/common.js"></script>
 </head>
 <body>
-<div class="wrapper">
+<div class="wrapper" id="rrapp" v-cloak>
     <div class="content-wrapper" style="margin-left: 0;">
         <section class="content">
             <div class="row">
@@ -29,8 +29,7 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">患者临床信息栏</h3>
                         <div class="box-tools pull-right">
-                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                    class="fa fa-minus"></i>
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                             </button>
                         </div>
                     </div>
@@ -47,20 +46,24 @@
                                     <th>测序深度</th>
                                     <th>产品</th>
                                     <th>携带筛查</th>
+                                    <th>报告类型</th>
                                     <th>送检医生</th>
                                     <th>患者信息</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                    <td>Call of Duty IV</td>
-                                    <td><span class="label label-success">Shipped</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#00a65a" data-height="20">
-                                            90,80,90,-70,61,-83,63
-                                        </div>
-                                    </td>
+                                    <td>{{sickInfo.reportCode}}</td>
+                                    <td>{{sickInfo.sickName}}</td>
+                                    <td><span class="label label-success">{{sickInfo.relation}}</span></td>
+                                    <td>{{sickInfo.isDisease}}</td>
+                                    <td>{{sickInfo.seqQuality}}</td>
+                                    <td>{{sickInfo.seqDepth}}</td>
+                                    <td>{{sickInfo.productName}}</td>
+                                    <td>{{sickInfo.isCarry}}</td>
+                                    <td>{{sickInfo.reportType}}</td>
+                                    <td>admin</td>
+                                    <td><a href="javascript:;">查看</a></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -100,38 +103,8 @@
                                     class="fa fa-minus"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="box-body">
-                        <div class="table-responsive">
-                            <table class="table no-margin">
-                                <thead>
-                                <tr>
-                                    <th>报告编号</th>
-                                    <th>姓名</th>
-                                    <th>与先证者关系</th>
-                                    <th>疾病状态</th>
-                                    <th>测序质量</th>
-                                    <th>测序深度</th>
-                                    <th>产品</th>
-                                    <th>携带筛查</th>
-                                    <th>送检医生</th>
-                                    <th>患者信息</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td><a href="pages/examples/invoice.html">OR9842</a></td>
-                                    <td>Call of Duty IV</td>
-                                    <td><span class="label label-success">Shipped</span></td>
-                                    <td>
-                                        <div class="sparkbar" data-color="#00a65a" data-height="20">
-                                            90,80,90,-70,61,-83,63
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table id="jqGrid"></table>
+                        <div id="jqGridPager"></div>
                     </div>
                     <div class="box-footer clearfix">
                         <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Place New Order</a>
@@ -204,7 +177,6 @@
                     <div class="box-body">
 
                     </div>
-
                 </div>
             </div>
 

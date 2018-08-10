@@ -3,7 +3,7 @@
 
 <mapper namespace="sw.melody.modules.docker.dao.SickRelationDao">
 
-	<select id="queryList" resultType="sw.melody.modules.docker.entity.SickRelationEntity">
+	<select id="queryObject" resultType="sw.melody.modules.docker.entity.SickRelationEntity">
 		SELECT DISTINCT
 		CONCAT(s.sick_code, '-', p.id) AS  report_code, p.product_name, s.sick_name
 		FROM tbl_sick s

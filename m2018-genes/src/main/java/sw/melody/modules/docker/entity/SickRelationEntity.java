@@ -31,6 +31,10 @@ public class SickRelationEntity {
 
     private boolean seqQuality;
 
+    // 测序深度
+
+    private boolean seqDepth;
+
     // 产品
 
     private String productName;

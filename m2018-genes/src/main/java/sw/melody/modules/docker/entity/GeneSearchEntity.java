@@ -2,14 +2,22 @@ package sw.melody.modules.docker.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author ping
  * @create 2018-08-09 10:59
  **/
+@Slf4j
 @Setter
 @Getter
 public class GeneSearchEntity {
+
+    private static final String UNKNOWN = "UNKNOWN";
+    private static final String POINT = ".";
+    private static final String COLON = ":";
+
 
     // 基因
 
@@ -99,6 +107,39 @@ public class GeneSearchEntity {
 
 
     public static void parseAttr(GeneSearchEntity entity) {
-
+        if (entity == null) {
+            return;
+        }
+        String ar = StringUtils.trim(entity.getAachangeRefgene());
+        if (StringUtils.isEmpty(ar) || UNKNOWN.equals(ar) || POINT.equalsIgnoreCase(ar)) {
+            //
+        } else {
+            String[] arArray = ar.split(COLON);
+            if (arArray.length >= 5) {
+                entity.setMutationInfo(arArray[3] + "\n" + entity.getChromPos() + "\n" + arArray[4] + "\n" + entity.getExonicfuncrefgene());
+            } else {
+                log.error("AachangeRefgene: {}长度不足5", entity.getAachangeRefgene());
+            }
+        }
+        StringBuilder af = new StringBuilder();
+        if (StringUtils.isEmpty(entity.getPopfreqmax())) {
+            af.append(entity.getPopfreqmax()).append("\n");
+        }
+        if (StringUtils.isEmpty(entity.getA1000gAll())) {
+            af.append(entity.getA1000gAll()).append("\n");
+        }
+        if (StringUtils.isEmpty(entity.getA1000gEas())) {
+            af.append(entity.getA1000gEas()).append("\n");
+        }
+        if (StringUtils.isEmpty(entity.getExacAll())) {
+            af.append(entity.getExacAll()).append("\n");
+        }
+        if (StringUtils.isEmpty(entity.getExacEas())) {
+            af.append(entity.getExacEas()).append("\n");
+        }
+        if (StringUtils.isEmpty(entity.getEsp6500siv2All())) {
+            af.append(entity.getEsp6500siv2All());
+        }
+        entity.setAlleleFrequency(af.toString());
     }
 }
