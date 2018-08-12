@@ -4,7 +4,7 @@
 <mapper namespace="sw.melody.modules.docker.dao.GeneSearchDao">
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.GeneSearchEntity">
-		SELECT si.gene_refgene, si.aachange_refgene, CONCAT(s.chrom, '-', s.pos) AS chromPos,
+		SELECT si.id, si.gene_refgene, si.aachange_refgene, CONCAT(s.chrom, '-', s.pos) AS chromPos,
 		si.exonicfunc_refgene, si.xref_refgene, sf.sick AS sample_name, si.popfreqmax, si.a1000g_all,
 		si.a1000g_eas, si.exac_all, si.exac_eas, si.esp6500siv2_all
 		FROM tbl_snp s

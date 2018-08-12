@@ -49,7 +49,8 @@ $(function () {
         url: baseURL + 'docker/gene_search/list',
         datatype: "json",
         colModel: [
-            { label: '基因', name: 'geneRefgene', width: 60, key: true },
+            { label: 'ID', name: 'id', width: 30, key: true },
+            { label: '基因', name: 'geneRefgene', width: 60},
             { label: 'Hpo', name: 'hop', width: 50 },
             { label: '突变信息', name: 'mutationInfo', width: 100 },
             { label: 'HGMD数据库', name: 'hgmd', width: 50 },
@@ -89,7 +90,7 @@ $(function () {
         },
         gridComplete:function(){
             //隐藏grid底部滚动条
-            // $("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
+            $("#jqGrid").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
         }
     });
 });

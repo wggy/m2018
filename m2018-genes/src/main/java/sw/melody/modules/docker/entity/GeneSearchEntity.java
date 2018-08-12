@@ -18,6 +18,7 @@ public class GeneSearchEntity {
     private static final String POINT = ".";
     private static final String COLON = ":";
 
+    private Long id;
 
     // 基因
 
