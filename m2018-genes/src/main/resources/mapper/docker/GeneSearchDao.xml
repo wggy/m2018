@@ -10,6 +10,7 @@
 		FROM tbl_snp s
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
+		WHERE si.popfreqmax <![CDATA[ > ]]> '0.' and si.popfreqmax <![CDATA[ <= ]]> '1.0'
 		order by s.id
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
