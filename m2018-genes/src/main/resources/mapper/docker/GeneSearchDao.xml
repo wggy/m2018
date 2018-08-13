@@ -6,11 +6,12 @@
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.GeneSearchEntity">
 		SELECT si.id, si.gene_refgene, si.aachange_refgene, CONCAT(s.chrom, '-', s.pos) AS chromPos,
 		si.exonicfunc_refgene, si.xref_refgene, sf.sick AS sample_name, si.popfreqmax, si.a1000g_all,
-		si.a1000g_eas, si.exac_all, si.exac_eas, si.esp6500siv2_all
+		si.a1000g_eas, si.exac_all, si.exac_eas, si.esp6500siv2_all, sf.mutation_ad, sf.mutation_mode, sf.mutation_rate
 		FROM tbl_snp s
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
-		WHERE si.popfreqmax <![CDATA[ > ]]> '0.' and si.popfreqmax <![CDATA[ <= ]]> '1.0'
+		WHERE si.popfreqmax <![CDATA[ > ]]> '0.' and si.popfreqmax <![CDATA[ <= ]]> '0.01'
+		and si.aachange_refgene is not null and si.aachange_refgene not in  ('UNKNOWN', 'unknown', '.', '')
 		order by s.id
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
@@ -22,10 +23,9 @@
 		FROM tbl_snp s
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
+		WHERE si.popfreqmax <![CDATA[ > ]]> '0.' and si.popfreqmax <![CDATA[ <= ]]> '0.01'
+		and si.aachange_refgene is not null and si.aachange_refgene not in  ('UNKNOWN', 'unknown', '.', '')
 		order by s.id
-		<if test="offset != null and limit != null">
-			limit #{offset}, #{limit}
-		</if>
 	</select>
 
 </mapper>

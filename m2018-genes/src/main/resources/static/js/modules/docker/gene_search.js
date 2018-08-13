@@ -61,7 +61,7 @@ $(function () {
             { label: '遗传方式', name: 'hereditaryMode', width: 60},
             { label: 'HPO/代谢数据库', name: 'hpoMetabolizeDb', width: 60},
             { label: '主要致病突变类型', name: 'mainMutationMode', width: 60},
-            { label: 'test1', name: 'sampleName', width: 60},
+            { label: 'test1', name: 'sampleNameAttr', width: 60},
             { label: 'Allele frequency', name: 'alleleFrequency', width: 60},
             { label: 'Revel/M-CAP', name: 'revelMcap', width: 60},
             { label: 'SIFT/Polyphen', name: 'siftPolyphen', width: 60},

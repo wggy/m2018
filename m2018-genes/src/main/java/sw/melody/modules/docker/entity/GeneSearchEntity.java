@@ -69,7 +69,7 @@ public class GeneSearchEntity {
 
     // 患者姓名
 
-    private String sampleName;
+    private String sampleNameAttr;
 
     /**
      Allele frequency： 包含六行属性
@@ -105,6 +105,9 @@ public class GeneSearchEntity {
     // Bp Score
 
     private String bpScore;
+    private String mutationAd;
+    private String mutationMode;
+    private String mutationRate;
 
 
     public static void parseAttr(GeneSearchEntity entity) {
@@ -123,24 +126,33 @@ public class GeneSearchEntity {
             }
         }
         StringBuilder af = new StringBuilder();
-        if (StringUtils.isEmpty(entity.getPopfreqmax())) {
+        if (!StringUtils.isEmpty(entity.getPopfreqmax())) {
             af.append(entity.getPopfreqmax()).append("\n");
         }
-        if (StringUtils.isEmpty(entity.getA1000gAll())) {
+        if (!StringUtils.isEmpty(entity.getA1000gAll())) {
             af.append(entity.getA1000gAll()).append("\n");
         }
-        if (StringUtils.isEmpty(entity.getA1000gEas())) {
+        if (!StringUtils.isEmpty(entity.getA1000gEas())) {
             af.append(entity.getA1000gEas()).append("\n");
         }
-        if (StringUtils.isEmpty(entity.getExacAll())) {
+        if (!StringUtils.isEmpty(entity.getExacAll())) {
             af.append(entity.getExacAll()).append("\n");
         }
-        if (StringUtils.isEmpty(entity.getExacEas())) {
+        if (!StringUtils.isEmpty(entity.getExacEas())) {
             af.append(entity.getExacEas()).append("\n");
         }
-        if (StringUtils.isEmpty(entity.getEsp6500siv2All())) {
+        if (!StringUtils.isEmpty(entity.getEsp6500siv2All())) {
             af.append(entity.getEsp6500siv2All());
         }
         entity.setAlleleFrequency(af.toString());
+
+        StringBuilder snt = new StringBuilder();
+        if (!StringUtils.isEmpty(entity.getMutationMode())) {
+            snt.append(entity.getMutationMode()).append("\n");
+        }
+        if (!StringUtils.isEmpty(entity.getMutationAd())) {
+            snt.append(entity.getMutationAd()).append("(").append(entity.getMutationRate()).append(")\n");
+        }
+        entity.setSampleNameAttr(snt.toString());
     }
 }
