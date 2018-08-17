@@ -8,7 +8,6 @@ import sw.melody.modules.docker.entity.GeneSearchEntity;
 import sw.melody.modules.docker.entity.SickRelationEntity;
 import sw.melody.modules.docker.service.GeneSearchService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,5 +37,10 @@ public class GeneSearchServiceImpl implements GeneSearchService {
     @Override
     public SickRelationEntity querySickRelation(Map<String, Object> paramsMap) {
         return sickRelationDao.queryObject(paramsMap);
+    }
+
+    @Override
+    public int queryTotalCount() {
+        return geneSearchDao.queryTotalCount();
     }
 }

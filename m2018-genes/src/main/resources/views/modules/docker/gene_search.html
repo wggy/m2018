@@ -19,6 +19,12 @@
     <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
     <script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
     <script src="../../js/common.js"></script>
+    <style>
+        .align-center {
+            line-height: 34px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <div class="wrapper" id="rrapp" v-cloak>
@@ -90,26 +96,66 @@
                         <li class="active"><a href="#custom-select" data-toggle="tab">自定义参数筛选</a></li>
                     </ul>
                     <div class="tab-content no-padding">
-                        <div class="chart tab-pane active" id="custom-select" style="position: relative; height: 300px;">custom</div>
+                        <div class="chart tab-pane active" id="custom-select" style="position: relative; height: 300px;">
+                            <div class="row box-body">
+                                <div class="col-md-3">
+                                    <h4 style="font-size:15px ">人群携带率设定:</h4>
+                                    <div>
+                                        <div class="form-group">
+                                            <div class="col-sm-6 control-label align-center">EXAC_ALL（60700）:</div>
+                                            <div class="col-sm-6 input-group">
+                                                <input type="text" v-model="q.exacAll" class="form-control" @change="if(/\D/.test(this.value)){alert('只能输入数字');this.value='';}">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-6 control-label align-center">千人基因组（1000g）:</div>
+                                            <div class="col-sm-6 input-group">
+                                                <input type="text" v-model="q.a1000gAll" class="form-control" @change="if(/\D/.test(this.value)){alert('只能输入数字');this.value='';}">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-6 control-label align-center">EXAC 亚洲人数据库：</div>
+                                            <div class="col-sm-6 input-group">
+                                                <input type="text" v-model="q.exacEas" class="form-control" @change="if(/\D/.test(this.value)){alert('只能输入数字');this.value='';}">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-6 control-label align-center">POPFREQMAX ：</div>
+                                            <div class="col-sm-6 input-group">
+                                                <input type="text" v-model="q.popfreqmax" class="form-control" @change="if(/\D/.test(this.value)){alert('只能输入数字');this.value='';}">
+                                                <span class="input-group-addon">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer clearfix">
+                        <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-right" @click="query">立即查询</a>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <h3 class="box-title">SNP/indel突变位点：</h3>
+                        <h3 class="box-title">SNP/indel突变位点：
+                            <small>{{totalCount}}/{{noConditionCount}}(筛选/全部)</small>
+                        </h3>
                         <div class="box-tools pull-right">
                             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
                                     class="fa fa-minus"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="box-body">
                         <table id="jqGrid"></table>
                         <div id="jqGridPager"></div>
-                    </div>
-                    <div class="box-footer clearfix">
-                        <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Place New Order</a>
-                        <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">View All
-                            Orders</a>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,6 @@
 package sw.melody.modules.job.service;
 
-import sw.melody.modules.job.entity.SnpEntity;
 import sw.melody.modules.job.entity.SnpFormatEntity;
-
 import java.util.List;
 import java.util.Map;
 
