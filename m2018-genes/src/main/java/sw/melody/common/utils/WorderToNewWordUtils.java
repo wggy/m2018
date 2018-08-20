@@ -45,7 +45,7 @@ public class WorderToNewWordUtils {
      * @return 成功返回true, 失败返回false
      */
     public static boolean changeWord(String inputUrl, String outputUrl,
-                                    Map<String, String> textMap, List<String[]> tableList) {
+                                     Map<String, String> textMap, List<String[]> tableList) {
 
         //模板转换默认成功
         boolean changeFlag = true;
@@ -231,12 +231,20 @@ public class WorderToNewWordUtils {
         return changeFlag;
     }
 
-    public static boolean geneReport(String inputUrl, String fileName, HttpServletResponse response, String text, List<String[]> tableList1, List<String[]> tableList2) {
+    public static boolean geneReport(String userAgent, String inputUrl, String fileName, HttpServletResponse response, String text, List<String[]> tableList1, List<String[]> tableList2) {
         boolean changeFlag = true;
         try {
             XWPFDocument document = getDocment(inputUrl, text, tableList1, tableList2);
             OutputStream os = response.getOutputStream();
-            response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+            String formFileName = fileName;
+            // 针对IE或者以IE为内核的浏览器：
+            if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
+                formFileName = java.net.URLEncoder.encode(formFileName, "UTF-8");
+            } else {
+                // 非IE浏览器的处理：
+                formFileName = new String(formFileName.getBytes("UTF-8"), "ISO-8859-1");
+            }
+            response.setHeader("Content-disposition", String.format("attachment; filename=\"%s\"", formFileName));
             document.write(os);
             os.close();
         } catch (IOException e) {

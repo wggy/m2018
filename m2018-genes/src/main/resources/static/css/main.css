@@ -52,3 +52,7 @@ tbody > tr > th {font-weight: normal; }
 .form-horizontal{
 	width:550px;padding-top:20px;
 }
+.align-center {
+    line-height: 34px;
+    text-align: center;
+}

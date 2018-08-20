@@ -15,6 +15,7 @@ import sw.melody.modules.docker.entity.GeneSearchEntity;
 import sw.melody.modules.docker.service.GeneSearchService;
 import sw.melody.modules.job.utils.Arith;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class GeneSearchController {
     }
 
     @RequestMapping("/report")
-    public void report(@RequestParam Map<String, Object> params, HttpServletResponse response) {
+    public void report(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
 
 
         List<String[]> list1 = new ArrayList<>();
@@ -107,7 +108,8 @@ public class GeneSearchController {
             list1.add(s);
         }
         String fileName = this.getClass().getClassLoader().getResource("healthy_template.docx").getPath();
-        WorderToNewWordUtils.geneReport(fileName, "ssssss.docx", response,"test1", list1, list2);
+        String userAgent = request.getHeader("User-Agent");
+        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
     }
 
 }

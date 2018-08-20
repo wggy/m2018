@@ -28,8 +28,8 @@ var vm = new Vue({
             }
             var params = {ids: ids.join(','), token: localStorage.getItem("token")};
             confirm('确定要生成报告？', function () {
-                // window.open(baseURL + "docker/gene_search/report?" + $.param(params));
-                GeneSearch.downLoad(baseURL + "docker/gene_search/report", params, 'post')
+                GeneSearch.downLoad(baseURL + "docker/gene_search/report", params, 'post');
+                parent.layer.msg('下载完成', {icon: 1});
             });
         },
         isNum: function (value) {
