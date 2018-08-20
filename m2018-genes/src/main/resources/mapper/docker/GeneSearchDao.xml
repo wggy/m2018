@@ -28,10 +28,25 @@
 			AND si.exac_eas <![CDATA[ <= ]]> #{exacEas}
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
-		ORDER BY s.id
+		ORDER BY si.id
 		<if test="offset != null and limit != null">
 			LIMIT #{offset}, #{limit}
 		</if>
+	</select>
+
+	<select id="queryListByIds" resultType="sw.melody.modules.docker.entity.GeneSearchEntity">
+		SELECT si.id, si.gene_refgene, si.aachange_refgene, CONCAT(s.chrom, '-', s.pos) AS chromPos,
+		si.exonicfunc_refgene, si.xref_refgene, sf.sick AS sample_name, si.popfreqmax, si.a1000g_all,
+		si.a1000g_eas, si.exac_all, si.exac_eas, si.esp6500siv2_all, sf.mutation_ad, sf.mutation_mode, sf.mutation_rate
+		FROM tbl_snp s
+		JOIN tbl_snp_info si ON s.id = si.snp_id
+		JOIN tbl_snp_format sf ON s.id = sf.snp_id
+		WHERE 1=1
+		AND si.id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		ORDER BY si.id
 	</select>
 	
  	<select id="queryTotal" resultType="int">

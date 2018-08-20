@@ -19,4 +19,5 @@ public interface GeneSearchService {
 
     int queryTotalCount();
 
+    List<GeneSearchEntity> queryListByIds(Long[] ids);
 }

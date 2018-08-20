@@ -1,27 +1,39 @@
 package sw.melody.common.utils;
 
+import org.apache.poi.POIXMLDocument;
+import org.apache.poi.xwpf.usermodel.*;
+import org.apache.xmlbeans.XmlCursor;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
+import org.springframework.util.CollectionUtils;
+
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.OutputStream;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.poi.POIXMLDocument;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.springframework.util.CollectionUtils;
 
 public class WorderToNewWordUtils {
 
-    private static final String wordTitle = "一、先证者${sampleName} SNP/Indel检测结果";
+    private static String wordTitle = "一、先证者${sampleName} SNP/Indel检测结果";
+    private static List<String[]> FixedRowsPre = new ArrayList<>();
+    private static final List<String[]> FixedRowsMid = new ArrayList<>();
+
+    static {
+        String[] Row_0 = {"第三部分  检测结果", "", "", "", "", "", ""};
+        String[] Row_1 = {wordTitle, "", "", "", "", "", ""};
+        String[] Row_2 = {"基因", "OMIM编号", "疾病名称/遗传方式", "突变信息", "转录本:外显子编号", "测序深度/突变比率/EXAC_ALL携带率", "ACMG分级"};
+        String[] Row_3 = {"二、外显子拷贝数变异检测结果\n该样本未未发现明确的与疾病相关的外显子拷贝数变异", "", "", "", "", "", ""};
+        String[] Row_4 = {"三、家系验证结果", "", "", "", "", "", ""};
+        String[] Row_5 = {"基因", "突变信息", "先证者", "先证者之父", "先证者之母", "", ""};
+        FixedRowsPre.add(Row_0);
+        FixedRowsPre.add(Row_1);
+        FixedRowsPre.add(Row_2);
+        FixedRowsMid.add(Row_3);
+        FixedRowsMid.add(Row_4);
+        FixedRowsMid.add(Row_5);
+    }
 
     /**
      * 根据模板生成新word文档
@@ -32,7 +44,7 @@ public class WorderToNewWordUtils {
      * @param tableList 需要插入的表格信息集合
      * @return 成功返回true, 失败返回false
      */
-    public static boolean changWord(String inputUrl, String outputUrl,
+    public static boolean changeWord(String inputUrl, String outputUrl,
                                     Map<String, String> textMap, List<String[]> tableList) {
 
         //模板转换默认成功
@@ -115,6 +127,9 @@ public class WorderToNewWordUtils {
      * @param textMap 需要替换的信息集合
      */
     public static void eachTable(List<XWPFTableRow> rows, Map<String, String> textMap) {
+        if (CollectionUtils.isEmpty(textMap)) {
+            return;
+        }
         for (XWPFTableRow row : rows) {
             List<XWPFTableCell> cells = row.getTableCells();
             for (XWPFTableCell cell : cells) {
@@ -195,82 +210,114 @@ public class WorderToNewWordUtils {
         return value;
     }
 
-    public static boolean geneReport(String inputUrl, String outputUrl, String text, List<String[]> tableList1, List<String[]> tableList2) {
+    private static XWPFDocument getDocment(String inputUrl, String text, List<String[]> tableList1, List<String[]> tableList2) throws IOException {
+        XWPFDocument document = new XWPFDocument(POIXMLDocument.openPackage(inputUrl));
+        fillTable(document.getTableArray(1), text, tableList1, tableList2);
+        return document;
+    }
 
-        //模板转换默认成功
+    public static boolean geneReport(String inputUrl, String outputUrl, String text, List<String[]> tableList1, List<String[]> tableList2) {
         boolean changeFlag = true;
         try {
-            //获取docx解析对象
-            XWPFDocument document = new XWPFDocument(POIXMLDocument.openPackage(inputUrl));
-            //解析替换文本段落对象
-//            WorderToNewWordUtils.changeText(document, textMap);
-            //解析替换表格对象
-            WorderToNewWordUtils.eachTable2(document, text, tableList1 ,tableList2);
-
-            //生成新的word
+            XWPFDocument document = getDocment(inputUrl, text, tableList1, tableList2);
             File file = new File(outputUrl);
             FileOutputStream stream = new FileOutputStream(file);
             document.write(stream);
             stream.close();
-
         } catch (IOException e) {
             e.printStackTrace();
             changeFlag = false;
         }
-
         return changeFlag;
-
     }
 
+    public static boolean geneReport(String inputUrl, String fileName, HttpServletResponse response, String text, List<String[]> tableList1, List<String[]> tableList2) {
+        boolean changeFlag = true;
+        try {
+            XWPFDocument document = getDocment(inputUrl, text, tableList1, tableList2);
+            OutputStream os = response.getOutputStream();
+            response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+            document.write(os);
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            changeFlag = false;
+        }
+        return changeFlag;
+    }
 
-    public static void eachTable2(XWPFDocument document, String sample, List<String[]> table2List1, List<String[]> table2List2) {
-        //获取表格对象集合
-        List<XWPFTable> tables = document.getTables();
-        for (int i = 0; i < tables.size(); i++) {
-            XWPFTable table = tables.get(i);
-            if (i == 1) {
-                List<XWPFTableRow> rows = table.getRows();
-                XWPFTableRow row1 = rows.get(1);
-                row1.getTableCells().get(0).setText(wordTitle.replace("${sampleName}", sample));
-                createNewRow(table, table2List1, table2List2);
+    private static void fillTable(XWPFTable table, String sample, List<String[]> list1, List<String[]> list2) {
+        if (CollectionUtils.isEmpty(list1)) {
+            return;
+        }
+        FixedRowsPre.get(1)[0] = wordTitle.replace("${sampleName}", sample);
+        int tableRowNum = list1.size() + 5;
+        int list2Num = 0;
+        if (!CollectionUtils.isEmpty(list2)) {
+            list2Num = list2.size();
+        }
+        tableRowNum += list2Num;
+        for (int i = 0; i < tableRowNum; i++) {
+            table.createRow();
+        }
 
-                for (int n = 3; n < 3 + table2List1.size(); n++) {
-                    XWPFTableRow newRow = table.getRow(n);
-                    System.out.println("row: " + n);
-                    List<XWPFTableCell> cells = newRow.getTableCells();
-                    for (int j = 0; j < cells.size(); j++) {
-                        XWPFTableCell cell = cells.get(j);
-                        cell.setText(table2List1.get(n-3)[j]);
-                    }
-                }
-
+        List<String[]> totalList = new ArrayList<>();
+        totalList.addAll(FixedRowsPre);
+        totalList.addAll(list1);
+        totalList.addAll(FixedRowsMid);
+        totalList.addAll(list2);
+        for (int rowIndex = 0; rowIndex < totalList.size(); rowIndex++) {
+            XWPFTableRow row = table.getRow(rowIndex);
+            for (int colIndex = 0; colIndex < 7; colIndex++) {
+                XWPFTableCell cell = row.getCell(colIndex);
+                cell.setText(totalList.get(rowIndex)[colIndex]);
             }
+        }
 
+        mergeCellsHorizontal(table, 0, 0, 6);
+        mergeCellsHorizontal(table, 1, 0, 6);
+        mergeCellsHorizontal(table, 3 + list1.size(), 0, 6);
+        mergeCellsHorizontal(table, 4 + list1.size(), 0, 6);
+        mergeCellsHorizontal(table, 5 + list1.size(), 4, 6);
+        for (int i = 0; i < list2Num; i++) {
+            mergeCellsHorizontal(table, 6 + i + list1.size(), 4, 6);
         }
     }
 
-    private static void createNewRow(XWPFTable table, List<String[]> table2List1, List<String[]> table2List2) {
-        List<XWPFTableRow> rows = table.getRows();
-        XWPFTableRow row3 = rows.get(3);
-        if (!CollectionUtils.isEmpty(table2List1)) {
-            for (int i=1; i<table2List1.size(); i++) {
-                table.addRow(row3, 4);
-            }
-        }
-
-        XWPFTableRow row8 = rows.get(6 + table2List1.size());
-        if (!CollectionUtils.isEmpty(table2List2)) {
-            for (int i=1; i<table2List2.size(); i++) {
-                table.addRow(row8, 6 + table2List1.size());
+    /**
+     * @Description: 跨列合并
+     */
+    public static void mergeCellsHorizontal(XWPFTable table, int row, int fromCell, int toCell) {
+        for (int cellIndex = fromCell; cellIndex <= toCell; cellIndex++) {
+            XWPFTableCell cell = table.getRow(row).getCell(cellIndex);
+            if (cellIndex == fromCell) {
+                cell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.RESTART);
+            } else {
+                cell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);
             }
         }
     }
+
+    /**
+     * @Description: 跨行合并
+     */
+    public void mergeCellsVertically(XWPFTable table, int col, int fromRow, int toRow) {
+        for (int rowIndex = fromRow; rowIndex <= toRow; rowIndex++) {
+            XWPFTableCell cell = table.getRow(rowIndex).getCell(col);
+            if (rowIndex == fromRow) {
+                cell.getCTTc().addNewTcPr().addNewVMerge().setVal(STMerge.RESTART);
+            } else {
+                cell.getCTTc().addNewTcPr().addNewVMerge().setVal(STMerge.CONTINUE);
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
         //模板文件地址
-        String inputUrl = "G:\\healthy_template.docx";
+        String inputUrl = "E:\\healthy_template.docx";
         //新生产的模板文件
-        String outputUrl = "G:\\test.docx";
+        String outputUrl = "E:\\test.docx";
 
         Map<String, String> testMap = new HashMap<>();
         testMap.put("sampleName", "小明");
@@ -285,9 +332,9 @@ public class WorderToNewWordUtils {
         testList1.add(new String[]{"基因3", "", "肌肉病3", "A突变3", "aa3", "0.1c", ""});
         testList1.add(new String[]{"基因4", "", "肌肉病4", "A突变4", "aa4", "0.1d", ""});
 
-        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4"});
-        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4"});
-        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4"});
+        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4", "", ""});
+        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4", "", ""});
+        testList2.add(new String[]{"家系基因4", "", "肌肉病4", "A突变4", "aa4", "", ""});
 
         WorderToNewWordUtils.geneReport(inputUrl, outputUrl, "test1", testList1, testList2);
     }

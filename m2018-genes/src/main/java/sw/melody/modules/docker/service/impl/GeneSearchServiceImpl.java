@@ -43,4 +43,11 @@ public class GeneSearchServiceImpl implements GeneSearchService {
     public int queryTotalCount() {
         return geneSearchDao.queryTotalCount();
     }
+
+    @Override
+    public List<GeneSearchEntity> queryListByIds(Long[] ids) {
+        List<GeneSearchEntity> list = geneSearchDao.queryListByIds(ids);
+        list.forEach(item -> GeneSearchEntity.parseAttr(item));
+        return list;
+    }
 }

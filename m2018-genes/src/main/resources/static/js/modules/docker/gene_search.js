@@ -21,6 +21,17 @@ var vm = new Vue({
         query: function () {
             vm.reload();
         },
+        report: function () {
+            var ids = getSelectedRows();
+            if (!ids) {
+                return;
+            }
+            var params = {ids: ids.join(','), token: localStorage.getItem("token")};
+            confirm('确定要生成报告？', function () {
+                // window.open(baseURL + "docker/gene_search/report?" + $.param(params));
+                GeneSearch.downLoad(baseURL + "docker/gene_search/report", params, 'post')
+            });
+        },
         isNum: function (value) {
             if (/\D/.test(value)) {
                 alert('只能输入数字');
@@ -45,6 +56,20 @@ GeneSearch.initSickInfo = function () {
     }, function (r) {
         vm.sickInfo = r.info;
     });
+};
+
+GeneSearch.downLoad = function (url, data, method) {
+
+    if (url && data) {
+        data = typeof data == 'string' ? data : $.param(data);
+        var inputs = '';
+        $.each(data.split('&'), function () {
+            var pair = this.split('=');
+            inputs += '<input type="hidden" name="' + pair[0] + '" value="' + pair[1] + '" />';
+        });
+        $('<form action="' + url + '" method="' + (method || 'post') + '">' + inputs + '</form>')
+            .appendTo('body').submit().remove();
+    }
 };
 
 $(function () {

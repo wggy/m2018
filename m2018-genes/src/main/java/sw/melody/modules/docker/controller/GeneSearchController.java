@@ -3,14 +3,20 @@ package sw.melody.modules.docker.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sw.melody.common.exception.RRException;
 import sw.melody.common.utils.Query;
 import sw.melody.common.utils.R;
+import sw.melody.common.utils.WorderToNewWordUtils;
 import sw.melody.modules.docker.entity.GeneSearchEntity;
 import sw.melody.modules.docker.service.GeneSearchService;
 import sw.melody.modules.job.utils.Arith;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +74,40 @@ public class GeneSearchController {
         returnMap.put("currPage", query.getPage());
         returnMap.put("noConditionCount", noConditionCount);
         return R.ok().put("page", returnMap);
+    }
+
+    @RequestMapping("/report")
+    public void report(@RequestParam Map<String, Object> params, HttpServletResponse response) {
+
+
+        List<String[]> list1 = new ArrayList<>();
+        List<String[]> list2 = new ArrayList<>();
+
+        if (params.get("ids") == null) {
+            throw new RRException("参数错误");
+        }
+        String ids = params.get("ids").toString();
+
+        String[] idsStrArray = ids.split("%2C");
+        Long[] idsArray = new Long[idsStrArray.length];
+        for (int i=0; i<idsStrArray.length; i++) {
+            idsArray[i] = Long.parseLong(idsStrArray[i]);
+        }
+        List<GeneSearchEntity> list = geneSearchService.queryListByIds(idsArray);
+
+        for (GeneSearchEntity entity : list) {
+            String[] s = new String[7];
+            s[0] = entity.getGeneRefgene();
+            s[1] = "";
+            s[2] = entity.getXrefRefgene();
+            s[3] = entity.getMutationInfo();
+            s[4] = entity.getAachangeRefgene();
+            s[5] = entity.getSampleNameAttr();
+            s[6] = "";
+            list1.add(s);
+        }
+        String fileName = this.getClass().getClassLoader().getResource("healthy_template.docx").getPath();
+        WorderToNewWordUtils.geneReport(fileName, "ssssss.docx", response,"test1", list1, list2);
     }
 
 }
