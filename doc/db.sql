@@ -193,3 +193,22 @@ ALTER TABLE `tbl_snp_format`
 ADD COLUMN `mutation_mode`  varchar(50) NULL COMMENT '突变类型，GT的值进行判断 hex 杂合突变 或者  hom 纯合突变 0/0：hom，0/1：hex，1/1: hom' AFTER `format_rate`,
 ADD COLUMN `mutation_ad`  varchar(50) NULL COMMENT 'AD=0,7 逗号转为斜杠/' AFTER `mutation_mode`,
 ADD COLUMN `mutation_rate`  varchar(50) NULL COMMENT 'AD第二个数字除以DP的取值' AFTER `mutation_ad`;
+
+-- 2018-08-27
+ALTER TABLE `tbl_sample`
+CHANGE COLUMN `upload_time` `upload_finish_time`  datetime NULL DEFAULT NULL COMMENT '上传时间' AFTER `location`,
+CHANGE COLUMN `trigger_time` `trigger_finish_time`  datetime NULL DEFAULT NULL AFTER `upload_finish_time`,
+CHANGE COLUMN `handler_time` `handler_finish_time`  datetime NULL DEFAULT NULL COMMENT '执行时间' AFTER `handler_status`,
+CHANGE COLUMN `store_time` `store_start_time`  datetime NULL DEFAULT NULL AFTER `handler_finish_time`,
+CHANGE COLUMN `finish_time` `store_finish_time`  datetime NULL DEFAULT NULL AFTER `store_status`,
+ADD COLUMN `upload_start_time`  datetime NULL ON UPDATE CURRENT_TIMESTAMP AFTER `location`,
+ADD COLUMN `upload_status`  varchar(50) NULL AFTER `upload_start_time`,
+ADD COLUMN `trigger_start_time`  datetime NULL AFTER `upload_finish_time`,
+ADD COLUMN `trigger_status`  varchar(50) NULL AFTER `trigger_start_time`,
+ADD COLUMN `handler_start_time`  datetime NULL AFTER `trigger_finish_time`;
+ALTER TABLE `tbl_sample`
+ADD COLUMN `md5`  varchar(100) NULL AFTER `store_finish_time`;
+ALTER TABLE `tbl_sample`
+DROP COLUMN `handler_start_time`,
+DROP COLUMN `handler_status`,
+DROP COLUMN `handler_finish_time`;

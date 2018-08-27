@@ -29,14 +29,15 @@ public class SampleServiceImpl implements SampleService {
         map.put("location", location);
         map.put("sickId", sickId);
         List<SampleEntity> list = sampleDao.queryList(map);
-        if (CollectionUtils.isEmpty(list))
+        if (CollectionUtils.isEmpty(list)) {
             return null;
+        }
         list.sort((o1, o2) -> {
-            if (o1.getUploadTime() == null || o2.getUploadTime() == null) {
+            if (o1.getUploadStartTime() == null || o2.getUploadStartTime() == null) {
                 return 0;
             }
-            long t1 = o1.getUploadTime().getTime();
-            long t2 = o2.getUploadTime().getTime();
+            long t1 = o1.getUploadStartTime().getTime();
+            long t2 = o2.getUploadStartTime().getTime();
             return Long.compare(t2, t1);
         });
         return list.get(0);
@@ -65,5 +66,10 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public void deleteBatch(Long[] ids) {
         sampleDao.deleteBatch(ids);
+    }
+
+    @Override
+    public SampleEntity queryObjectByMd5(String md5) {
+        return sampleDao.queryObjectByMd5(md5);
     }
 }

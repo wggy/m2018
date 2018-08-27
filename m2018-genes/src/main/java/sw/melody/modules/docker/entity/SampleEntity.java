@@ -9,6 +9,7 @@ import java.util.Date;
 
 /***
  * 样本实体
+ * @author wange
  */
 @Setter
 @Getter
@@ -23,24 +24,25 @@ public class SampleEntity implements Serializable {
 
     @NotBlank(message="参数名不能为空")
     private String location;
+
     //上传时间
 
-    private Date uploadTime;
+    private Date uploadStartTime;
+    private String uploadStatus;
+    private Date uploadFinishTime;
 
-    // 病情描述
+    //触发脚本时间
 
-    private String handlerStatus;
+    private Date triggerStartTime;
+    private String triggerStatus;
+    private Date triggerFinishTime;
 
-    //更新时间
+    //入库时间
 
-    private Date handlerTime;
+    private Date storeStartTime;
+    private String storeStatus;
+    private Date storeFinishTime;
 
-    //触发时间
-
-    private Date triggerTime;
     private String sickName;
     private String sickCode;
-    private Date storeTime;
-    private String storeStatus;
-    private Date finishTime;
 }

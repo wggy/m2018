@@ -82,4 +82,7 @@
 		</foreach>
 	</delete>
 
+	<select id="queryObjectByMd5" resultType="sw.melody.modules.docker.entity.SampleEntity">
+		select * from tbl_sample where md5 = #{value} limit 1
+	</select>
 </mapper>

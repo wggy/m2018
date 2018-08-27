@@ -115,7 +115,6 @@ public class SampleController {
         if (bashFile == null) {
             throw new RRException("bash文件不存在");
         }
-//        FileUtils.copyFile(bashFile, new File(fullPathNoFile + ConfigConstant.File_Separator + ConfigConstant.Shell_Bwa));
         Process ps = Runtime.getRuntime().exec("cp -pf " + bashFilePath + " " + fullPathNoFile);
         int status = ps.waitFor();
         if (status != 0) {
@@ -125,13 +124,13 @@ public class SampleController {
             //保存上传文件信息
             sampleEntity = new SampleEntity();
             sampleEntity.setLocation(shortPath);
-            sampleEntity.setUploadTime(new Date());
+            sampleEntity.setUploadStartTime(new Date());
             sampleEntity.setSickId(id);
             sampleEntity.setOriginName(file.getOriginalFilename());
             sampleService.save(sampleEntity);
         } else {
             sampleEntity.setOriginName(file.getOriginalFilename());
-            sampleEntity.setUploadTime(new Date());
+            sampleEntity.setUploadStartTime(new Date());
             sampleService.update(sampleEntity);
         }
 
@@ -147,13 +146,13 @@ public class SampleController {
         if (sampleEntity == null) {
             throw new RRException("查无上传记录");
         }
-        if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getHandlerStatus())) {
+        if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getTriggerStatus())) {
             throw new RRException("正在解析样本中...");
-        } else if (Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getHandlerStatus())) {
+        } else if (Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getTriggerStatus())) {
             throw new RRException("样本已解析完成...");
-        } else if (StringUtils.isEmpty(sampleEntity.getHandlerStatus())) {
-            sampleEntity.setHandlerStatus(Constant.SampleStatus.Running.getStatus());
-            sampleEntity.setTriggerTime(new Date());
+        } else if (StringUtils.isEmpty(sampleEntity.getTriggerStatus())) {
+            sampleEntity.setTriggerStatus(Constant.SampleStatus.Running.getStatus());
+            sampleEntity.setTriggerStartTime(new Date());
             sampleService.update(sampleEntity);
         }
         Thread exeThread = new Thread(() -> {
@@ -175,21 +174,21 @@ public class SampleController {
                 log.info("status: {}", status);
                 if (status != 0) {
                     log.error("Failed to call shell's command ");
-                    sampleEntity.setHandlerStatus(Constant.SampleStatus.Fail.getStatus());
+                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
                 } else {
                     BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
                     String line;
                     while ((line = br.readLine()) != null) {
                         log.info(line);
                     }
-                    sampleEntity.setHandlerStatus(Constant.SampleStatus.Success.getStatus());
+                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Success.getStatus());
                     br.close();
                 }
             } catch (Exception e) {
-                sampleEntity.setHandlerStatus(Constant.SampleStatus.Fail.getStatus());
+                sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
                 e.printStackTrace();
             }
-            sampleEntity.setHandlerTime(new Date());
+            sampleEntity.setTriggerFinishTime(new Date());
             sampleService.update(sampleEntity);
         });
         Runtime.getRuntime().addShutdownHook(exeThread);
@@ -206,7 +205,7 @@ public class SampleController {
         if (sampleEntity == null) {
             throw new RRException("查无上传记录");
         }
-        if (!Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getHandlerStatus())) {
+        if (!Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getStoreStatus())) {
             throw new RRException("样本未成功解析，无法入库...");
         }
         if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getStoreStatus())) {
@@ -215,7 +214,7 @@ public class SampleController {
             throw new RRException("样本已入库...");
         }
         sampleEntity.setStoreStatus(Constant.SampleStatus.Running.getStatus());
-        sampleEntity.setStoreTime(new Date());
+        sampleEntity.setStoreStartTime(new Date());
         sampleService.update(sampleEntity);
 
         String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
@@ -228,11 +227,11 @@ public class SampleController {
             log.info("snp store: {}", snpPath);
             geneIndelTask.parse(snpPath);
             sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
-            sampleEntity.setFinishTime(new Date());
+            sampleEntity.setStoreFinishTime(new Date());
             return R.ok("入库成功...");
         } catch (Exception e) {
             sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
-            sampleEntity.setFinishTime(new Date());
+            sampleEntity.setStoreFinishTime(new Date());
             e.printStackTrace();
             return R.ok("入库失败...");
         }
