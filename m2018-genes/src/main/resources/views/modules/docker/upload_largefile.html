@@ -46,8 +46,13 @@
 <script type="text/javascript">
     $(function () {
         var $list = $('#fileList');
+        var mainFrame = parent.document.getElementById('mainFrame').contentWindow;
+        var sickId =mainFrame.document.getElementById('sickInput').value;
+        if (!sickId) {
+            alert("未选择病人");
+            return;
+        }
         var uploader = WebUploader.create({
-
             //设置选完文件后是否自动上传
             auto: false,
             //swf文件路径
@@ -55,21 +60,20 @@
             swf: '../../plugins/webuploader/Uploader.swf',
 
             // 文件接收服务端。
-            server: '/docker/upload/large_file',
+            server: '/docker/upload/large_file?token=' + localStorage.getItem("token"),
 
             // 选择文件的按钮。可选。
             // 内部根据当前运行是创建，可能是input元素，也可能是flash.
             pick: '#picker',
 
             chunked: true, //开启分块上传
-            chunkSize: 10 * 1024 * 1024,
+            chunkSize: 1 * 1024 * 1024,
             chunkRetry: 3,//网络问题上传失败后重试次数
             threads: 5, //上传并发数
             //formData: { guid: WebUploader.guid() },  //一个文件有一个guid，在服务器端合并成一个文件  这里有个问题，多个文件或者上传一个文件成功后不刷新直接添加文件上传生成的guid不变！！！   暂时只能传一个大文件（已解决）
             //fileNumLimit :1,
-            fileSizeLimit: 2000 * 1024 * 1024,//最大2GB
-            fileSingleSizeLimit: 2000 * 1024 * 1024,
-
+            fileSizeLimit: 10000 * 1024 * 1024,//最大10GB
+            fileSingleSizeLimit: 10000 * 1024 * 1024,
 
             resize: false//不压缩
 
@@ -87,7 +91,8 @@
                 '<h4 class="info">' + file.name + '<button type="button" fileId="' + file.id + '" class="btn btn-danger btn-delete"><span class="glyphicon glyphicon-trash"></span></button></h4>' +
                 '<p class="state">正在计算文件MD5...请等待计算完毕后再点击上传！</p>' +
                 '</div>');
-            //删除要上传的文件
+
+            var index = parent.layer.load(1, {shade: [0.5,'#fff']});
             //每次添加文件都给btn-delete绑定删除方法
             $(".btn-delete").click(function () {
                 //console.log($(this).attr("fileId"));//拿到文件id
@@ -96,44 +101,44 @@
                 $(this).parent().parent().remove();//DOM上删除了
             });
 
-            uploader.options.formData.guid = WebUploader.guid();//每个文件都附带一个guid，以在服务端确定哪些文件块本来是一个
+            //每个文件都附带一个guid，以在服务端确定哪些文件块本来是一个
+            uploader.options.formData.guid = WebUploader.guid();
+            uploader.options.formData.sickId = sickId;
 
-            uploader.md5File(file)
-                .then(function (fileMd5) { // 完成
-                    //var end = +new Date();
-                    // console.log("before-send-file  preupload: file.size="+file.size+" file.md5="+fileMd5);
-                    //insertLog("<br>" + moment().format("YYYY-MM-DD HH:mm:ss") + " before-send-file  preupload:计算文件(" + file.name + ")MD5完成. 耗时  " + (end - start) + '毫秒  fileMd5: ' + fileMd5);
-                    file.wholeMd5 = fileMd5;//获取到了md5
-                    uploader.options.formData.md5value = file.wholeMd5;//每个文件都附带一个md5，便于实现秒传
+            uploader.md5File(file).then(function (fileMd5) {
+                parent.layer.close(index);
+                //获取到了md5
+                file.wholeMd5 = fileMd5;
 
-                    $('#' + file.id).find('p.state').text('MD5计算完毕，可以点击上传了');
+                //每个文件都附带一个md5，便于实现秒传
+                uploader.options.formData.md5 = file.wholeMd5;
 
-                    $.ajax({//向服务端发送请求
-                        cache: false,
-                        type: "post",
-                        //dataType: "json",
-                        url: "/docker/upload/check_md5",
-                        data: {
-                            fileMd5: fileMd5,
-                            fileName: file.name,
-                            fileID: file.id,
-                            //isShared: $("#isShared").val()
-                        },
-                        success: function (result) {
-                            console.log(result);
-                            if (result.code === 0) {
-                                console.log("服务器上已经有同样的文件了，开始秒传！");
-                                uploader.removeFile(file, true);
-                                $('#' + file.id).find('p.state').text('已上传');
-                                $('#' + file.id).find(".progress").find(".progress-bar").attr("class", "progress-bar progress-bar-success");
-                                $('#' + file.id).find(".info").find('.btn').fadeOut('slow');//上传完后删除"删除"按钮
-                                $("#StopBtn").fadeOut('slow');
-                            } else {
-                                console.log("服务器上没有同样的文件，秒传失败！");
-                            }
+                $('#' + file.id).find('p.state').text('MD5计算完毕，可以点击上传了');
+
+                $.ajax({
+                    cache: false,
+                    type: "post",
+                    dataType: "json",
+                    url: "/docker/upload/check_md5",
+                    data: {
+                        md5: fileMd5,
+                        fileName: file.name,
+                        fileID: file.id
+                    },
+                    success: function (result) {
+                        console.log(result);
+                        if (result.msg == 'this file is exist') {
+                            uploader.removeFile(file, true);
+                            $('#' + file.id).find('p.state').text('该文件已上传');
+                            $('#' + file.id).find(".progress").find(".progress-bar").attr("class", "progress-bar progress-bar-success");
+                            $('#' + file.id).find(".info").find('.btn').fadeOut('slow');
+                            $("#StopBtn").fadeOut('slow');
+                        } else {
+                            console.log("服务器上没有同样的文件，秒传失败！");
                         }
-                    });
+                    }
                 });
+            });
         });
 
         // 文件上传过程中创建进度条实时显示。
@@ -152,6 +157,7 @@
             $li.find('p.state').text('上传中');
 
             $percent.css('width', percentage * 100 + '%');
+            $percent.html(percentage * 100 + '%');
         });
 
         uploader.on('uploadSuccess', function (file) {

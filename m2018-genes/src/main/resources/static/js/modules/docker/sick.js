@@ -40,39 +40,39 @@ $(function () {
         }
     });
 
-    var allowedFile = null;
-    $.get(baseURL + "sys/config/get_key?key=FILE_ALLOWED", function (r) {
-        allowedFile = r.config;
-    });
-
-    new AjaxUpload('#upload', {
-        action: null,
-        name: 'file',
-        autoSubmit: true,
-        responseType: "json",
-        onSubmit: function (file, extension) {
-            var id = getSelectedRow();
-            if (id == null) {
-                return false;
-            }
-            this._settings.action = baseURL + 'docker/sample/upload/' + id + '?token=' + token;
-
-            allowedFile = allowedFile ? allowedFile.value : "(fq|fastq|gz)$";
-            var reg = new RegExp(allowedFile);
-            if (!(extension && reg.test(extension.toLowerCase()))) {
-                alert('只支持' + allowedFile + '的文件！');
-                return false;
-            }
-        },
-        onComplete: function (file, r) {
-            if (r.code == 0) {
-                alert("上传成功，路径：" + r.url);
-                vm.reload();
-            } else {
-                alert(r.msg);
-            }
-        }
-    });
+    // var allowedFile = null;
+    // $.get(baseURL + "sys/config/get_key?key=FILE_ALLOWED", function (r) {
+    //     allowedFile = r.config;
+    // });
+    //
+    // new AjaxUpload('#upload', {
+    //     action: null,
+    //     name: 'file',
+    //     autoSubmit: true,
+    //     responseType: "json",
+    //     onSubmit: function (file, extension) {
+    //         var id = getSelectedRow();
+    //         if (id == null) {
+    //             return false;
+    //         }
+    //         this._settings.action = baseURL + 'docker/sample/upload/' + id + '?token=' + token;
+    //
+    //         allowedFile = allowedFile ? allowedFile.value : "(fq|fastq|gz)$";
+    //         var reg = new RegExp(allowedFile);
+    //         if (!(extension && reg.test(extension.toLowerCase()))) {
+    //             alert('只支持' + allowedFile + '的文件！');
+    //             return false;
+    //         }
+    //     },
+    //     onComplete: function (file, r) {
+    //         if (r.code == 0) {
+    //             alert("上传成功，路径：" + r.url);
+    //             vm.reload();
+    //         } else {
+    //             alert(r.msg);
+    //         }
+    //     }
+    // });
 });
 
 var vm = new Vue({
@@ -164,6 +164,20 @@ var vm = new Vue({
                 postData: {'key': vm.q.key},
                 page: page
             }).trigger("reloadGrid");
+        },
+        openDlg: function () {
+            var id = getSelectedRow();
+            if (id == null) {
+                return;
+            }
+            $('#sickInput').val(id);
+            parent.layer.open({
+                type: 2,
+                area: ['700px', '450px'],
+                fixed: false,
+                maxmin: true,
+                content: 'modules/docker/upload_largefile.html'
+            });
         }
     }
 });

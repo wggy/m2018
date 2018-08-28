@@ -1,7 +1,12 @@
 package sw.melody.modules.docker.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
+import sw.melody.common.exception.RRException;
+import sw.melody.common.utils.ConfigConstant;
+import sw.melody.modules.sys.service.SysConfigService;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,10 +17,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 
+/**
+ * @author wange
+ */
 public class SaveFile {
 
-    private static final File uploadDirectory = new File(getRealPath());
+//    private File uploadDirectory = new File(getRealPath());
 
+    private Object lockObj = new Object();
+
+    @Autowired
+    private SysConfigService sysConfigService;
 
     /**
      * @param savePath
@@ -24,23 +36,19 @@ public class SaveFile {
      * @return
      * @throws Exception
      */
-    public static boolean saveFile(@NotNull final String savePath,
+    public boolean saveFile(@NotNull final String savePath,
                                    @NotNull final String fileFullName,
                                    @NotNull final MultipartFile file)
             throws Exception {
         byte[] data = readInputStream(file.getInputStream());
         //new一个文件对象用来保存图片，默认保存当前工程根目录
-        File uploadFile = new File(savePath + fileFullName);
+        File uploadFile = new File(addFileSeparator(savePath) + fileFullName);
         //判断文件夹是否存在，不存在就创建一个
         File fileDirectory = new File(savePath);
-        synchronized (uploadDirectory) {
-            if (!uploadDirectory.exists()) {
-                if (!uploadDirectory.mkdir()) {
-                    throw new Exception("保存文件的父文件夹创建失败！路径为：" + savePath);
-                }
-            }
+
+        synchronized (lockObj) {
             if (!fileDirectory.exists()) {
-                if (!fileDirectory.mkdir()) {
+                if (!fileDirectory.mkdirs()) {
                     throw new Exception("文件夹创建失败！路径为：" + savePath);
                 }
             }
@@ -57,7 +65,7 @@ public class SaveFile {
         return uploadFile.exists();
     }
 
-    public static byte[] readInputStream(InputStream inStream) throws Exception {
+    public byte[] readInputStream(InputStream inStream) throws Exception {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int len;
@@ -73,8 +81,19 @@ public class SaveFile {
      *
      * @return
      */
-    public static String getRealPath() {
-        return "/home/lgf";
+    public String getRealPath() {
+        String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
+        return prefix;
+    }
+
+    public String addFileSeparator(String path) {
+        if (StringUtils.isBlank(path)) {
+            throw new RRException("路径为空");
+        }
+        if (path.endsWith(ConfigConstant.File_Separator)) {
+            return path;
+        }
+        return path + ConfigConstant.File_Separator;
     }
 
 
@@ -85,7 +104,7 @@ public class SaveFile {
      * @return
      * @throws IOException
      */
-    public static File getFileByPath(String filePath) throws IOException {
+    public File getFileByPath(String filePath) throws IOException {
         Path path = Paths.get(getRealPath() + filePath);
         if (Files.exists(path)) {
             return new File(path.toUri());

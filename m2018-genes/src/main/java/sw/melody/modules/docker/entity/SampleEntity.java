@@ -45,4 +45,10 @@ public class SampleEntity implements Serializable {
 
     private String sickName;
     private String sickCode;
+    private String md5;
+
+    public SampleEntity() {
+    }
+
+
 }

@@ -32,7 +32,7 @@
 			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
 			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
 			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
-			<a class="btn btn-primary" id="upload"><i class="fa fa-plus"></i>&nbsp;上传文件</a>
+			<a class="btn btn-primary" id="upload" @click="openDlg"><i class="fa fa-plus"></i>&nbsp;上传文件</a>
 		</div>
 	    <table id="jqGrid"></table>
 	    <div id="jqGridPager"></div>
@@ -98,6 +98,7 @@
 			</div>
 		</form>
 	</div>
+	<input id="sickInput" value="" hidden="hidden">
 </div>
 
 <script src="../../js/modules/docker/sick.js"></script>

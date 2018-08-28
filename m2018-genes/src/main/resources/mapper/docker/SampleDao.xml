@@ -16,9 +16,6 @@
 			<if test="location != null">
 				and t.location = #{location}
 			</if>
-			<if test="handlerStatus != null">
-				and t.handler_status = #{handlerStatus}
-			</if>
 		</where>
 		order by id desc
 		<if test="offset != null and limit != null">
@@ -32,41 +29,109 @@
 			<if test="sickId != null">
 				and t.sick_id = #{sickId}
 			</if>
-			<if test="handlerStatus != null">
-				and t.handler_status = #{handlerStatus}
-			</if>
 		</where>
 	</select>
 	 
 	<insert id="save" parameterType="sw.melody.modules.docker.entity.SampleEntity" useGeneratedKeys="true" keyProperty="id">
 		insert into tbl_sample
-		(
-			`sick_id`,
-			`origin_name`,
-			`location`,
-			`upload_time`,
-			`handler_status`,
-			`handler_time`
-		)
-		values
-		(
-			#{sickId},
-			#{originName},
-			#{location},
-			#{uploadTime},
-			#{handlerStatus},
-			#{handlerTime}
-		)
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sickId != null">
+				`sick_id`,
+			</if>
+			<if test="originName != null">
+				`origin_name`,
+			</if>
+			<if test="location != null">
+				`location`,
+			</if>
+			<if test="uploadStartTime != null">
+				`upload_start_time`,
+			</if>
+			<if test="uploadStatus != null">
+				`upload_status`,
+			</if>
+			<if test="uploadFinishTime != null">
+				`upload_finish_time`,
+			</if>
+			<if test="triggerStartTime != null">
+				`trigger_start_time`,
+			</if>
+			<if test="triggerStatus != null">
+				`trigger_status`,
+			</if>
+			<if test="triggerFinishTime != null">
+				`trigger_finish_time`,
+			</if>
+			<if test="storeStartTime != null">
+				`store_start_time`,
+			</if>
+			<if test="storeStatus != null">
+				`store_status`,
+			</if>
+			<if test="storeFinishTime != null">
+				`store_finish_fime`,
+			</if>
+			<if test="md5 != null">
+				`md5`,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="sickId != null">
+				#{sickId},
+			</if>
+			<if test="originName != null">
+				#{originName},
+			</if>
+			<if test="location != null">
+				#{location},
+			</if>
+			<if test="uploadStartTime != null">
+				#{uploadStartTime},
+			</if>
+			<if test="uploadStatus != null">
+				#{uploadStatus},
+			</if>
+			<if test="uploadFinishTime != null">
+				#{uploadFinishTime},
+			</if>
+			<if test="triggerStartTime != null">
+				#{triggerStartTime},
+			</if>
+			<if test="triggerStatus != null">
+				#{triggerStatus},
+			</if>
+			<if test="triggerFinishTime != null">
+				#{triggerFinishTime},
+			</if>
+			<if test="storeStartTime != null">
+				#{storeStartTime},
+			</if>
+			<if test="storeStatus != null">
+				#{storeStatus},
+			</if>
+			<if test="storeFinishTime != null">
+				#{storeFinishTime},
+			</if>
+			<if test="md5 != null">
+				#{md5},
+			</if>
+		</trim>
 	</insert>
 	 
 	<update id="update" parameterType="sw.melody.modules.docker.entity.SampleEntity">
 		update tbl_sample
 		<set>
-			<if test="handlerStatus != null">`handler_status` = #{handlerStatus}, </if>
-			<if test="handlerTime != null">`handler_time` = #{handlerTime},</if>
-			<if test="uploadTime != null">`upload_time` = #{uploadTime},</if>
-			<if test="originName != null">`origin_name` = #{originName},</if>
-			<if test="triggerTime != null">`trigger_time` = #{triggerTime},</if>
+			<if test="location != null">`location` = #{location},</if>
+			<if test="uploadStartTime != null">`upload_start_time` = #{uploadStartTime},</if>
+			<if test="uploadStatus != null">`upload_status` = #{uploadStatus},</if>
+			<if test="uploadFinishTime != null">`upload_finish_time` = #{uploadFinishTime},</if>
+			<if test="triggerStartTime != null">`trigger_start_time` = #{triggerStartTime},</if>
+			<if test="triggerStatus != null">`trigger_status` = #{triggerStatus}, </if>
+			<if test="triggerFinishTime != null">`trigger_finish_time` = #{triggerFinishTime},</if>
+			<if test="storeStartTime != null">`store_start_time` = #{storeStartTime},</if>
+			<if test="storeStatus != null">`store_status` = #{storeStatus}, </if>
+			<if test="storeFinishTime != null">`store_finish_time` = #{storeFinishTime},</if>
+			<if test="md5 != null">`md5` = #{md5},</if>
 		</set>
 		where id = #{id}
 	</update>

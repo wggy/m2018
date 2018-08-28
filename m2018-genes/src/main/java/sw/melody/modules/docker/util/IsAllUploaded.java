@@ -21,18 +21,18 @@ public class IsAllUploaded {
      */
     public static boolean isAllUploaded(@NotNull final String md5,
                                         @NotNull final String chunks) {
-        int size = uploadInfoList.stream()
-                .filter(item -> item.getMd5().equals(md5))
-                .distinct()
-                .collect(Collectors.toList())
-                .size();
-        boolean bool = (size == Integer.parseInt(chunks));
-        if (bool) {
-            synchronized (uploadInfoList) {
+        synchronized (uploadInfoList) {
+            int size = uploadInfoList.stream()
+                    .filter(item -> item.getMd5().equals(md5))
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .size();
+            boolean bool = (size == Integer.parseInt(chunks));
+            if (bool) {
                 uploadInfoList.removeIf(item -> Objects.equals(item.getMd5(), md5));
             }
+            return bool;
         }
-        return bool;
     }
 
     /**
@@ -43,7 +43,7 @@ public class IsAllUploaded {
      * @param fileName    文件名
      * @param ext         文件后缀名
      */
-    public static void uploaded(@NotNull final String md5,
+    public static boolean uploadedAll(@NotNull final String md5,
                                 @NotNull final String guid,
                                 @NotNull final String chunk,
                                 @NotNull final String chunks,
@@ -59,8 +59,9 @@ public class IsAllUploaded {
 
         if (allUploaded) {
             MergeFile.mergeFile(chunksNumber, ext, guid, uploadFolderPath);
-//            fileService.save(new com.zhangzhihao.FileUpload.Java.Model.File(guid + ext, md5, new Date()));
+            return true;
         }
+        return false;
     }
 }
 

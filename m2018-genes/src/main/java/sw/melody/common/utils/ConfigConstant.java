@@ -41,6 +41,7 @@ public class ConfigConstant {
 
     public static final String Result_Indel_File_Prefix = "_sorted_dedup_recal_raw_variants_indel_marker_filtered_annovar.hg19_multianno.vcf";
     public static final String Result_Snp_File_Prefix   = "_sorted_dedup_recal_raw_variants_snp_marked_filtered_annovar.hg19_multianno.vcf";
+    public static final String Dot   = ".";
 
     /***
      * 上传文件短路径
@@ -51,11 +52,33 @@ public class ConfigConstant {
     public static String getShortPath(String sickCode, String suffix) {
         //文件路径
         String path = DateUtils.format(new Date(), "yyyyMMdd") + File_Separator + sickCode;
-        return path + "." + suffix;
+        if (suffix.startsWith(Dot)) {
+            return path + suffix;
+        }
+        return path + Dot + suffix;
+    }
+
+    public static String getShortPath(String sickCode, String guid, String suffix) {
+        //文件路径
+        String path = sickCode + File_Separator + guid;
+        if (suffix.startsWith(Dot)) {
+            return path + suffix;
+        }
+        return path + Dot + suffix;
     }
 
     public static String getFullPathNoFile(String prefix) {
+        if (prefix.endsWith(File_Separator)) {
+            return prefix + DateUtils.format(new Date(), "yyyyMMdd");
+        }
         return prefix + File_Separator + DateUtils.format(new Date(), "yyyyMMdd");
+    }
+
+    public static String getFullPathNoFile(String prefix, String sickCode, String guid) {
+        if (prefix.endsWith(File_Separator)) {
+            return prefix + sickCode + File_Separator + guid;
+        }
+        return prefix + File_Separator + sickCode + File_Separator + guid;
     }
 
     /***
@@ -80,6 +103,9 @@ public class ConfigConstant {
      * @return
      */
     public static String getFullPath(String prefix, String shortPath) {
+        if (prefix.endsWith(File_Separator)) {
+            return prefix + shortPath;
+        }
         return prefix + File_Separator + shortPath;
     }
 }
