@@ -73,9 +73,17 @@ GeneSearch.downLoad = function (url, data, method) {
 };
 
 $(function () {
-    var href = window.location.href;
-    var params = href.replace("m=", "").substring(href.indexOf('?') + 1);
-    var pArray = params.split('-');
+    var mainFrame = parent.document.getElementById('mainFrame').contentWindow;
+    if (!mainFrame) {
+        console.error("未获取上层iframe");
+        return;
+    }
+    var sickParams = mainFrame.document.getElementById('sickParams').value;
+    if (!sickParams) {
+        console.error("未读取到参数");
+        return;
+    }
+    var pArray = sickParams.split('-');
     GeneSearch.sickCode = pArray[0];
     GeneSearch.productId = pArray[1];
     GeneSearch.initSickInfo();

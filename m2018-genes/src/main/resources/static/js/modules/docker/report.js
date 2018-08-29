@@ -42,7 +42,20 @@ $(function () {
     });
 
     $('#jqGrid').on('click', '.sickcode', function () {
-        window.parent.location.hash = '#modules/docker/gene_search.html?m=' + $(this).attr('attrcode');
+        var params = $(this).attr('attrcode');
+        $('#sickParams').val(params);
+        if (!params) {
+            alert('参数无法获取');
+            return;
+        }
+        var index = layer.open({
+            type: 2,
+            area: ['900px', '550px'],
+            maxmin: true,
+            fixed: false,
+            content: 'gene_search.html'
+        });
+        layer.full(index);
     });
 });
 

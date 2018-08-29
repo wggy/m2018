@@ -212,3 +212,5 @@ ALTER TABLE `tbl_sample`
 DROP COLUMN `handler_start_time`,
 DROP COLUMN `handler_status`,
 DROP COLUMN `handler_finish_time`;
+ALTER TABLE `tbl_snp`
+ADD COLUMN `sick_id`  int(10) NULL AFTER `data_type`;

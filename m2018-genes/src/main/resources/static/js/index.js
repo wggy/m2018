@@ -55,11 +55,11 @@ var vm = new Vue({
 				vm.user = r.user;
 			});
 		},
-		getReportUrl: function () {
-            $.getJSON(baseURL + "docker/report/get_dy_url", function(r){
-                vm.reportUrl = r.list;
-            });
-        },
+        // getReportUrl: function () {
+        //     $.getJSON(baseURL + "docker/report/get_dy_url", function(r){
+        //         vm.reportUrl = r.list;
+        //     });
+        // },
 		updatePassword: function(){
 			layer.open({
 				type: 1,
@@ -100,25 +100,25 @@ var vm = new Vue({
 	created: function(){
 		this.getMenuList();
 		this.getUser();
-		this.getReportUrl();
+		// this.getReportUrl();
 	},
     updated: function(){
         //路由
         var router = new Router();
         routerList(router, vm.menuList);
         // 添加特殊菜单，不在菜单表中，由报告数据跳转
-        router.add('#modules/docker/gene_search.html', function() {
-            var url = window.location.hash;
-            vm.main = url.replace('#', '');
-            vm.navTitle = '基因数据搜索';
-        });
-		$.each(vm.reportUrl, function (i, value) {
-            router.add('#modules/docker/gene_search.html?m='+value, function() {
-                var url = window.location.hash;
-                vm.main = url.replace('#', '');
-                vm.navTitle = '基因数据搜索';
-            });
-        });
+        // router.add('#modules/docker/gene_search.html', function() {
+        //     var url = window.location.hash;
+        //     vm.main = url.replace('#', '');
+        //     vm.navTitle = '基因数据搜索';
+        // });
+        // $.each(vm.reportUrl, function (i, value) {
+        //     router.add('#modules/docker/gene_search.html?m='+value, function() {
+        //         var url = window.location.hash;
+        //         vm.main = url.replace('#', '');
+        //         vm.navTitle = '基因数据搜索';
+        //     });
+        // });
         router.start();
     }
 });

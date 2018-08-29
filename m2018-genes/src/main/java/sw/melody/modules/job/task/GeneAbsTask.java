@@ -144,7 +144,7 @@ public abstract class GeneAbsTask {
     @Autowired
     private SickFormatTask sickFormatTask;
 
-    public void parse(String fileName) throws Exception {
+    public void parse(String fileName, Long sickId) throws Exception {
         File f = new File(fileName);
         BufferedReader reader = new BufferedReader(new FileReader(f));
         String str = null;
@@ -168,7 +168,7 @@ public abstract class GeneAbsTask {
                 continue;
             }
             if (flag) {
-                SnpEntity snpEntity = parseLine(str, getGeneType());
+                SnpEntity snpEntity = parseLine(str, getGeneType(), sickId);
                 if (snpEntity == null) {
                     log.error("snpEntity is null...");
                     continue;
@@ -189,7 +189,7 @@ public abstract class GeneAbsTask {
         log.info("length_map : {}", leng_map);
     }
 
-    private SnpEntity parseLine(String line, String dataType) {
+    private SnpEntity parseLine(String line, String dataType, Long sickId) {
         if (StringUtils.isEmpty(line)) {
             return null;
         }
@@ -198,7 +198,7 @@ public abstract class GeneAbsTask {
 
         SnpEntity entity = null;
         try {
-            entity = new SnpEntity(cols, dataType);
+            entity = new SnpEntity(cols, dataType, sickId);
         } catch (Exception e) {
             log.error("数据行不合法： {}", line);
             e.getMessage();

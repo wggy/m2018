@@ -5,8 +5,8 @@
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.ReportEntity">
 		SELECT sa.sick_id, s.sick_name, CONCAT(s.sick_code, '-', p.id) as sick_code, sa.id as sample_id,
-		sa.upload_time, sa.trigger_time, sa.handler_time, sa.store_time, sa.finish_time,
-		sa.handler_status, sa.store_status, p.product_name
+		sa.upload_start_time, sa.upload_status, sa.upload_finish_time, sa.trigger_start_time, sa.trigger_status,
+		sa.trigger_finish_time, sa.store_start_time, sa.store_status, sa.store_finish_time, p.product_name
 		FROM tbl_sick s
 		JOIN tbl_sample sa ON s.id=sa.sick_id
 		JOIN tbl_sick_product sp ON s.id=sp.sick_id
@@ -22,7 +22,7 @@
 				and sa.id = #{sampleId}
 			</if>
 		</where>
-		order by sa.finish_time desc, sa.sick_id desc
+		order by sa.store_finish_time desc, sa.sick_id desc
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
 		</if>

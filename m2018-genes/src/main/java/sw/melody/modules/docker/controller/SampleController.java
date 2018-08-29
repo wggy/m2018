@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /****
  * 样本管理
@@ -48,6 +50,8 @@ public class SampleController {
     private GeneSnpTask geneSnpTask;
     @Autowired
     private GeneIndelTask geneIndelTask;
+
+    private ExecutorService executors =  Executors.newFixedThreadPool(1);
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sample:query")
@@ -155,18 +159,18 @@ public class SampleController {
             sampleEntity.setTriggerStartTime(new Date());
             sampleService.update(sampleEntity);
         }
+
         Thread exeThread = new Thread(() -> {
-            String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
             SampleEntity entity = sampleService.queryObject(id);
-            String fullPath = ConfigConstant.getFullPath(prefix, entity.getLocation());
+            String fullPath = entity.getLocation();
             File fullPathFile = new File(fullPath);
-            if (fullPathFile == null) {
+            if (fullPathFile == null || !fullPathFile.exists()) {
                 log.error("fullPathFile 不存在。。。。");
                 return;
             }
 //            String bwaFile = fullPathFile.getParent() + ConfigConstant.File_Separator + ConfigConstant.Shell_Bwa;
             Process ps = null;
-            String command = "cd " + fullPathFile.getParent() + " &&  nohup ./" + ConfigConstant.Shell_Bwa + " " + fullPathFile.getName() + " >log.out 2>&1 &";
+            String command = "cd " + fullPathFile.getParent() + " &&  nohup ./" + ConfigConstant.Shell_Bwa + " " + fullPathFile.getName() + " > " + fullPathFile.getName() + ".out 2>&1";
             log.info("command: {}", command);
             try {
                 ps = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
@@ -217,18 +221,25 @@ public class SampleController {
         sampleEntity.setStoreStartTime(new Date());
         sampleService.update(sampleEntity);
 
-        String prefix = sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX);
-        String fullPath = ConfigConstant.getFullPath(prefix, sampleEntity.getLocation());
+        String fullPath = sampleEntity.getLocation();
         String indelPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Indel_File_Prefix;
         String snpPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Snp_File_Prefix;
+        Long sickId = sampleEntity.getSickId();
         try {
-            log.info("indel store: {}", indelPath);
-            geneSnpTask.parse(indelPath);
-            log.info("snp store: {}", snpPath);
-            geneIndelTask.parse(snpPath);
-            sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
-            sampleEntity.setStoreFinishTime(new Date());
-            return R.ok("入库成功...");
+            executors.execute(() -> {
+                log.info("indel store: {}", indelPath);
+                try {
+                    geneSnpTask.parse(indelPath, sickId);
+                    log.info("snp store: {}", snpPath);
+                    geneIndelTask.parse(snpPath, sickId);
+                    sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
+                    sampleEntity.setStoreFinishTime(new Date());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            return R.ok("入库操作执行中...");
         } catch (Exception e) {
             sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
             sampleEntity.setStoreFinishTime(new Date());

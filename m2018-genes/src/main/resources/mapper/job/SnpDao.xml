@@ -39,7 +39,8 @@
 			`filter`,
 			`info`,
 			`create_time`,
-			`data_type`
+			`data_type`,
+			`sick_id`
 		)
 		values
 		(
@@ -52,7 +53,8 @@
 			#{filter},
 			#{info},
 			#{createTime},
-			#{dataType}
+			#{dataType},
+			#{sickId}
 		)
 	</insert>
 	

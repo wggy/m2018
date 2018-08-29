@@ -12,8 +12,8 @@ import sw.melody.common.utils.Constant;
 @Component("geneIndelTask")
 public class GeneIndelTask extends GeneAbsTask {
 
-    public void parseIndel(String filename) throws Exception {
-        super.parse(filename);
+    public void parseIndel(String filename, Long sickId) throws Exception {
+        super.parse(filename, sickId);
     }
 
     @Override

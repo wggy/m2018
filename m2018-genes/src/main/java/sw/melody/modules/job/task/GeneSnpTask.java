@@ -12,8 +12,8 @@ import sw.melody.common.utils.Constant;
 @Component("geneSnpTask")
 public class GeneSnpTask extends GeneAbsTask{
 
-    public void parseSnp(String filename) throws Exception {
-        super.parse(filename);
+    public void parseSnp(String filename, Long sickId) throws Exception {
+        super.parse(filename, sickId);
     }
 
     @Override

@@ -6,6 +6,7 @@ import sw.melody.common.exception.RRException;
 
 /***
  * Created by ping on 2018/6/21
+ * @author wange
  */
 @Setter
 @Getter
@@ -21,11 +22,12 @@ public class SnpEntity {
     private String info;
     private Integer createTime;
     private String dataType;
+    private Long sickId;
 
     public SnpEntity() {
     }
 
-    public SnpEntity(String[] cols, String dataType) {
+    public SnpEntity(String[] cols, String dataType, Long sickId) {
         if (cols == null || cols.length < 9) {
             throw new RRException("数据行不匹配");
         }
@@ -39,5 +41,6 @@ public class SnpEntity {
         this.info = cols[7];
         this.createTime = (int) (System.currentTimeMillis() / 1000);
         this.dataType = dataType;
+        this.sickId = sickId;
     }
 }
