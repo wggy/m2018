@@ -94,4 +94,8 @@
 		</foreach>
 	</delete>
 
+	<select id="queryObjectByCode" resultType="sw.melody.modules.docker.entity.SickEntity">
+		select * from tbl_sick where sick_code = #{value} limit 1
+	</select>
+
 </mapper>

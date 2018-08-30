@@ -8,6 +8,8 @@ import java.util.Map;
 public interface SickService {
     SickEntity queryObject(Long id);
 
+    SickEntity queryObjectByCode(String sickCode);
+
     List<SickEntity> queryList(Map<String, Object> map);
 
     int queryTotal(Map<String, Object> map);

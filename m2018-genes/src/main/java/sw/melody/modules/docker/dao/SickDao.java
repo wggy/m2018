@@ -6,4 +6,5 @@ import sw.melody.modules.sys.dao.BaseDao;
 
 @Mapper
 public interface SickDao extends BaseDao<SickEntity> {
+    SickEntity queryObjectByCode(String sickCode);
 }

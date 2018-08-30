@@ -12,7 +12,11 @@ import sw.melody.common.utils.Query;
 import sw.melody.common.utils.R;
 import sw.melody.common.utils.WorderToNewWordUtils;
 import sw.melody.modules.docker.entity.GeneSearchEntity;
+import sw.melody.modules.docker.entity.ProductEntity;
+import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.GeneSearchService;
+import sw.melody.modules.docker.service.ProductService;
+import sw.melody.modules.docker.service.SickService;
 import sw.melody.modules.job.utils.Arith;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +37,10 @@ public class GeneSearchController {
 
     @Autowired
     private GeneSearchService geneSearchService;
+    @Autowired
+    private SickService sickService;
+    @Autowired
+    private ProductService productService;
 
     @RequestMapping("/sick_info")
     public R sickInfo(@RequestParam Map<String, Object> params) {
@@ -82,34 +90,31 @@ public class GeneSearchController {
 
 
         List<String[]> list1 = new ArrayList<>();
-        List<String[]> list2 = new ArrayList<>();
-
-        if (params.get("ids") == null) {
+        if (params.get("ids") == null || params.get("productId") == null || params.get("sickCode") == null) {
             throw new RRException("参数错误");
         }
         String ids = params.get("ids").toString();
-
+        String productId = params.get("productId").toString();
+        String sickCode = params.get("sickCode").toString();
         String[] idsStrArray = ids.split("%2C");
         Long[] idsArray = new Long[idsStrArray.length];
         for (int i=0; i<idsStrArray.length; i++) {
             idsArray[i] = Long.parseLong(idsStrArray[i]);
         }
         List<GeneSearchEntity> list = geneSearchService.queryListByIds(idsArray);
-
-        for (GeneSearchEntity entity : list) {
-            String[] s = new String[7];
-            s[0] = entity.getGeneRefgene();
-            s[1] = "";
-            s[2] = entity.getXrefRefgene();
-            s[3] = entity.getMutationInfo();
-            s[4] = entity.getAachangeRefgene();
-            s[5] = entity.getSampleNameAttr();
-            s[6] = "";
-            list1.add(s);
+        SickEntity sickEntity = sickService.queryObjectByCode(sickCode);
+        ProductEntity productEntity = productService.queryObject(Long.parseLong(productId));
+        if (sickEntity == null) {
+            throw new RRException("查无该病人记录");
         }
-        String fileName = this.getClass().getClassLoader().getResource("healthy_template.docx").getPath();
+        if (productEntity == null) {
+            throw new RRException("查无该检验产品记录");
+        }
+
+        String fileName = this.getClass().getClassLoader().getResource("report.xlsx").getPath();
         String userAgent = request.getHeader("User-Agent");
-        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
+        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, null);
+
     }
 
 }

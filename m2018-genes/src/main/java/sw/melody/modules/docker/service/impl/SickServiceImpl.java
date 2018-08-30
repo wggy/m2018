@@ -23,6 +23,11 @@ public class SickServiceImpl implements SickService {
     }
 
     @Override
+    public SickEntity queryObjectByCode(String sickCode) {
+        return sickDao.queryObjectByCode(sickCode);
+    }
+
+    @Override
     public List<SickEntity> queryList(Map<String, Object> map) {
         return sickDao.queryList(map);
     }
