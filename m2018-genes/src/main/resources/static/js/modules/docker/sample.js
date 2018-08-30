@@ -59,15 +59,16 @@ var vm = new Vue({
             vm.reload();
         },
         execute: function () {
-            var id = getSelectedRow();
-            if (id == null) {
-                return;
+            var ids = getSelectedRows();
+            if(ids == null || ids.length > 2){
+                alert('最多选择两条记录');
+                return ;
             }
             $.ajax({
                 type: "POST",
-                url: baseURL + "docker/sample/execute/" + id,
+                url: baseURL + "docker/sample/execute",
                 contentType: "application/json",
-                data: JSON.stringify(vm.config),
+                data: JSON.stringify(ids),
                 success: function(r){
                     if(r.code === 0){
                         alert('操作成功', function(){

@@ -37,7 +37,8 @@ public class ConfigConstant {
      * 可上传的文件
      */
     public static final String File_Allowed = "FILE_ALLOWED";
-    public static final String Shell_Bwa = "run_bwa.sh";
+    public static final String Shell_Bwa = " nohup ./run_bwa.sh ";
+    public static final String Shell_Bwa_File = "run_bwa.sh";
 
     public static final String Result_Indel_File_Prefix = "_sorted_dedup_recal_raw_variants_indel_marker_filtered_annovar.hg19_multianno.vcf";
     public static final String Result_Snp_File_Prefix   = "_sorted_dedup_recal_raw_variants_snp_marked_filtered_annovar.hg19_multianno.vcf";

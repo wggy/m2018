@@ -214,3 +214,12 @@ DROP COLUMN `handler_status`,
 DROP COLUMN `handler_finish_time`;
 ALTER TABLE `tbl_snp`
 ADD COLUMN `sick_id`  int(10) NULL AFTER `data_type`;
+ALTER TABLE `tbl_snp`
+MODIFY COLUMN `alt`  varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '变异值' AFTER `ref`;
+ALTER TABLE `tbl_snp`
+MODIFY COLUMN `pos`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '基因位置' AFTER `chrom`,
+MODIFY COLUMN `pos_id`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `pos`,
+MODIFY COLUMN `ref`  varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '参考值' AFTER `pos_id`,
+MODIFY COLUMN `qual`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `alt`,
+MODIFY COLUMN `filter`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `qual`;
+

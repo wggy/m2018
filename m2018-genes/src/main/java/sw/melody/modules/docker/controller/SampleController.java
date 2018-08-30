@@ -5,18 +5,17 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sw.melody.common.annotation.SysLog;
 import sw.melody.common.exception.RRException;
 import sw.melody.common.utils.*;
+import sw.melody.common.utils.Constant.SampleStatus;
 import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.docker.util.SaveFile;
 import sw.melody.modules.job.task.GeneIndelTask;
 import sw.melody.modules.job.task.GeneSnpTask;
 import sw.melody.modules.sys.entity.SysConfigEntity;
@@ -38,7 +37,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 @RestController
 @RequestMapping("docker/sample")
-public class SampleController {
+public class SampleController extends SaveFile {
 
     @Autowired
     private SampleService sampleService;
@@ -51,7 +50,7 @@ public class SampleController {
     @Autowired
     private GeneIndelTask geneIndelTask;
 
-    private ExecutorService executors =  Executors.newFixedThreadPool(1);
+    private ExecutorService storeExecutor = Executors.newSingleThreadExecutor();
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sample:query")
@@ -142,63 +141,75 @@ public class SampleController {
     }
 
     @SysLog("解析病患样本")
-    @RequestMapping("/execute/{id}")
+    @RequestMapping("/execute")
     @RequiresPermissions("docker:sample:edit")
-    public R execute(@PathVariable("id") Long id) throws Exception {
+    public R execute(@RequestBody Long[] ids) throws Exception {
+
+        if (ids == null || ids.length > 2) {
+            return R.error("参数错误，请选择一个或两个");
+        }
+
+        Long id = ids[0];
 
         SampleEntity sampleEntity = sampleService.queryObject(id);
-        if (sampleEntity == null) {
-            throw new RRException("查无上传记录");
-        }
-        if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getTriggerStatus())) {
-            throw new RRException("正在解析样本中...");
-        } else if (Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getTriggerStatus())) {
-            throw new RRException("样本已解析完成...");
-        } else if (StringUtils.isEmpty(sampleEntity.getTriggerStatus())) {
-            sampleEntity.setTriggerStatus(Constant.SampleStatus.Running.getStatus());
-            sampleEntity.setTriggerStartTime(new Date());
-            sampleService.update(sampleEntity);
+        SampleEntity secSampleEntity = null;
+        String secFileName = "";
+        checkStatus(sampleEntity);
+        if (ids.length == 2) {
+            Long secId = ids[1];
+            secSampleEntity = sampleService.queryObject(secId);
+            checkStatus(secSampleEntity);
+            secFileName = secSampleEntity.getOriginName();
         }
 
-        Thread exeThread = new Thread(() -> {
-            SampleEntity entity = sampleService.queryObject(id);
-            String fullPath = entity.getLocation();
-            File fullPathFile = new File(fullPath);
-            if (fullPathFile == null || !fullPathFile.exists()) {
-                log.error("fullPathFile 不存在。。。。");
-                return;
+        String targetFileName = sampleEntity.getOriginName();
+        String bashFilePath = sysConfigService.getValue(ConfigConstant.SAMPLE_SHELL_PATH);
+        File bashFile = new File(bashFilePath);
+
+        File fullPathFile = new File(sampleEntity.getLocation());
+        String fullPathNoFile = fullPathFile.getParent();
+        if (!bashFile.exists() || !fullPathFile.exists()) {
+            throw new RRException("bash文件不存在");
+        }
+
+        File targetBashFile = new File(addFileSeparator(fullPathNoFile) + ConfigConstant.Shell_Bwa_File);
+        if (!targetBashFile.exists()) {
+            Process cpFilePs = Runtime.getRuntime().exec("cp -pf " + bashFilePath + " " + fullPathNoFile);
+            int cpFileStatus = cpFilePs.waitFor();
+            if (cpFileStatus != 0) {
+                throw new RRException("中间文件拷贝失败");
             }
-//            String bwaFile = fullPathFile.getParent() + ConfigConstant.File_Separator + ConfigConstant.Shell_Bwa;
-            Process ps = null;
-            String command = "cd " + fullPathFile.getParent() + " &&  nohup ./" + ConfigConstant.Shell_Bwa + " " + fullPathFile.getName() + " > " + fullPathFile.getName() + ".out 2>&1";
-            log.info("command: {}", command);
-            try {
-                ps = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
-                int status = ps.waitFor();
-                log.info("status: {}", status);
-                if (status != 0) {
-                    log.error("Failed to call shell's command ");
-                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
-                } else {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        log.info(line);
-                    }
-                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Success.getStatus());
-                    br.close();
-                }
-            } catch (Exception e) {
-                sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
-                e.printStackTrace();
-            }
-            sampleEntity.setTriggerFinishTime(new Date());
-            sampleService.update(sampleEntity);
-        });
+        }
+
+        String command = getCommand(ids, fullPathNoFile, targetFileName, secFileName);
+        log.info("command: {}", command);
+        Thread exeThread = new TriggerThread(command, sampleEntity, secSampleEntity);
         Runtime.getRuntime().addShutdownHook(exeThread);
         exeThread.start();
         return R.ok("调度成功");
 
+    }
+
+    private void checkStatus(SampleEntity sampleEntity) {
+        if (sampleEntity == null) {
+            throw new RRException("查无上传记录");
+        }
+        if (SampleStatus.Running.getStatus().equals(sampleEntity.getTriggerStatus())) {
+            throw new RRException("正在解析样本中...");
+        } else if (SampleStatus.Success.getStatus().equals(sampleEntity.getTriggerStatus())) {
+            throw new RRException("样本已解析完成...");
+        } else {
+            sampleEntity.setTriggerStatus(Constant.SampleStatus.Running.getStatus());
+            sampleEntity.setTriggerStartTime(new Date());
+            sampleService.update(sampleEntity);
+        }
+    }
+
+    private String getCommand(Long[] ids, String fullPathNoFile, String targetFileName, String secFileName) {
+        if (ids.length == 1) {
+            return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " > " + targetFileName + ".out 2>&1 &";
+        }
+        return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " " + secFileName + " > " + targetFileName + ".out 2>&1 &";
     }
 
     @SysLog("样本入库")
@@ -209,7 +220,7 @@ public class SampleController {
         if (sampleEntity == null) {
             throw new RRException("查无上传记录");
         }
-        if (!Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getStoreStatus())) {
+        if (!Constant.SampleStatus.Success.getStatus().equals(sampleEntity.getTriggerStatus())) {
             throw new RRException("样本未成功解析，无法入库...");
         }
         if (Constant.SampleStatus.Running.getStatus().equals(sampleEntity.getStoreStatus())) {
@@ -226,7 +237,7 @@ public class SampleController {
         String snpPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Snp_File_Prefix;
         Long sickId = sampleEntity.getSickId();
         try {
-            executors.execute(() -> {
+            storeExecutor.execute(() -> {
                 log.info("indel store: {}", indelPath);
                 try {
                     geneSnpTask.parse(indelPath, sickId);
@@ -234,8 +245,12 @@ public class SampleController {
                     geneIndelTask.parse(snpPath, sickId);
                     sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
                     sampleEntity.setStoreFinishTime(new Date());
+                    sampleService.update(sampleEntity);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
+                    sampleEntity.setStoreFinishTime(new Date());
+                    sampleService.update(sampleEntity);
                 }
             });
 
@@ -243,9 +258,62 @@ public class SampleController {
         } catch (Exception e) {
             sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
             sampleEntity.setStoreFinishTime(new Date());
+            sampleService.update(sampleEntity);
             e.printStackTrace();
             return R.ok("入库失败...");
         }
     }
 
+    class TriggerThread extends Thread {
+
+        private String command;
+        private SampleEntity sampleEntity;
+        private SampleEntity secSampleEntity;
+
+        public TriggerThread(String command, SampleEntity sampleEntity, SampleEntity secSampleEntity) {
+            this.command = command;
+            this.sampleEntity = sampleEntity;
+            this.secSampleEntity = secSampleEntity;
+        }
+
+        @Override
+        public void run() {
+            Process ps;
+            try {
+                ps = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
+                int status = ps.waitFor();
+                log.info("status: {}", status);
+                if (status != 0) {
+                    log.error("Failed to call shell's command ");
+                    sampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
+                    if (secSampleEntity != null) {
+                        secSampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
+                    }
+                } else {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        log.info(line);
+                    }
+                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Success.getStatus());
+                    if (secSampleEntity != null) {
+                        secSampleEntity.setTriggerStatus(SampleStatus.Success.getStatus());
+                    }
+                    br.close();
+                }
+            } catch (Exception e) {
+                sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
+                if (secSampleEntity != null) {
+                    secSampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
+                }
+                e.printStackTrace();
+            }
+            sampleEntity.setTriggerFinishTime(new Date());
+            if (secSampleEntity != null) {
+                secSampleEntity.setTriggerFinishTime(new Date());
+            }
+            sampleService.update(sampleEntity);
+            sampleService.update(secSampleEntity);
+        }
+    }
 }

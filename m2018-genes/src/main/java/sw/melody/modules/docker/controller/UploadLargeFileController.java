@@ -72,7 +72,6 @@ public class UploadLargeFileController extends SaveFile {
                 chunkInfo.setUploadStartTime(new Date());
                 chunkInfo.setOriginName(guid + ext);
                 chunkInfo.setSickId(sickId);
-                chunkInfo.setMd5(md5);
                 sampleService.save(chunkInfo);
             }
 
@@ -101,12 +100,22 @@ public class UploadLargeFileController extends SaveFile {
                     entity.setUploadFinishTime(new Date());
                     entity.setUploadStatus(SampleStatus.Success.getStatus());
                     entity.setLocation(fullPath);
+                    entity.setMd5(md5);
                     sampleService.update(entity);
                 }
             } else {
                 fileName = guid + ext;
                 //上传文件没有分块的话就直接保存
                 saveFile(uploadFolderPath, fileName, file);
+                SampleEntity entity = sampleService.queryObjectByMd5(md5);
+                if (entity == null) {
+                    throw new RRException("服务器找不到文件");
+                }
+                entity.setUploadFinishTime(new Date());
+                entity.setUploadStatus(SampleStatus.Success.getStatus());
+                entity.setLocation(fullPath);
+                entity.setMd5(md5);
+                sampleService.update(entity);
             }
             return R.ok("{chunk: " + chunk + "}");
         } catch (Exception ex) {
