@@ -27,8 +27,8 @@ var vm = new Vue({
                 return;
             }
             var params = {ids: ids.join(','), token: localStorage.getItem("token")};
-            params.sickCode = GeneSearch.sickCode;
-            params.productId = GeneSearch.productId;
+            params.productId = GeneSearch.sickCode;
+            params.productId = GeneSearch.sickCode;
             confirm('确定要生成报告？', function () {
                 GeneSearch.downLoad(baseURL + "docker/gene_search/report", params, 'post');
                 parent.layer.msg('下载完成', {icon: 1});
@@ -44,7 +44,7 @@ var vm = new Vue({
             vm.showList = true;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {
-                postData: vm.q,
+                postData: $.extend({}, vm.q, GeneSearch),
                 page: page
             }).trigger("reloadGrid");
         }
@@ -75,12 +75,8 @@ GeneSearch.downLoad = function (url, data, method) {
 };
 
 $(function () {
-    var mainFrame = parent.document.getElementById('mainFrame').contentWindow;
-    if (!mainFrame) {
-        console.error("未获取上层iframe");
-        return;
-    }
-    var sickParams = mainFrame.document.getElementById('sickParams').value;
+
+    var sickParams = parent.document.getElementById('sickParams').value;
     if (!sickParams) {
         console.error("未读取到参数");
         return;
@@ -114,7 +110,7 @@ $(function () {
             {label: '单点分数', name: 'singlePointScore', width: 60},
             {label: 'Bp Score', name: 'bpScore', width: 60}
         ],
-        postData: vm.q,
+        postData: $.extend({}, vm.q, GeneSearch),
         viewrecords: true,
         height: '100%',
         rowNum: 10,

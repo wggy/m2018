@@ -97,8 +97,8 @@
             $(".btn-delete").click(function () {
                 //console.log($(this).attr("fileId"));//拿到文件id
                 uploader.removeFile(uploader.getFile($(this).attr("fileId"), true));
-                $(this).parent().parent().fadeOut();//视觉上消失了
-                $(this).parent().parent().remove();//DOM上删除了
+                $(this).parent().parent().fadeOut();
+                $(this).parent().parent().remove();
             });
 
             //每个文件都附带一个guid，以在服务端确定哪些文件块本来是一个

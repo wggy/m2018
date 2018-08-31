@@ -50,10 +50,10 @@ public class GeneSearchController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
         Query query = new Query(params);
-        String popfreqmax = query.get("popfreqmax") == null ? "" : query.get("popfreqmax").toString();
-        String exacAll = query.get("exacAll") == null ? "" : query.get("exacAll").toString();
-        String a1000gAll = query.get("a1000gAll") == null ? "" : query.get("a1000gAll").toString();
-        String exacEas = query.get("exacEas") == null ? "" : query.get("exacEas").toString();
+        String popfreqmax = query.get("popfreqmax") == null || "0".equals(query.get("popfreqmax")) ? "" : query.get("popfreqmax").toString();
+        String exacAll = query.get("exacAll") == null || "0".equals(query.get("exacAll")) ? "" : query.get("exacAll").toString();
+        String a1000gAll = query.get("a1000gAll") == null || "0".equals(query.get("a1000gAll")) ? "" : query.get("a1000gAll").toString();
+        String exacEas = query.get("exacEas") == null || "0".equals(query.get("exacEas")) ? "" : query.get("exacEas").toString();
 
         query.remove("popfreqmax");
         query.remove("exacAll");
@@ -71,7 +71,6 @@ public class GeneSearchController {
         if (StringUtils.isNotBlank(exacEas)) {
             query.put("exacEas", Arith.div(Double.valueOf(exacEas), 100d, 4) + "");
         }
-
         List<GeneSearchEntity> list = geneSearchService.queryList(query);
         int totalCount = geneSearchService.queryTotal(query);
         int noConditionCount = geneSearchService.queryTotalCount();

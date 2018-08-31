@@ -2,17 +2,15 @@ $(function () {
     $("#jqGrid").jqGrid({
         url: baseURL + 'docker/report/list',
         datatype: "json",
-        colModel: [			
-			{ label: '报告编号', name: 'sickCode', width: 60, formatter: function (cellvalue, options, rowObject) {
+        colModel: [
+            { label: '病患ID', name: 'sickId', width: 60 },
+            { label: '病患姓名', name: 'sickName', width: 60 },
+            { label: '报告编号', name: 'sickCode', width: 60, formatter: function (cellvalue, options, rowObject) {
                     return '<a class="sickcode" href="javascript:;" attrcode="' + rowObject.sickCode + '">' + rowObject.sickCode + '</a>';
                 }},
 			{ label: '检测产品', name: 'productName', width: 60 },
-			{ label: '送样时间', name: 'uploadTime', width: 60 },
-			{ label: '调度开始时间', name: 'triggerTime', width: 60 },
-			{ label: '调度完成时间', name: 'handlerTime', width: 60 },
-            { label: '调度状态', name: 'handlerStatus', width: 60 },
-            { label: '入库开始时间', name: 'storeTime', width: 60 },
-			{ label: '入库完成时间', name: 'finishTime', width: 60 },
+            { label: '入库开始时间', name: 'storeStartTime', width: 60 },
+			{ label: '入库完成时间', name: 'storeFinishTime', width: 60 },
 			{ label: '入库状态', name: 'storeStatus', width: 60 }
         ],
 		viewrecords: true,

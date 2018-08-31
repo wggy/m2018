@@ -17,7 +17,6 @@ $(function () {
             {label: '入库开始时间', name: 'storeStartTime', width: 90},
             {label: '入库状态', name: 'storeStatus', width: 60},
             {label: '入库完成时间', name: 'storeFinishTime', width: 90},
-            {label: '执行时间', name: 'handlerTime', width: 90},
             {label: 'MD5', name: 'md5', width: 90}
         ],
         viewrecords: true,

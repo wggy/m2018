@@ -5,12 +5,12 @@
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.ReportEntity">
 		SELECT sa.sick_id, s.sick_name, CONCAT(s.sick_code, '-', p.id) as sick_code, sa.id as sample_id,
-		sa.upload_start_time, sa.upload_status, sa.upload_finish_time, sa.trigger_start_time, sa.trigger_status,
-		sa.trigger_finish_time, sa.store_start_time, sa.store_status, sa.store_finish_time, p.product_name
+		sa.store_start_time, sa.store_status, sa.store_finish_time, p.product_name
 		FROM tbl_sick s
 		JOIN tbl_sample sa ON s.id=sa.sick_id
 		JOIN tbl_sick_product sp ON s.id=sp.sick_id
 		JOIN tbl_product p ON sp.product_id=p.id
+		WHERE sa.store_status='success'
 		<where>
 			<if test="sickId != null">
 				and sa.sick_id = #{sickId}
@@ -34,6 +34,7 @@
 		JOIN tbl_sample sa ON s.id=sa.sick_id
 		JOIN tbl_sick_product sp ON s.id=sp.sick_id
 		JOIN tbl_product p ON sp.product_id=p.id
+		WHERE sa.store_status='success'
 		<where>
 			<if test="sickId != null">
 				and sa.sick_id = #{sickId}

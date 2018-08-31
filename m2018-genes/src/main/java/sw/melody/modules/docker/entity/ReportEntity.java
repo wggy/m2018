@@ -13,19 +13,19 @@ import java.util.Date;
 @Getter
 public class ReportEntity implements Serializable {
     // 病人信息
+
     private String sickCode;
     private String sickName;
     private Long sickId;
+
     // 检验产品
+
     private String productName;
 
     // 样本信息
+
     private Long sampleId;
-    private Date uploadTime;
-    private Date triggerTime;
-    private Date handlerTime;
-    private Date storeTime;
-    private Date finishTime;
-    private String handlerStatus;
+    private Date storeStartTime;
+    private Date storeFinishTime;
     private String storeStatus;
 }

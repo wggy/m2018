@@ -8,6 +8,7 @@
 		si.exonicfunc_refgene, si.xref_refgene, sf.sick AS sample_name, si.popfreqmax, si.a1000g_all,
 		si.a1000g_eas, si.exac_all, si.exac_eas, si.esp6500siv2_all, sf.mutation_ad, sf.mutation_mode, sf.mutation_rate
 		FROM tbl_snp s
+		JOIN tbl_sick sc ON s.sick_id=sc.id
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
 		WHERE 1=1
@@ -26,6 +27,9 @@
 		AND si.exac_eas <![CDATA[ > ]]> '0.'
 		<if test="exacEas != null and exacEas.trim() != ''">
 			AND si.exac_eas <![CDATA[ <= ]]> #{exacEas}
+		</if>
+		<if test="sickCode != null">
+			AND sc.sick_code = #{sickCode}
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
 		ORDER BY si.id
@@ -52,6 +56,7 @@
  	<select id="queryTotal" resultType="int">
 		SELECT COUNT(1)
 		FROM tbl_snp s
+		JOIN tbl_sick sc ON s.sick_id=sc.id
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
 		WHERE 1=1
@@ -70,6 +75,9 @@
 		AND si.exac_eas <![CDATA[ > ]]> '0.'
 		<if test="exacEas != null and exacEas.trim() != ''">
 			AND si.exac_eas <![CDATA[ <= ]]> #{exacEas}
+		</if>
+		<if test="sickCode != null">
+			AND sc.sick_code = #{sickCode}
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
 	</select>
