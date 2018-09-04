@@ -35,8 +35,8 @@ public class UploadLargeFileController extends SaveFile {
     private SickService sickService;
 
     @RequestMapping(value = "/check_md5", method = RequestMethod.POST)
-    public R bigFileUpload(String md5) {
-        SampleEntity entity = sampleService.queryObjectByMd5(md5);
+    public R bigFileUpload(String fileMd5, String fileName, String fileID) {
+        SampleEntity entity = sampleService.queryObjectByMd5(fileMd5);
         if (entity == null) {
             return R.ok("this file is not exist");
         }
@@ -44,20 +44,12 @@ public class UploadLargeFileController extends SaveFile {
     }
 
     @RequestMapping(value = "/large_file")
-    public R fileUpload(String guid,
-                             String md5,
-                             String chunks,
-                             String chunk,
-                             Long sickId,
-                             String name,
-                             String type,
-                             String lastModifiedDate,
-                             int size,
-                             MultipartFile file) {
+    public R fileUpload(String guid, String md5value, String chunks, String chunk, Long sickId,
+                        String name, MultipartFile file) {
         try {
             String fileName;
 
-            if (StringUtils.isBlank(md5)) {
+            if (StringUtils.isBlank(md5value)) {
                 log.error("md5 is null");
             }
             int index;
@@ -65,13 +57,14 @@ public class UploadLargeFileController extends SaveFile {
             String uploadFolderPath = getRealPath();
             String ext = name.substring(name.lastIndexOf("."));
             SampleEntity chunkInfo = new SampleEntity();
-            index = Integer.parseInt(chunk);
+            index = chunk == null ? 0 : Integer.parseInt(chunk);
 
             if (index == 0) {
                 chunkInfo.setUploadStatus(SampleStatus.Running.getStatus());
                 chunkInfo.setUploadStartTime(new Date());
                 chunkInfo.setOriginName(guid + ext);
                 chunkInfo.setSickId(sickId);
+                chunkInfo.setMd5(md5value);
                 sampleService.save(chunkInfo);
             }
 
@@ -91,30 +84,30 @@ public class UploadLargeFileController extends SaveFile {
                 // 将文件分块保存到临时文件夹里，便于之后的合并文件
                 saveFile(fullPathNoFile, fileName, file);
                 // 验证所有分块是否上传成功，成功的话进行合并
-                boolean allUploaded = IsAllUploaded.uploadedAll(md5, guid, chunk, chunks, fullPathNoFile, fileName, ext);
+                boolean allUploaded = IsAllUploaded.uploadedAll(md5value, guid, chunk, chunks, fullPathNoFile, fileName, ext);
                 if (allUploaded) {
-                    SampleEntity entity = sampleService.queryObjectByMd5(md5);
+                    SampleEntity entity = sampleService.queryObjectByMd5(md5value);
                     if (entity == null) {
                         throw new RRException("服务器找不到文件");
                     }
                     entity.setUploadFinishTime(new Date());
                     entity.setUploadStatus(SampleStatus.Success.getStatus());
                     entity.setLocation(fullPath);
-                    entity.setMd5(md5);
+                    entity.setMd5(md5value);
                     sampleService.update(entity);
                 }
             } else {
                 fileName = guid + ext;
                 //上传文件没有分块的话就直接保存
-                saveFile(uploadFolderPath, fileName, file);
-                SampleEntity entity = sampleService.queryObjectByMd5(md5);
+                saveFile(addFileSeparator(uploadFolderPath) + sickEntity.getSickCode(), fileName, file);
+                SampleEntity entity = sampleService.queryObjectByMd5(md5value);
                 if (entity == null) {
                     throw new RRException("服务器找不到文件");
                 }
                 entity.setUploadFinishTime(new Date());
                 entity.setUploadStatus(SampleStatus.Success.getStatus());
                 entity.setLocation(fullPath);
-                entity.setMd5(md5);
+                entity.setMd5(md5value);
                 sampleService.update(entity);
             }
             return R.ok("{chunk: " + chunk + "}");

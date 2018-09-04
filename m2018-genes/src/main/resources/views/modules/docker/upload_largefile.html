@@ -47,36 +47,23 @@
     $(function () {
         var $list = $('#fileList');
         var mainFrame = parent.document.getElementById('mainFrame').contentWindow;
-        var sickId =mainFrame.document.getElementById('sickInput').value;
+        var sickId = mainFrame.document.getElementById('sickInput').value;
         if (!sickId) {
             alert("未选择病人");
             return;
         }
         var uploader = WebUploader.create({
-            //设置选完文件后是否自动上传
             auto: false,
-            //swf文件路径
-            //swf: BASE_URL + '~/FileUpload/Uploader.swf',
             swf: '../../plugins/webuploader/Uploader.swf',
-
-            // 文件接收服务端。
             server: '/docker/upload/large_file?token=' + localStorage.getItem("token"),
-
-            // 选择文件的按钮。可选。
-            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
             pick: '#picker',
-
-            chunked: true, //开启分块上传
+            chunked: true,
             chunkSize: 1 * 1024 * 1024,
-            chunkRetry: 3,//网络问题上传失败后重试次数
-            threads: 5, //上传并发数
-            //formData: { guid: WebUploader.guid() },  //一个文件有一个guid，在服务器端合并成一个文件  这里有个问题，多个文件或者上传一个文件成功后不刷新直接添加文件上传生成的guid不变！！！   暂时只能传一个大文件（已解决）
-            //fileNumLimit :1,
-            fileSizeLimit: 10000 * 1024 * 1024,//最大10GB
+            chunkRetry: 3,
+            threads: 5,
+            fileSizeLimit: 10000 * 1024 * 1024,
             fileSingleSizeLimit: 10000 * 1024 * 1024,
-
-            resize: false//不压缩
-
+            resize: false
             //选择文件类型
             //accept: {
             //    title: 'Images',
@@ -85,33 +72,36 @@
             //}
         });
 
-        // 当有文件被添加进队列的时候
+        uploader.on('uploadBeforeSend', function(block, data, headers) {
+
+            console.log(block);
+            console.log(data);
+            var file = block.file;
+            var fileMd5 = file.wholeMd5;
+            data.md5value = fileMd5;
+            data.guid = file.guid;
+            data.sickId = sickId;
+        });
+
         uploader.on('fileQueued', function (file) {
             $list.append('<div id="' + file.id + '" class="item">' +
                 '<h4 class="info">' + file.name + '<button type="button" fileId="' + file.id + '" class="btn btn-danger btn-delete"><span class="glyphicon glyphicon-trash"></span></button></h4>' +
                 '<p class="state">正在计算文件MD5...请等待计算完毕后再点击上传！</p>' +
                 '</div>');
 
-            var index = parent.layer.load(1, {shade: [0.5,'#fff']});
-            //每次添加文件都给btn-delete绑定删除方法
+            var index = parent.layer.load(1, {shade: [0.38, '#fff']});
             $(".btn-delete").click(function () {
-                //console.log($(this).attr("fileId"));//拿到文件id
                 uploader.removeFile(uploader.getFile($(this).attr("fileId"), true));
                 $(this).parent().parent().fadeOut();
                 $(this).parent().parent().remove();
             });
 
-            //每个文件都附带一个guid，以在服务端确定哪些文件块本来是一个
-            uploader.options.formData.guid = WebUploader.guid();
-            uploader.options.formData.sickId = sickId;
-
             uploader.md5File(file).then(function (fileMd5) {
                 parent.layer.close(index);
-                //获取到了md5
                 file.wholeMd5 = fileMd5;
-
-                //每个文件都附带一个md5，便于实现秒传
-                uploader.options.formData.md5 = file.wholeMd5;
+                file.guid = WebUploader.guid();
+                console.log(file.name + "=" + fileMd5);
+                console.log(file.name + "=" + file.guid);
 
                 $('#' + file.id).find('p.state').text('MD5计算完毕，可以点击上传了');
 
@@ -121,12 +111,11 @@
                     dataType: "json",
                     url: "/docker/upload/check_md5",
                     data: {
-                        md5: fileMd5,
+                        fileMd5: fileMd5,
                         fileName: file.name,
                         fileID: file.id
                     },
                     success: function (result) {
-                        console.log(result);
                         if (result.msg == 'this file is exist') {
                             uploader.removeFile(file, true);
                             $('#' + file.id).find('p.state').text('该文件已上传');
@@ -141,7 +130,6 @@
             });
         });
 
-        // 文件上传过程中创建进度条实时显示。
         uploader.on('uploadProgress', function (file, percentage) {
             var $li = $('#' + file.id),
                 $percent = $li.find('.progress .progress-bar');
@@ -155,7 +143,6 @@
             }
 
             $li.find('p.state').text('上传中');
-
             $percent.css('width', percentage * 100 + '%');
             $percent.html(percentage * 100 + '%');
         });
@@ -173,30 +160,23 @@
             $('#' + file.id).find(".progress").find(".progress-bar").attr("class", "progress-bar progress-bar-danger");
             //添加重试按钮
             //为了防止重复添加重试按钮，做一个判断
-            //var retrybutton = $('#' + file.id).find(".btn-retry");
-            //$('#' + file.id)
             if ($('#' + file.id).find(".btn-retry").length < 1) {
                 var btn = $('<button type="button" fileid="' + file.id + '" class="btn btn-success btn-retry"><span class="glyphicon glyphicon-refresh"></span></button>');
                 $('#' + file.id).find(".info").append(btn);//.find(".btn-danger")
             }
 
-
             $(".btn-retry").click(function () {
-                //console.log($(this).attr("fileId"));//拿到文件id
                 uploader.retry(uploader.getFile($(this).attr("fileId")));
-
             });
         });
 
         uploader.on('uploadComplete', function (file) {//上传完成后回调
-            //$('#' + file.id).find('.progress').fadeOut();//上传完删除进度条
-            //$('#' + file.id + 'btn').fadeOut('slow')//上传完后删除"删除"按钮
+//            $('#' + file.id).find('.progress').fadeOut();//上传完删除进度条
+//            $('#' + file.id + 'btn').fadeOut('slow')//上传完后删除"删除"按钮
         });
 
         uploader.on('uploadFinished', function () {
-            //上传完后的回调方法
-            //alert("所有文件上传完毕");
-            //提交表单
+
         });
 
         $("#UploadBtn").click(function () {
@@ -232,7 +212,6 @@
             if (response._raw === '{"error":true}') {
                 return false;
             }
-
         });
     });
 </script>
