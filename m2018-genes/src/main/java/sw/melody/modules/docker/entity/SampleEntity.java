@@ -47,8 +47,8 @@ public class SampleEntity implements Serializable {
     private String sickCode;
     private String md5;
 
-    public SampleEntity() {
-    }
 
+    private Integer deleteFlag = 1;
+    private String secOriginName;
 
 }

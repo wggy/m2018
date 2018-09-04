@@ -222,4 +222,8 @@ MODIFY COLUMN `pos_id`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci 
 MODIFY COLUMN `ref`  varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '参考值' AFTER `pos_id`,
 MODIFY COLUMN `qual`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `alt`,
 MODIFY COLUMN `filter`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER `qual`;
+ALTER TABLE `tbl_sample`
+ADD COLUMN `sec_origin_name`  varchar(255) NULL AFTER `md5`,
+ADD COLUMN `delete_flag`  int(3) NULL DEFAULT 1 COMMENT '0：删除，1：正常' AFTER `sec_origin_name`;
+
 

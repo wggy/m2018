@@ -73,11 +73,8 @@ public class UploadLargeFileController extends SaveFile {
                 throw new RRException("查无该病患记录");
             }
 
-            String shortPath = ConfigConstant.getShortPath(sickEntity.getSickCode(), guid, ext);
-            String fullPath = ConfigConstant.getFullPath(uploadFolderPath, shortPath);
             String fullPathNoFile = ConfigConstant.getFullPathNoFile(uploadFolderPath, sickEntity.getSickCode(), guid);
-
-
+            String location = ConfigConstant.getFullPath(uploadFolderPath, sickEntity.getSickCode());
             //判断文件是否分块
             if (chunks != null) {
                 fileName = String.valueOf(index) + ext;
@@ -92,21 +89,20 @@ public class UploadLargeFileController extends SaveFile {
                     }
                     entity.setUploadFinishTime(new Date());
                     entity.setUploadStatus(SampleStatus.Success.getStatus());
-                    entity.setLocation(fullPath);
+                    entity.setLocation(location);
                     entity.setMd5(md5value);
                     sampleService.update(entity);
                 }
             } else {
                 fileName = guid + ext;
-                //上传文件没有分块的话就直接保存
-                saveFile(addFileSeparator(uploadFolderPath) + sickEntity.getSickCode(), fileName, file);
+                saveFile(location, fileName, file);
                 SampleEntity entity = sampleService.queryObjectByMd5(md5value);
                 if (entity == null) {
                     throw new RRException("服务器找不到文件");
                 }
                 entity.setUploadFinishTime(new Date());
                 entity.setUploadStatus(SampleStatus.Success.getStatus());
-                entity.setLocation(fullPath);
+                entity.setLocation(location);
                 entity.setMd5(md5value);
                 sampleService.update(entity);
             }

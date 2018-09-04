@@ -72,4 +72,9 @@ public class SampleServiceImpl implements SampleService {
     public SampleEntity queryObjectByMd5(String md5) {
         return sampleDao.queryObjectByMd5(md5);
     }
+
+    @Override
+    public void deleteByFlag(Long id) {
+        sampleDao.deleteByFlag(id);
+    }
 }

@@ -10,12 +10,12 @@
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select t.*, s.sick_code, s.sick_name from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
 		<where>
-			<if test="sickId != null">
-				and t.sick_id = #{sickId}
+			<if test="key != null and key.trim() != ''">
+				(s.sick_code = concat('%', #{key}, '%')
+				or
+				s.sick_name like concat('%', #{key}, '%'))
 			</if>
-			<if test="location != null">
-				and t.location = #{location}
-			</if>
+			and t.delete_flag=1
 		</where>
 		order by id desc
 		<if test="offset != null and limit != null">
@@ -26,9 +26,12 @@
  	<select id="queryTotal" resultType="int">
 		select count(1) from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
 		<where>
-			<if test="sickId != null">
-				and t.sick_id = #{sickId}
+			<if test="key != null and key.trim() != ''">
+				(s.sick_code = concat('%', #{key}, '%')
+				or
+				s.sick_name like concat('%', #{key}, '%'))
 			</if>
+			and t.delete_flag=1
 		</where>
 	</select>
 	 
@@ -74,6 +77,12 @@
 			<if test="md5 != null">
 				`md5`,
 			</if>
+			<if test="secOriginName != null">
+				`sec_origin_name`,
+			</if>
+			<if test="deleteFlag != null">
+				`delete_flag`,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="sickId != null">
@@ -115,6 +124,12 @@
 			<if test="md5 != null">
 				#{md5},
 			</if>
+			<if test="secOriginName != null">
+				#{secOriginName},
+			</if>
+			<if test="deleteFlag != null">
+				#{deleteFlag},
+			</if>
 		</trim>
 	</insert>
 	 
@@ -132,6 +147,7 @@
 			<if test="storeStatus != null">`store_status` = #{storeStatus}, </if>
 			<if test="storeFinishTime != null">`store_finish_time` = #{storeFinishTime},</if>
 			<if test="md5 != null">`md5` = #{md5},</if>
+			<if test="secOriginName != null">`sec_origin_name` = #{secOriginName},</if>
 		</set>
 		where id = #{id}
 	</update>
@@ -150,4 +166,8 @@
 	<select id="queryObjectByMd5" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select * from tbl_sample where md5 = #{value} limit 1
 	</select>
+
+	<delete id="deleteByFlag">
+		update tbl_sample set delete_flag=0 where id = #{value}
+	</delete>
 </mapper>

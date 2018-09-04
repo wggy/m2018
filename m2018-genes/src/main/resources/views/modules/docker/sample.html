@@ -28,12 +28,15 @@
 			</div>
 			<a class="btn btn-default" @click="query">查询</a>
 			
-			<a class="btn btn-primary" @click="execute"><i class="fa fa-plus"></i>&nbsp;解析样本</a>
-			<a class="btn btn-primary" @click="store"><i class="fa fa-plus"></i>&nbsp;解析入库</a>
+			<a class="btn btn-primary" @click="merge"><i class="fa fa-plus"></i>&nbsp;合并</a>
+			<a class="btn btn-primary" @click="execute"><i class="fa fa-plus"></i>&nbsp;调度</a>
+			<a class="btn btn-primary" @click="more"><i class="fa fa-plus"></i>&nbsp;日志</a>
+			<a class="btn btn-primary" @click="store"><i class="fa fa-plus"></i>&nbsp;入库</a>
 		</div>
 	    <table id="jqGrid"></table>
 	    <div id="jqGridPager"></div>
-    </div>
+		<input id="sickAttrId" type="hidden">
+	</div>
 </div>
 
 <script src="../../js/modules/docker/sample.js"></script>

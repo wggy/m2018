@@ -1,5 +1,6 @@
 package sw.melody.modules.docker.controller;
 
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +16,7 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.docker.util.MoreLogUtil;
 import sw.melody.modules.docker.util.SaveFile;
 import sw.melody.modules.job.task.GeneIndelTask;
 import sw.melody.modules.job.task.GeneSnpTask;
@@ -33,6 +35,7 @@ import java.util.concurrent.Executors;
 
 /****
  * 样本管理
+ * @author wange
  */
 @Slf4j
 @RestController
@@ -77,9 +80,8 @@ public class SampleController extends SaveFile {
     /**
      * 上传文件
      */
-    @SysLog("上传病患样本")
+    @SysLog("上传样本")
     @RequestMapping("/upload/{id}")
-    @RequiresPermissions("docker:sample:edit")
     public R upload(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws Exception {
         if (file == null || id == null || file.isEmpty()) {
             throw new RRException("上传文件或参数不能为空");
@@ -140,38 +142,40 @@ public class SampleController extends SaveFile {
         return R.ok().put("url", shortPath);
     }
 
-    @SysLog("解析病患样本")
-    @RequestMapping("/execute")
+    @SysLog("调度样本")
+    @RequestMapping("/execute/{id}")
     @RequiresPermissions("docker:sample:edit")
-    public R execute(@RequestBody Long[] ids) throws Exception {
+    public R execute(@PathVariable("id") Long id) throws Exception {
 
-        if (ids == null || ids.length > 2) {
-            return R.error("参数错误，请选择一个或两个");
+        if (id == null) {
+            return R.error("参数错误");
         }
-
-        Long id = ids[0];
 
         SampleEntity sampleEntity = sampleService.queryObject(id);
-        SampleEntity secSampleEntity = null;
-        String secFileName = "";
         checkStatus(sampleEntity);
-        if (ids.length == 2) {
-            Long secId = ids[1];
-            secSampleEntity = sampleService.queryObject(secId);
-            checkStatus(secSampleEntity);
-            secFileName = secSampleEntity.getOriginName();
-        }
 
         String targetFileName = sampleEntity.getOriginName();
         String bashFilePath = sysConfigService.getValue(ConfigConstant.SAMPLE_SHELL_PATH);
         File bashFile = new File(bashFilePath);
-
-        File fullPathFile = new File(sampleEntity.getLocation());
-        String fullPathNoFile = fullPathFile.getParent();
-        if (!bashFile.exists() || !fullPathFile.exists()) {
+        if (!bashFile.exists()) {
             throw new RRException("bash文件不存在");
         }
 
+        File fullPathFile = new File(addFileSeparator(sampleEntity.getLocation()) + sampleEntity.getOriginName());
+        if (!fullPathFile.exists()) {
+            throw new RRException("样本1不存在");
+        }
+
+        String secFileName = "";
+        if (!StringUtils.isBlank(sampleEntity.getSecOriginName())) {
+            File secFullPathFile = new File(addFileSeparator(sampleEntity.getLocation()) + sampleEntity.getSecOriginName());
+            if (!secFullPathFile.exists()) {
+                throw new RRException("样本2不存在");
+            }
+            secFileName = sampleEntity.getSecOriginName();
+        }
+
+        String fullPathNoFile = sampleEntity.getLocation();
         File targetBashFile = new File(addFileSeparator(fullPathNoFile) + ConfigConstant.Shell_Bwa_File);
         if (!targetBashFile.exists()) {
             Process cpFilePs = Runtime.getRuntime().exec("cp -pf " + bashFilePath + " " + fullPathNoFile);
@@ -181,9 +185,9 @@ public class SampleController extends SaveFile {
             }
         }
 
-        String command = getCommand(ids, fullPathNoFile, targetFileName, secFileName);
+        String command = getCommand(fullPathNoFile, targetFileName, secFileName);
         log.info("command: {}", command);
-        Thread exeThread = new TriggerThread(command, sampleEntity, secSampleEntity);
+        Thread exeThread = new TriggerThread(command, sampleEntity);
         Runtime.getRuntime().addShutdownHook(exeThread);
         exeThread.start();
         return R.ok("调度成功");
@@ -205,8 +209,8 @@ public class SampleController extends SaveFile {
         }
     }
 
-    private String getCommand(Long[] ids, String fullPathNoFile, String targetFileName, String secFileName) {
-        if (ids.length == 1) {
+    private String getCommand(String fullPathNoFile, String targetFileName, String secFileName) {
+        if (StringUtils.isBlank(secFileName)) {
             return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " > " + targetFileName + ".out 2>&1 &";
         }
         return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " " + secFileName + " > " + targetFileName + ".out 2>&1 &";
@@ -232,9 +236,10 @@ public class SampleController extends SaveFile {
         sampleEntity.setStoreStartTime(new Date());
         sampleService.update(sampleEntity);
 
-        String fullPath = sampleEntity.getLocation();
-        String indelPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Indel_File_Prefix;
-        String snpPath = fullPath.substring(0, fullPath.indexOf(".")) + ConfigConstant.Result_Snp_File_Prefix;
+        String location = sampleEntity.getLocation();
+        String fileName = sampleEntity.getOriginName().substring(0, sampleEntity.getOriginName().indexOf("."));
+        String indelPath = addFileSeparator(location).concat(fileName).concat(ConfigConstant.Result_Indel_File_Prefix);
+        String snpPath = addFileSeparator(location).concat(fileName).concat(ConfigConstant.Result_Snp_File_Prefix);
         Long sickId = sampleEntity.getSickId();
         try {
             storeExecutor.execute(() -> {
@@ -243,12 +248,12 @@ public class SampleController extends SaveFile {
                     geneSnpTask.parse(indelPath, sickId);
                     log.info("snp store: {}", snpPath);
                     geneIndelTask.parse(snpPath, sickId);
-                    sampleEntity.setStoreStatus(Constant.SampleStatus.Success.getStatus());
+                    sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
                     sampleEntity.setStoreFinishTime(new Date());
                     sampleService.update(sampleEntity);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
+                    sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
                     sampleEntity.setStoreFinishTime(new Date());
                     sampleService.update(sampleEntity);
                 }
@@ -256,7 +261,7 @@ public class SampleController extends SaveFile {
 
             return R.ok("入库操作执行中...");
         } catch (Exception e) {
-            sampleEntity.setStoreStatus(Constant.SampleStatus.Fail.getStatus());
+            sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
             sampleEntity.setStoreFinishTime(new Date());
             sampleService.update(sampleEntity);
             e.printStackTrace();
@@ -264,16 +269,61 @@ public class SampleController extends SaveFile {
         }
     }
 
+    @SysLog("调度样本")
+    @RequestMapping("/merge")
+    @RequiresPermissions("docker:sample:edit")
+    public R merge(@RequestBody Long[] ids) throws Exception {
+        if (ids == null || ids.length != 2) {
+            return R.error("参数错误，请传入两条记录");
+        }
+
+        SampleEntity frtSample = sampleService.queryObject(ids[0]);
+        SampleEntity secSample = sampleService.queryObject(ids[1]);
+        if (frtSample == null || secSample == null) {
+            return R.error("样本不存在");
+        }
+        if (!SampleStatus.Success.getStatus().equals(frtSample.getUploadStatus())
+                || !SampleStatus.Success.getStatus().equals(secSample.getUploadStatus())) {
+            return R.error("您选择的记录未成功上传");
+        }
+        if (frtSample.getSickId().intValue() != secSample.getSickId().intValue()) {
+            return R.error("您选择的记录归属不同病人");
+        }
+
+        frtSample.setSecOriginName(secSample.getOriginName());
+        sampleService.update(frtSample);
+        sampleService.deleteByFlag(secSample.getId());
+        return R.ok("合并成功");
+    }
+
+
+    @RequestMapping("/more/{id}")
+    public R moreLog(@PathVariable("id") Long id, Integer fromLine) throws Exception {
+        if (id == null) {
+            return R.error("参数错误");
+        }
+        SampleEntity sampleEntity = sampleService.queryObject(id);
+        if (sampleEntity == null) {
+            return R.error("改样本不存在");
+        }
+        String logFileName = addFileSeparator(sampleEntity.getLocation()).concat(sampleEntity.getOriginName()).concat(".out");
+        MoreLogUtil.LogResult logResult = MoreLogUtil.readLog(logFileName, fromLine);
+
+        if (logResult != null && logResult.getFromLineNum() > logResult.getToLineNum()) {
+            logResult.setEnd(true);
+        }
+        return R.ok().put("log", logResult);
+    }
+
+
     class TriggerThread extends Thread {
 
         private String command;
         private SampleEntity sampleEntity;
-        private SampleEntity secSampleEntity;
 
-        public TriggerThread(String command, SampleEntity sampleEntity, SampleEntity secSampleEntity) {
+        public TriggerThread(String command, SampleEntity sampleEntity) {
             this.command = command;
             this.sampleEntity = sampleEntity;
-            this.secSampleEntity = secSampleEntity;
         }
 
         @Override
@@ -286,9 +336,6 @@ public class SampleController extends SaveFile {
                 if (status != 0) {
                     log.error("Failed to call shell's command ");
                     sampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
-                    if (secSampleEntity != null) {
-                        secSampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
-                    }
                 } else {
                     BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
                     String line;
@@ -296,24 +343,14 @@ public class SampleController extends SaveFile {
                         log.info(line);
                     }
                     sampleEntity.setTriggerStatus(Constant.SampleStatus.Success.getStatus());
-                    if (secSampleEntity != null) {
-                        secSampleEntity.setTriggerStatus(SampleStatus.Success.getStatus());
-                    }
                     br.close();
                 }
             } catch (Exception e) {
                 sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());
-                if (secSampleEntity != null) {
-                    secSampleEntity.setTriggerStatus(SampleStatus.Fail.getStatus());
-                }
                 e.printStackTrace();
             }
             sampleEntity.setTriggerFinishTime(new Date());
-            if (secSampleEntity != null) {
-                secSampleEntity.setTriggerFinishTime(new Date());
-            }
             sampleService.update(sampleEntity);
-            sampleService.update(secSampleEntity);
         }
     }
 }

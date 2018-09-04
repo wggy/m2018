@@ -23,4 +23,6 @@ public interface SampleService {
     void deleteBatch(Long[] ids);
 
     SampleEntity queryObjectByMd5(String md5);
+
+    void deleteByFlag(Long id);
 }
