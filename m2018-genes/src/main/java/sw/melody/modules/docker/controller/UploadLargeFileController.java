@@ -16,9 +16,12 @@ import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
 import sw.melody.modules.docker.util.IsAllUploaded;
+import sw.melody.modules.docker.util.MergeFile;
 import sw.melody.modules.docker.util.SaveFile;
 
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author ping
@@ -33,6 +36,9 @@ public class UploadLargeFileController extends SaveFile {
     private SampleService sampleService;
     @Autowired
     private SickService sickService;
+
+    private final static ExecutorService mergeExecutor = Executors.newSingleThreadExecutor();
+
 
     @RequestMapping(value = "/check_md5", method = RequestMethod.POST)
     public R bigFileUpload(String fileMd5, String fileName, String fileID) {
@@ -83,15 +89,25 @@ public class UploadLargeFileController extends SaveFile {
                 // 验证所有分块是否上传成功，成功的话进行合并
                 boolean allUploaded = IsAllUploaded.uploadedAll(md5value, guid, chunk, chunks, fullPathNoFile, fileName, ext);
                 if (allUploaded) {
+                    int chunksNumber = Integer.parseInt(chunks);
                     SampleEntity entity = sampleService.queryObjectByMd5(md5value);
                     if (entity == null) {
                         throw new RRException("服务器找不到文件");
                     }
-                    entity.setUploadFinishTime(new Date());
-                    entity.setUploadStatus(SampleStatus.Success.getStatus());
-                    entity.setLocation(location);
-                    entity.setMd5(md5value);
-                    sampleService.update(entity);
+                    mergeExecutor.submit(() -> {
+                        try {
+                            entity.setUploadStatus(SampleStatus.Merging.getStatus());
+                            sampleService.update(entity);
+                            MergeFile.mergeFile(chunksNumber, ext, guid, uploadFolderPath);
+                            entity.setUploadFinishTime(new Date());
+                            entity.setUploadStatus(SampleStatus.Success.getStatus());
+                            entity.setLocation(location);
+                            entity.setMd5(md5value);
+                            sampleService.update(entity);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
             } else {
                 fileName = guid + ext;

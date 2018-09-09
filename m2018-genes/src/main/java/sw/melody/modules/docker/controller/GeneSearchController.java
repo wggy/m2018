@@ -73,7 +73,12 @@ public class GeneSearchController {
         }
         List<GeneSearchEntity> list = geneSearchService.queryList(query);
         int totalCount = geneSearchService.queryTotal(query);
-        int noConditionCount = geneSearchService.queryTotalCount();
+        String sickCode = query.get("sickCode").toString();
+        SickEntity sickEntity = sickService.queryObjectByCode(sickCode);
+        if (sickEntity == null) {
+            return R.error("该病人未录入");
+        }
+        int noConditionCount = geneSearchService.queryTotalCount(sickEntity.getId());
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("list", list);
         returnMap.put("totalCount", totalCount);
@@ -86,15 +91,19 @@ public class GeneSearchController {
 
     @RequestMapping("/report")
     public void report(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
-
-
-        List<String[]> list1 = new ArrayList<>();
         if (params.get("ids") == null || params.get("productId") == null || params.get("sickCode") == null) {
             throw new RRException("参数错误");
         }
         String ids = params.get("ids").toString();
         String productId = params.get("productId").toString();
         String sickCode = params.get("sickCode").toString();
+        List<String[]> list1 = new ArrayList<>();
+        List<String[]> list2 = new ArrayList<>();
+
+        if (params.get("ids") == null) {
+            throw new RRException("参数错误");
+        }
+
         String[] idsStrArray = ids.split("%2C");
         Long[] idsArray = new Long[idsStrArray.length];
         for (int i=0; i<idsStrArray.length; i++) {
@@ -109,11 +118,20 @@ public class GeneSearchController {
         if (productEntity == null) {
             throw new RRException("查无该检验产品记录");
         }
-
-        String fileName = this.getClass().getClassLoader().getResource("report.xlsx").getPath();
+        for (GeneSearchEntity entity : list) {
+            String[] s = new String[7];
+            s[0] = entity.getGeneRefgene();
+            s[1] = "";
+            s[2] = entity.getXrefRefgene();
+            s[3] = entity.getMutationInfo();
+            s[4] = entity.getAachangeRefgene();
+            s[5] = entity.getSampleNameAttr();
+            s[6] = "";
+            list1.add(s);
+        }
+        String fileName = this.getClass().getClassLoader().getResource("healthy_template.docx").getPath();
         String userAgent = request.getHeader("User-Agent");
-        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, null);
-
+        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
     }
 
 }

@@ -1,6 +1,5 @@
 package sw.melody.modules.docker.controller;
 
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -259,7 +258,7 @@ public class SampleController extends SaveFile {
                 }
             });
 
-            return R.ok("入库操作执行中...");
+            return R.ok("开始入库成功...");
         } catch (Exception e) {
             sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
             sampleEntity.setStoreFinishTime(new Date());

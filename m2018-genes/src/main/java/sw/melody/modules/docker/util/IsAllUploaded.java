@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -55,10 +57,7 @@ public class IsAllUploaded {
             uploadInfoList.add(new UploadInfo(md5, chunks, chunk, uploadFolderPath, fileName, ext));
         }
         boolean allUploaded = isAllUploaded(md5, chunks);
-        int chunksNumber = Integer.parseInt(chunks);
-
         if (allUploaded) {
-            MergeFile.mergeFile(chunksNumber, ext, guid, uploadFolderPath);
             return true;
         }
         return false;

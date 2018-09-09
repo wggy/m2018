@@ -40,8 +40,8 @@ public class GeneSearchServiceImpl implements GeneSearchService {
     }
 
     @Override
-    public int queryTotalCount() {
-        return geneSearchDao.queryTotalCount();
+    public int queryTotalCount(Long sickId) {
+        return geneSearchDao.queryTotalCount(sickId);
     }
 
     @Override

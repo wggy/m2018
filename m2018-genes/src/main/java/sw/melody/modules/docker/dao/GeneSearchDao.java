@@ -12,6 +12,6 @@ import java.util.List;
  */
 @Mapper
 public interface GeneSearchDao extends BaseDao<GeneSearchEntity> {
-    int queryTotalCount();
+    int queryTotalCount(Long sickId);
     List<GeneSearchEntity> queryListByIds(Long[] ids);
 }

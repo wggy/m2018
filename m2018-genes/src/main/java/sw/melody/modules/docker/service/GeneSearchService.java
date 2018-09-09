@@ -17,7 +17,7 @@ public interface GeneSearchService {
 
     SickRelationEntity querySickRelation(Map<String, Object> paramsMap);
 
-    int queryTotalCount();
+    int queryTotalCount(Long sickId);
 
     List<GeneSearchEntity> queryListByIds(Long[] ids);
 }

@@ -104,6 +104,7 @@ public class Constant {
     public enum SampleStatus {
 
         Running("running"),
+        Merging("merging"),
         Success("success"),
         Fail("fail");
 
