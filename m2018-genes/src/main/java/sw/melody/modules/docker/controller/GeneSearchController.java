@@ -21,6 +21,7 @@ import sw.melody.modules.job.utils.Arith;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +131,51 @@ public class GeneSearchController {
             list1.add(s);
         }
         String fileName = this.getClass().getClassLoader().getResource("healthy_template.docx").getPath();
+        String userAgent = request.getHeader("User-Agent");
+        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
+    }
+
+    @RequestMapping("/download")
+    public void download(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
+        if (params.get("ids") == null || params.get("productId") == null || params.get("sickCode") == null) {
+            throw new RRException("参数错误");
+        }
+        String ids = params.get("ids").toString();
+        String productId = params.get("productId").toString();
+        String sickCode = params.get("sickCode").toString();
+        List<String[]> list1 = new ArrayList<>();
+        List<String[]> list2 = new ArrayList<>();
+
+        if (params.get("ids") == null) {
+            throw new RRException("参数错误");
+        }
+
+        String[] idsStrArray = ids.split("%2C");
+        Long[] idsArray = new Long[idsStrArray.length];
+        for (int i=0; i<idsStrArray.length; i++) {
+            idsArray[i] = Long.parseLong(idsStrArray[i]);
+        }
+        List<GeneSearchEntity> list = geneSearchService.queryListByIds(idsArray);
+        SickEntity sickEntity = sickService.queryObjectByCode(sickCode);
+        ProductEntity productEntity = productService.queryObject(Long.parseLong(productId));
+        if (sickEntity == null) {
+            throw new RRException("查无该病人记录");
+        }
+        if (productEntity == null) {
+            throw new RRException("查无该检验产品记录");
+        }
+
+        String fileName = this.getClass().getClassLoader().getResource("report.xml").getPath();
+        StringBuilder sb = new StringBuilder();
+        String s;
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(fileName)))) {
+            while ((s = br.readLine()) != null) {
+                sb.append(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String userAgent = request.getHeader("User-Agent");
         WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
     }

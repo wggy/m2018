@@ -56,17 +56,20 @@ public class SickFormatTask {
                 log.error("SnpFormatEntity: {} 的format_val取值为空", entity.getId());
                 continue;
             }
-            String[] formatValArray = formatVal.split(":");
-            if (formatValArray.length != 5) {
-                log.error("SnpFormatEntity: {} 的format_val取值长度不是5", entity.getFormatVal());
-                continue;
+
+            try {
+                String[] formatValArray = formatVal.split(":");
+                String mutationMode = Constant.MutationMode.getMode(formatValArray[0]);
+                String mutationAd = formatValArray[1].replace(",", "/");
+                String mutationRate = calcRate(formatValArray[1].split(",")[1], formatValArray[2]);
+                entity.setMutationMode(mutationMode);
+                entity.setMutationAd(mutationAd);
+                entity.setMutationRate(mutationRate);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("SnpFormatEntity解析失败", e);
             }
-            String mutationMode = Constant.MutationMode.getMode(formatValArray[0]);
-            String mutationAd = formatValArray[1].replace(",", "/");
-            String mutationRate = calcRate(formatValArray[1].split(",")[1], formatValArray[2]);
-            entity.setMutationMode(mutationMode);
-            entity.setMutationAd(mutationAd);
-            entity.setMutationRate(mutationRate);
+
         }
     }
 

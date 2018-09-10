@@ -29,6 +29,7 @@ public abstract class GeneAbsTask {
     private static final String TAB = "\t";
     private static final String INFO_SIGN = ";";
     private static final String EQUAL_SIGN = "=";
+    private static final String EMPTY_VALUE = ".";
 
     // 固定表头
 
@@ -140,8 +141,6 @@ public abstract class GeneAbsTask {
     @Autowired
     private SnpService snpService;
     @Autowired
-    private SnpFormatService snpFormatService;
-    @Autowired
     private SickFormatTask sickFormatTask;
 
     public void parse(String fileName, Long sickId) throws Exception {
@@ -251,6 +250,18 @@ public abstract class GeneAbsTask {
             BeanUtils.setProperty(entity, key, val);
         }
 
+        if (StringUtils.isNotBlank(entity.getPopfreqmax()) && EMPTY_VALUE.equals(entity.getPopfreqmax())) {
+            entity.setPopfreqmax("0");
+        }
+        if (StringUtils.isNotBlank(entity.getExac_all()) && EMPTY_VALUE.equals(entity.getExac_all())) {
+            entity.setExac_all("0");
+        }
+        if (StringUtils.isNotBlank(entity.getA1000g_all()) && EMPTY_VALUE.equals(entity.getA1000g_all())) {
+            entity.setA1000g_all("0");
+        }
+        if (StringUtils.isNotBlank(entity.getExac_eas()) && EMPTY_VALUE.equals(entity.getExac_eas())) {
+            entity.setExac_eas("0");
+        }
         return entity;
     }
 

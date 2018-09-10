@@ -12,24 +12,27 @@
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
 		WHERE 1=1
-		AND si.popfreqmax <![CDATA[ >= ]]> '0.'
+		AND si.popfreqmax <![CDATA[ >= ]]> '0'
 		<if test="popfreqmax != null and popfreqmax.trim() != ''">
 			AND si.popfreqmax <![CDATA[ <= ]]> #{popfreqmax}
 		</if>
-		AND si.exac_all <![CDATA[ >= ]]> '0.'
+		AND si.exac_all <![CDATA[ >= ]]> '0'
 		<if test="exacAll != null and exacAll.trim() != ''">
 			AND si.exac_all <![CDATA[ <= ]]> #{exacAll}
 		</if>
-		AND si.a1000g_all <![CDATA[ >= ]]> '0.'
+		AND si.a1000g_all <![CDATA[ >= ]]> '0'
 		<if test="a1000gAll != null and a1000gAll.trim() != ''">
 			AND si.a1000g_all <![CDATA[ <= ]]> #{a1000gAll}
 		</if>
-		AND si.exac_eas <![CDATA[ >= ]]> '0.'
+		AND si.exac_eas <![CDATA[ >= ]]> '0'
 		<if test="exacEas != null and exacEas.trim() != ''">
 			AND si.exac_eas <![CDATA[ <= ]]> #{exacEas}
 		</if>
 		<if test="sickCode != null">
 			AND sc.sick_code = #{sickCode}
+		</if>
+		<if test="not_synonymous_SNV == 'true'">
+			AND si.exonicfunc_refgene <![CDATA[ <> ]]> 'synonymous_SNV'
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
 		ORDER BY si.id
@@ -60,24 +63,27 @@
 		JOIN tbl_snp_info si ON s.id = si.snp_id
 		JOIN tbl_snp_format sf ON s.id = sf.snp_id
 		WHERE 1=1
-		AND si.popfreqmax <![CDATA[ >= ]]> '0.'
+		AND si.popfreqmax <![CDATA[ >= ]]> '0'
 		<if test="popfreqmax != null and popfreqmax.trim() != ''">
 			AND si.popfreqmax <![CDATA[ <= ]]> #{popfreqmax}
 		</if>
-		AND si.exac_all <![CDATA[ >= ]]> '0.'
+		AND si.exac_all <![CDATA[ >= ]]> '0'
 		<if test="exacAll != null and exacAll.trim() != ''">
 			AND si.exac_all <![CDATA[ <= ]]> #{exacAll}
 		</if>
-		AND si.a1000g_all <![CDATA[ >= ]]> '0.'
+		AND si.a1000g_all <![CDATA[ >= ]]> '0'
 		<if test="a1000gAll != null and a1000gAll.trim() != ''">
 			AND si.a1000g_all <![CDATA[ <= ]]> #{a1000gAll}
 		</if>
-		AND si.exac_eas <![CDATA[ >= ]]> '0.'
+		AND si.exac_eas <![CDATA[ >= ]]> '0'
 		<if test="exacEas != null and exacEas.trim() != ''">
 			AND si.exac_eas <![CDATA[ <= ]]> #{exacEas}
 		</if>
 		<if test="sickCode != null">
 			AND sc.sick_code = #{sickCode}
+		</if>
+		<if test="not_synonymous_SNV == 'true'">
+			AND si.exonicfunc_refgene <![CDATA[ <> ]]> 'synonymous_SNV'
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
 	</select>

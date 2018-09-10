@@ -10,7 +10,8 @@ var vm = new Vue({
             popfreqmax: 1,
             exacAll: 1,
             a1000gAll: 1,
-            exacEas: 1
+            exacEas: 1,
+            not_synonymous_SNV: true
         },
         title: null,
         sickInfo: {},
