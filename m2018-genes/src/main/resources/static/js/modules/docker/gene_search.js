@@ -28,10 +28,10 @@ var vm = new Vue({
                 return;
             }
             var params = {ids: ids.join(','), token: localStorage.getItem("token")};
-            params.productId = GeneSearch.sickCode;
-            params.productId = GeneSearch.sickCode;
+            params.productId = GeneSearch.productId;
+            params.sickCode = GeneSearch.sickCode;
             confirm('确定要生成报告？', function () {
-                GeneSearch.downLoad(baseURL + "docker/gene_search/report", params, 'post');
+                GeneSearch.downLoad(baseURL + "docker/gene_search/download", params, 'post');
                 parent.layer.msg('下载完成', {icon: 1});
             });
         },

@@ -51,9 +51,6 @@ public class XlsxExcelUtils {
         Sheet sheet = wb.getSheetAt(0);
 
         int size = list.size();
-//        for (int i=1; i<size;i ++) {
-//            sheet.createRow(39+i);
-//        }
         for (int i=1; i<size;i ++) {
             sheet.createRow(46);
         }
@@ -65,37 +62,4 @@ public class XlsxExcelUtils {
         os.close();
     }
 
-    public static void main(String[] args) throws IOException {
-        String inputFileName = "d:/report.xlsx";
-        String outputFileName = "d:/result.xlsx";
-
-        SickEntity sickEntity = new SickEntity();
-        sickEntity.setUpdateTime(new Date());
-        sickEntity.setCreateTime(new Date());
-        sickEntity.setSickCode("HY1111111111");
-        sickEntity.setFamily("爸爸妈妈");
-        sickEntity.setFamilyHistory("无");
-        sickEntity.setMedicalHistory("抗衰老");
-        sickEntity.setSickName("张三");
-
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setCreateTime(new Date());
-        productEntity.setGenes("Gene1111111111111111111wsss");
-        productEntity.setProductCode("yanwu");
-        productEntity.setProductName("演武");
-
-        List<GeneSearchEntity> list = new ArrayList<>();
-        GeneSearchEntity entity1 = new GeneSearchEntity();
-        entity1.setAlleleFrequency("ssss1111111111");
-        entity1.setMutationInfo("aaaa11111111");
-        list.add(entity1);
-
-        GeneSearchEntity entity2 = new GeneSearchEntity();
-        entity2.setAlleleFrequency("ssss222222");
-        entity2.setMutationInfo("aaaa2222222222");
-        list.add(entity2);
-
-        parse(inputFileName, outputFileName, sickEntity, productEntity, list);
-
-    }
 }

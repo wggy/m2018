@@ -80,12 +80,22 @@ public class SickFormatTask {
         return Arith.div(Arith.toDouble(mutationRate1), Arith.toDouble(mutationRate2), 2) + "";
     }
 
+    private static String calcRate1(String mutationRate1, String mutationRate2) {
+        if (sZero.equals(mutationRate2)) {
+            return null;
+        }
+        return Arith.div(Arith.toDouble(mutationRate1), Arith.toDouble(mutationRate2), 2) + "";
+    }
+
     public static void main(String[] args) {
-        String s = "0,7";
-        String n = s.replace(",", "/");
-        System.out.println(s);
-        System.out.println(n);
-        System.out.println(s);
+        String s = "1/1:0,9:9:27:404,27,0";
+        String[] formatValArray = s.split(":");
+        String mutationMode = Constant.MutationMode.getMode(formatValArray[0]);
+        String mutationAd = formatValArray[1].replace(",", "/");
+        String mutationRate = calcRate1(formatValArray[1].split(",")[1], formatValArray[2]);
+        System.out.println(mutationMode);
+        System.out.println(mutationAd);
+        System.out.println(mutationRate);
     }
 
 }

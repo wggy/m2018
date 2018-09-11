@@ -34,7 +34,10 @@
 			`sick`,
 			`format`,
 			`format_val`,
-			`format_rate`
+			`format_rate`,
+			`mutation_mode`,
+			`mutation_ad`,
+			`mutation_rate`
 		)
 		values
 		(
@@ -42,7 +45,10 @@
 			#{sick},
 			#{format},
 			#{formatVal},
-			#{formatRate}
+			#{formatRate},
+			#{mutationMode},
+			#{mutationAd},
+			#{mutationRate}
 		)
 	</insert>
 
@@ -53,7 +59,10 @@
 		`sick`,
 		`format`,
 		`format_val`,
-		`format_rate`
+		`format_rate`,
+		`mutation_mode`,
+		`mutation_ad`,
+		`mutation_rate`
 		)
 		values
 		<foreach item="item" collection="list" index="index" separator=",">
@@ -62,7 +71,10 @@
 		#{item.sick},
 		#{item.format},
 		#{item.formatVal},
-		#{item.formatRate}
+		#{item.formatRate},
+		#{mutationMode},
+		#{mutationAd},
+		#{mutationRate}
 		)
 		</foreach>
 	</insert>

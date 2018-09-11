@@ -1,22 +1,26 @@
 package sw.melody.modules.docker.controller;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sw.melody.common.exception.RRException;
+import sw.melody.common.utils.DateUtils;
 import sw.melody.common.utils.Query;
 import sw.melody.common.utils.R;
 import sw.melody.common.utils.WorderToNewWordUtils;
 import sw.melody.modules.docker.entity.GeneSearchEntity;
 import sw.melody.modules.docker.entity.ProductEntity;
+import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.GeneSearchService;
 import sw.melody.modules.docker.service.ProductService;
+import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.docker.util.FreemarkerUtil;
 import sw.melody.modules.job.utils.Arith;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +46,8 @@ public class GeneSearchController {
     private SickService sickService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SampleService sampleService;
 
     @RequestMapping("/sick_info")
     public R sickInfo(@RequestParam Map<String, Object> params) {
@@ -143,9 +149,6 @@ public class GeneSearchController {
         String ids = params.get("ids").toString();
         String productId = params.get("productId").toString();
         String sickCode = params.get("sickCode").toString();
-        List<String[]> list1 = new ArrayList<>();
-        List<String[]> list2 = new ArrayList<>();
-
         if (params.get("ids") == null) {
             throw new RRException("参数错误");
         }
@@ -164,20 +167,68 @@ public class GeneSearchController {
         if (productEntity == null) {
             throw new RRException("查无该检验产品记录");
         }
+        SampleEntity sampleEntity = sampleService.queryObjectBySickId(sickEntity.getId());
+        if (sampleEntity == null) {
+            throw new RRException("查无样本记录");
+        }
+        List<Map<String, Object>> geneList = new ArrayList<>();
+        List<Map<String, Object>> familyList = new ArrayList<>();
 
-        String fileName = this.getClass().getClassLoader().getResource("report.xml").getPath();
-        StringBuilder sb = new StringBuilder();
-        String s;
-        try (BufferedReader br = new BufferedReader(new FileReader(new File(fileName)))) {
-            while ((s = br.readLine()) != null) {
-                sb.append(s);
-            }
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("genesList", geneList);
+        dataMap.put("familyList", familyList);
+        dataMap.put("sickName", sickEntity.getSickName());
+
+        if (StringUtils.isNotBlank(sickEntity.getBirthday())) {
+            String[] bithdayArray = sickEntity.getBirthday().split("-");
+            dataMap.put("birthYear", bithdayArray[0]);
+            dataMap.put("birthMonth", bithdayArray[1]);
+            dataMap.put("birthDay", bithdayArray[2]);
+        }
+
+        if (sickEntity.getCreateTime() != null) {
+            String createDate = DateUtils.format(sickEntity.getCreateTime(), DateUtils.DATE_PATTERN);
+            String[] createDateArray = createDate.split("-");
+            dataMap.put("receiveYear", createDateArray[0]);
+            dataMap.put("receiveMonth", createDateArray[1]);
+            dataMap.put("receiveDay", createDateArray[2]);
+        }
+        dataMap.put("nation", sickEntity.getNation());
+        dataMap.put("sex", sickEntity.getSex());
+        dataMap.put("hospital", sickEntity.getHospital());
+        dataMap.put("department", sickEntity.getDepartment());
+        dataMap.put("doctor", sickEntity.getDoctor());
+        dataMap.put("sampleCode", sickEntity.getSickCode().concat("-").concat(productEntity.getId().toString()));
+        dataMap.put("tell", sickEntity.getPanelName());
+        dataMap.put("sickHistory", sickEntity.getMedicalHistory());
+        dataMap.put("familyHistory", sickEntity.getFamilyHistory());
+        dataMap.put("assistCheck", "无");
+        dataMap.put("diagnosis", "无");
+        dataMap.put("focusGenes", sickEntity.getDiseaseGeneFocused());
+        dataMap.put("sampleName", "test1");
+
+        for (GeneSearchEntity entity : list) {
+            Map<String, Object> geneMap = new HashMap<>();
+            Map<String, Object> familyMap = new HashMap<>();
+            geneMap.put("geneRefgene", entity.getGeneRefgene());
+            geneMap.put("xrefRefgene", entity.getXrefRefgene());
+            geneMap.put("mutationInfo", entity.getMutationInfo());
+            geneMap.put("aachangeRefgene", entity.getAachangeRefgene());
+            geneMap.put("sampleNameAttr", entity.getSampleNameAttr());
+            geneList.add(geneMap);
+            familyMap.put("geneRefgene", entity.getGeneRefgene());
+            familyMap.put("mutationInfo", entity.getMutationInfo());
+            familyMap.put("mutationType", entity.getMutationMode());
+            familyList.add(familyMap);
+        }
+
+        try {
+            FreemarkerUtil.process(dataMap, request, response, "基因报告.doc");
+        } catch (TemplateException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String userAgent = request.getHeader("User-Agent");
-        WorderToNewWordUtils.geneReport(userAgent, fileName, "基因检测报告.docx", response,"test1", list1, list2);
     }
 
 }

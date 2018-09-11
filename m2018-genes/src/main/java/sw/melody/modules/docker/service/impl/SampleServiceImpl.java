@@ -77,4 +77,9 @@ public class SampleServiceImpl implements SampleService {
     public void deleteByFlag(Long id) {
         sampleDao.deleteByFlag(id);
     }
+
+    @Override
+    public SampleEntity queryObjectBySickId(Long sickId) {
+        return sampleDao.queryObjectBySickId(sickId);
+    }
 }

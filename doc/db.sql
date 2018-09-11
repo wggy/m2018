@@ -227,3 +227,11 @@ ADD COLUMN `sec_origin_name`  varchar(255) NULL AFTER `md5`,
 ADD COLUMN `delete_flag`  int(3) NULL DEFAULT 1 COMMENT '0：删除，1：正常' AFTER `sec_origin_name`;
 
 
+ALTER TABLE `tbl_sick`
+ADD COLUMN `birthday`  varchar(50) NULL AFTER `update_time`,
+ADD COLUMN `nation`  varchar(200) NULL AFTER `birthday`,
+ADD COLUMN `hospital`  varchar(200) NULL AFTER `nation`,
+ADD COLUMN `department`  varchar(200) NULL AFTER `hospital`,
+ADD COLUMN `doctor`  varchar(200) NULL AFTER `department`;
+
+

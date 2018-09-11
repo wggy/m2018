@@ -163,16 +163,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${sickName}</w:t>
-                                    </w:r>
-                                    <w:r>
-                                        <w:rPr>
-                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
-                                            <w:color w:val="FF0000"/>
-                                            <w:kern w:val="0"/>
-                                            <w:szCs w:val="21"/>
-                                        </w:rPr>
-                                        <w:t xml:space="preserve"> </w:t>
+                                        <w:t>${sickName!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -247,7 +238,11 @@
                                             <w:sz w:val="21"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
+                                    <#if sex=="男">
                                         <w:sym w:font="Wingdings 2" w:char="0052"/>
+                                    <#else>
+                                        <w:sym w:font="Wingdings 2" w:char="00A3"/>
+                                    </#if>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -277,7 +272,11 @@
                                             <w:sz w:val="21"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
+                                    <#if sex=="女">
                                         <w:sym w:font="Wingdings 2" w:char="0052"/>
+                                    <#else>
+                                        <w:sym w:font="Wingdings 2" w:char="00A3"/>
+                                    </#if>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -327,7 +326,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${year}</w:t>
+                                        <w:t>${birthYear!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -348,7 +347,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${month}</w:t>
+                                        <w:t>${birthMonth!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -362,16 +361,6 @@
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
-                                            <w:rFonts w:ascii="宋体" w:cs="宋体"/>
-                                            <w:color w:val="000000"/>
-                                            <w:kern w:val="0"/>
-                                            <w:sz w:val="21"/>
-                                            <w:szCs w:val="21"/>
-                                        </w:rPr>
-                                        <w:t xml:space="preserve"> </w:t>
-                                    </w:r>
-                                    <w:r>
-                                        <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
                                             <w:color w:val="000000"/>
                                             <w:kern w:val="0"/>
@@ -379,7 +368,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${day}</w:t>
+                                        <w:t xml:space="preserve"> ${birthDay!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -451,7 +440,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${nation}</w:t>
+                                        <w:t>${nation!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -559,7 +548,7 @@
                                             <w:kern w:val="0"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
-                                        <w:sym w:font="Wingdings 2" w:char="0052"/>
+                                        <w:sym w:font="Wingdings 2" w:char="00A3"/>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -577,6 +566,24 @@
                                             <w:kern w:val="0"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
+                                        <w:sym w:font="Wingdings 2" w:char="00A3"/>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:hAnsi="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                        </w:rPr>
+                                        <w:t xml:space="preserve">母 </w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:hAnsi="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                        </w:rPr>
                                         <w:sym w:font="Wingdings 2" w:char="0052"/>
                                     </w:r>
                                     <w:r>
@@ -586,7 +593,7 @@
                                             <w:kern w:val="0"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
-                                        <w:t>母 □其他</w:t>
+                                        <w:t>其他</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -649,7 +656,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${hospital}</w:t>
+                                        <w:t>${hospital!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -714,7 +721,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${department}</w:t>
+                                        <w:t>${department!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -752,7 +759,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${doctor}</w:t>
+                                        <w:t>${doctor!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -816,7 +823,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${sampleCode}</w:t>
+                                        <w:t>${sampleCode!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -865,7 +872,64 @@
                                             <w:kern w:val="0"/>
                                             <w:szCs w:val="21"/>
                                         </w:rPr>
-                                        <w:t>收样时间： 年 月 日</w:t>
+                                        <w:t>收样时间：</w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
+                                        </w:rPr>
+                                        <w:t>${receiveYear!''}</w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                        </w:rPr>
+                                        <w:t xml:space="preserve">年 </w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
+                                        </w:rPr>
+                                        <w:t>${receiveMonth!''}</w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                        </w:rPr>
+                                        <w:t xml:space="preserve">月 </w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
+                                        </w:rPr>
+                                        <w:t>${receiveDay!''}</w:t>
+                                    </w:r>
+                                    <w:r>
+                                        <w:rPr>
+                                            <w:rFonts w:hint="eastAsia" w:ascii="宋体" w:cs="宋体"/>
+                                            <w:color w:val="000000"/>
+                                            <w:kern w:val="0"/>
+                                            <w:szCs w:val="21"/>
+                                        </w:rPr>
+                                        <w:t>日</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -991,7 +1055,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${tell}</w:t>
+                                        <w:t>${tell!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -1082,7 +1146,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${sickHistory}</w:t>
+                                        <w:t>${sickHistory!''}</w:t>
                                     </w:r>
                                 </w:p>
                                 <w:p>
@@ -1197,7 +1261,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${familyHistory}</w:t>
+                                        <w:t>${familyHistory!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -1287,7 +1351,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${assistCheck}</w:t>
+                                        <w:t>${assistCheck!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -1388,7 +1452,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${diagnosis}</w:t>
+                                        <w:t>${diagnosis!''}</w:t>
                                     </w:r>
                                 </w:p>
                                 <w:p>
@@ -1426,7 +1490,7 @@
                                             <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${focusGenes}</w:t>
+                                        <w:t>${focusGenes!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -2099,6 +2163,8 @@
                             </w:rPr>
                             <w:t>基因检测报告</w:t>
                         </w:r>
+                        <w:bookmarkStart w:id="0" w:name="_GoBack"/>
+                        <w:bookmarkEnd w:id="0"/>
                         <w:r>
                             <w:rPr>
                                 <w:szCs w:val="21"/>
@@ -2281,7 +2347,7 @@
                                             <w:sz w:val="24"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${sampleName}</w:t>
+                                        <w:t>${sampleName!''}</w:t>
                                     </w:r>
                                     <w:r>
                                         <w:rPr>
@@ -2418,15 +2484,7 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                         </w:rPr>
-                                        <w:t>转录</w:t>
-                                    </w:r>
-                                    <w:bookmarkStart w:id="0" w:name="_GoBack"/>
-                                    <w:bookmarkEnd w:id="0"/>
-                                    <w:r>
-                                        <w:rPr>
-                                            <w:rFonts w:hint="eastAsia"/>
-                                        </w:rPr>
-                                        <w:t>本:外显子编号</w:t>
+                                        <w:t>转录本:外显子编号</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -2523,8 +2581,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
@@ -2532,8 +2590,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.geneRefgene!''}</w:t>
@@ -2555,8 +2613,8 @@
                                         <w:jc w:val="left"/>
                                         <w:rPr>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                     </w:pPr>
                                 </w:p>
@@ -2577,8 +2635,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
@@ -2586,8 +2644,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.xrefRefgene!''}</w:t>
@@ -2609,8 +2667,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
@@ -2618,8 +2676,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.mutationInfo!''}</w:t>
@@ -2642,8 +2700,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
@@ -2651,8 +2709,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.aachangeRefgene!''}</w:t>
@@ -2675,8 +2733,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
@@ -2684,8 +2742,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.sampleNameAttr!''}</w:t>
@@ -2706,8 +2764,8 @@
                                         <w:jc w:val="left"/>
                                         <w:rPr>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                     </w:pPr>
                                 </w:p>
@@ -2910,7 +2968,7 @@
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${sampleName}</w:t>
+                                        <w:t>${sampleName!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -2955,7 +3013,7 @@
                                 </w:p>
                             </w:tc>
                         </w:tr>
-                        <#list familyList as familyItem>
+                        <#list familyList as family>
                             <w:tr>
                             <w:tblPrEx>
                                 <w:tblBorders>
@@ -2990,17 +3048,20 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US"/>
                                         </w:rPr>
                                     </w:pPr>
                                     <w:r>
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${familyItem.geneRefgene!''}</w:t>
+                                        <w:t>${family.geneRefgene!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -3018,17 +3079,20 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US"/>
                                         </w:rPr>
                                     </w:pPr>
                                     <w:r>
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>${familyItem.mutationInfo!''}</w:t>
+                                        <w:t>${family.mutationInfo!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -3044,16 +3108,22 @@
                                         <w:widowControl/>
                                         <w:jc w:val="left"/>
                                         <w:rPr>
-                                            <w:rFonts w:hint="eastAsia"/>
+                                            <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                     </w:pPr>
                                     <w:r>
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
+                                            <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
-                                        <w:t>杂合突变</w:t>
+                                        <w:t>${family.mutationType!''}</w:t>
                                     </w:r>
                                 </w:p>
                             </w:tc>
@@ -3071,12 +3141,16 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                     </w:pPr>
                                     <w:r>
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                         <w:t>未检测</w:t>
                                     </w:r>
@@ -3096,12 +3170,16 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                     </w:pPr>
                                     <w:r>
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                         </w:rPr>
                                         <w:t>未检测</w:t>
                                     </w:r>
@@ -3827,8 +3905,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.geneRefgene!''}</w:t>
@@ -3877,8 +3955,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.xrefRefgene!''}</w:t>
@@ -3907,8 +3985,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.mutationInfo!''}</w:t>
@@ -3937,8 +4015,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.aachangeRefgene!''}</w:t>
@@ -3967,8 +4045,8 @@
                                         <w:rPr>
                                             <w:rFonts w:hint="eastAsia"/>
                                             <w:color w:val="FF0000"/>
-                                            <w:sz w:val="13"/>
-                                            <w:szCs w:val="13"/>
+                                            <w:sz w:val="21"/>
+                                            <w:szCs w:val="21"/>
                                             <w:lang w:val="en-US" w:eastAsia="zh-CN"/>
                                         </w:rPr>
                                         <w:t>${gene.sampleNameAttr!''}</w:t>
@@ -4535,6 +4613,7 @@
                         <w:footerReference r:id="rId4" w:type="default"/>
                         <w:pgSz w:w="12242" w:h="15842"/>
                         <w:pgMar w:top="1021" w:right="1797" w:bottom="737" w:left="1797" w:header="851" w:footer="992" w:gutter="0"/>
+                        <w:pgNumType w:fmt="decimal"/>
                         <w:cols w:space="425" w:num="1"/>
                         <w:docGrid w:type="lines" w:linePitch="312" w:charSpace="0"/>
                     </w:sectPr>
@@ -4558,6 +4637,7 @@
                 <customShpExts>
                     <customShpInfo spid="_x0000_s4097"/>
                     <customShpInfo spid="_x0000_s4098"/>
+                    <customShpInfo spid="_x0000_s4100" textRotate="1"/>
                 </customShpExts>
             </s:customData>
         </pkg:xmlData>
@@ -4581,7 +4661,7 @@
                 <Characters>2194</Characters>
                 <Lines>18</Lines>
                 <Paragraphs>5</Paragraphs>
-                <TotalTime>2</TotalTime>
+                <TotalTime>9</TotalTime>
                 <ScaleCrop>false</ScaleCrop>
                 <LinksUpToDate>false</LinksUpToDate>
                 <CharactersWithSpaces>2573</CharactersWithSpaces>
@@ -4597,7 +4677,7 @@
                 <dc:creator>USER</dc:creator>
                 <cp:lastModifiedBy>wange</cp:lastModifiedBy>
                 <cp:lastPrinted>2017-07-06T21:54:00Z</cp:lastPrinted>
-                <dcterms:modified xsi:type="dcterms:W3CDTF">2018-09-10T09:23:48Z</dcterms:modified>
+                <dcterms:modified xsi:type="dcterms:W3CDTF">2018-09-11T06:44:08Z</dcterms:modified>
                 <dc:title>停育/流产胚胎样品送检申请单</dc:title>
                 <cp:revision>80</cp:revision>
             </cp:coreProperties>
@@ -4697,6 +4777,113 @@
                             <w:szCs w:val="21"/>
                         </w:rPr>
                     </w:pPr>
+                    <w:r>
+                        <w:rPr>
+                            <w:sz w:val="21"/>
+                        </w:rPr>
+                        <w:pict>
+                            <v:shape id="_x0000_s4100" o:spid="_x0000_s4100" o:spt="202" type="#_x0000_t202" style="position:absolute;left:0pt;margin-top:0pt;height:144pt;width:144pt;mso-position-horizontal:center;mso-position-horizontal-relative:margin;mso-wrap-style:none;z-index:251660288;mso-width-relative:page;mso-height-relative:page;" filled="f" stroked="f" coordsize="21600,21600">
+                                <v:path/>
+                                <v:fill on="f" focussize="0,0"/>
+                                <v:stroke on="f"/>
+                                <v:imagedata o:title=""/>
+                                <o:lock v:ext="edit" aspectratio="f"/>
+                                <v:textbox inset="0mm,0mm,0mm,0mm" style="mso-fit-shape-to-text:t;">
+                                    <w:txbxContent>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                        </w:p>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                        </w:p>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                        </w:p>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                        </w:p>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                        </w:p>
+                                        <w:p>
+                                            <w:pPr>
+                                                <w:pStyle w:val="3"/>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia" w:eastAsia="宋体"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                            </w:pPr>
+                                            <w:r>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                                <w:fldChar w:fldCharType="begin"/>
+                                            </w:r>
+                                            <w:r>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                                <w:instrText xml:space="preserve"> PAGE  \* MERGEFORMAT </w:instrText>
+                                            </w:r>
+                                            <w:r>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                                <w:fldChar w:fldCharType="separate"/>
+                                            </w:r>
+                                            <w:r>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                                <w:t>1</w:t>
+                                            </w:r>
+                                            <w:r>
+                                                <w:rPr>
+                                                    <w:rFonts w:hint="eastAsia"/>
+                                                    <w:lang w:eastAsia="zh-CN"/>
+                                                </w:rPr>
+                                                <w:fldChar w:fldCharType="end"/>
+                                            </w:r>
+                                        </w:p>
+                                    </w:txbxContent>
+                                </v:textbox>
+                            </v:shape>
+                        </w:pict>
+                    </w:r>
                     <w:r>
                         <w:rPr>
                             <w:rFonts w:hint="eastAsia"/>
@@ -5483,18 +5670,32 @@
                     <w:rsid w:val="06984CDF"/>
                     <w:rsid w:val="07245699"/>
                     <w:rsid w:val="0CC70EB9"/>
+                    <w:rsid w:val="167C50C0"/>
+                    <w:rsid w:val="17682368"/>
+                    <w:rsid w:val="1903070D"/>
+                    <w:rsid w:val="1E1B5BB3"/>
                     <w:rsid w:val="200354D0"/>
                     <w:rsid w:val="24696B26"/>
                     <w:rsid w:val="278D66D3"/>
+                    <w:rsid w:val="2D2B3B61"/>
                     <w:rsid w:val="303837FB"/>
+                    <w:rsid w:val="312B4D13"/>
+                    <w:rsid w:val="36153D54"/>
                     <w:rsid w:val="3B784FEA"/>
+                    <w:rsid w:val="3F6B5816"/>
+                    <w:rsid w:val="44AB6CB1"/>
                     <w:rsid w:val="48340532"/>
                     <w:rsid w:val="4E1B125C"/>
+                    <w:rsid w:val="53C46713"/>
                     <w:rsid w:val="56CD588F"/>
                     <w:rsid w:val="59226AF7"/>
                     <w:rsid w:val="59337701"/>
                     <w:rsid w:val="5F385EE5"/>
+                    <w:rsid w:val="61BE2DE4"/>
+                    <w:rsid w:val="67652363"/>
+                    <w:rsid w:val="6872151E"/>
                     <w:rsid w:val="69504531"/>
+                    <w:rsid w:val="6BD43ABC"/>
                     <w:rsid w:val="770D0F52"/>
                     <w:rsid w:val="7BE85518"/>
                     <w:rsid w:val="7D393240"/>
@@ -5560,7 +5761,7 @@
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Normal Indent"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="footnote text"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="annotation text"/>
-                    <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="header"/>
+                    <w:lsdException w:qFormat="1" w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="header"/>
                     <w:lsdException w:qFormat="1" w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="footer"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="index heading"/>
                     <w:lsdException w:qFormat="1" w:uiPriority="0" w:name="caption"/>
@@ -5594,7 +5795,7 @@
                     <w:lsdException w:qFormat="1" w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Title"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Closing"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Signature"/>
-                    <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:name="Default Paragraph Font"/>
+                    <w:lsdException w:qFormat="1" w:unhideWhenUsed="0" w:uiPriority="0" w:name="Default Paragraph Font"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Body Text"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Body Text Indent"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="List Continue"/>
@@ -5632,7 +5833,7 @@
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="HTML Sample"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="HTML Typewriter"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="HTML Variable"/>
-                    <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:name="Normal Table"/>
+                    <w:lsdException w:qFormat="1" w:unhideWhenUsed="0" w:uiPriority="0" w:name="Normal Table"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="annotation subject"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Table Simple 1"/>
                     <w:lsdException w:unhideWhenUsed="0" w:uiPriority="0" w:semiHidden="0" w:name="Table Simple 2"/>
@@ -5797,11 +5998,13 @@
                 <w:style w:type="character" w:default="1" w:styleId="6">
                     <w:name w:val="Default Paragraph Font"/>
                     <w:semiHidden/>
+                    <w:qFormat/>
                     <w:uiPriority w:val="0"/>
                 </w:style>
                 <w:style w:type="table" w:default="1" w:styleId="8">
                     <w:name w:val="Normal Table"/>
                     <w:semiHidden/>
+                    <w:qFormat/>
                     <w:uiPriority w:val="0"/>
                     <w:tblPr>
                         <w:tblLayout w:type="fixed"/>
@@ -5847,6 +6050,7 @@
                     <w:name w:val="header"/>
                     <w:basedOn w:val="1"/>
                     <w:link w:val="11"/>
+                    <w:qFormat/>
                     <w:uiPriority w:val="0"/>
                     <w:pPr>
                         <w:pBdr>
@@ -5955,6 +6159,7 @@
                 <w:style w:type="character" w:customStyle="1" w:styleId="13">
                     <w:name w:val="标题 字符"/>
                     <w:link w:val="5"/>
+                    <w:qFormat/>
                     <w:uiPriority w:val="0"/>
                     <w:rPr>
                         <w:rFonts w:ascii="Cambria" w:hAnsi="Cambria" w:cs="Times New Roman"/>

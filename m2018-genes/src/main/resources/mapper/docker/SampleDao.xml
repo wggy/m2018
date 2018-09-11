@@ -170,4 +170,8 @@
 	<delete id="deleteByFlag">
 		update tbl_sample set delete_flag=0 where id = #{value}
 	</delete>
+
+	<select id="queryObjectBySickId" resultType="sw.melody.modules.docker.entity.SampleEntity">
+		SELECT * FROM tbl_sample t WHERE t.delete_flag=1 AND t.sick_id=${value} AND t.store_status='success' LIMIT 1
+	</select>
 </mapper>

@@ -25,4 +25,7 @@ public interface SampleService {
     SampleEntity queryObjectByMd5(String md5);
 
     void deleteByFlag(Long id);
+
+    SampleEntity queryObjectBySickId(Long sickId);
+
 }

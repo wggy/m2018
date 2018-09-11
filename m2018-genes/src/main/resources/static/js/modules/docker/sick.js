@@ -11,6 +11,11 @@ $(function () {
             {label: '疾病基因', name: 'diseaseGeneFocused', width: 90},
             {label: '病史药史', name: 'familyHistory', width: 90},
             {label: '病情描述', name: 'panelName', width: 90},
+            {label: '出生日期', name: 'birthday', width: 90},
+            {label: '民族', name: 'nation', width: 60},
+            {label: '医院', name: 'hospital', width: 60},
+            {label: '科室', name: 'department', width: 70},
+            {label: '申请医生', name: 'doctor', width: 70},
             {label: '创建时间', name: 'createTime', width: 80},
             {label: '更新时间', name: 'updateTime', width: 80}
         ],

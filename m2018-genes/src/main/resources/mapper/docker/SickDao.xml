@@ -45,7 +45,12 @@
 			`family_history`,
 			`panel_name`,
 			`create_time`,
-			`update_time`
+			`update_time`,
+			`birthday`,
+			`nation`,
+			`hospital`,
+			`department`,
+			`doctor`
 		)
 		values
 		(
@@ -58,7 +63,12 @@
 			#{familyHistory},
 			#{panelName},
 			#{createTime},
-			#{updateTime}
+			#{updateTime},
+			#{birthday},
+			#{nation},
+			#{hospital},
+			#{department},
+			#{doctor}
 		)
 	</insert>
 	 
@@ -73,6 +83,11 @@
 			<if test="familyHistory != null">`family_history` = #{familyHistory},</if>
 			<if test="panelName != null">`panel_name` = #{panelName},</if>
 			<if test="updateTime != null">`update_time` = #{updateTime},</if>
+			<if test="birthday != null">`birthday` = #{birthday},</if>
+			<if test="nation != null">`nation` = #{nation},</if>
+			<if test="hospital != null">`hospital` = #{hospital},</if>
+			<if test="department != null">`department` = #{department},</if>
+			<if test="doctor != null">`doctor` = #{doctor},</if>
 		</set>
 		where id = #{id}
 	</update>
