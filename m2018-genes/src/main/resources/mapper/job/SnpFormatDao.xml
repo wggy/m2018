@@ -72,9 +72,9 @@
 		#{item.format},
 		#{item.formatVal},
 		#{item.formatRate},
-		#{mutationMode},
-		#{mutationAd},
-		#{mutationRate}
+		#{item.mutationMode},
+		#{item.mutationAd},
+		#{item.mutationRate}
 		)
 		</foreach>
 	</insert>
