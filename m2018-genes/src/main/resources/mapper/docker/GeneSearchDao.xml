@@ -35,7 +35,7 @@
 			AND si.exonicfunc_refgene <![CDATA[ <> ]]> 'synonymous_SNV'
 		</if>
 		AND si.aachange_refgene IS NOT NULL AND si.aachange_refgene NOT IN  ('UNKNOWN', 'unknown', '.', '')
-		ORDER BY si.id
+		ORDER BY si.gene_refgene asc
 		<if test="offset != null and limit != null">
 			LIMIT #{offset}, #{limit}
 		</if>

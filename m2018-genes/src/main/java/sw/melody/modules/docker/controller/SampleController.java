@@ -244,9 +244,9 @@ public class SampleController extends SaveFile {
             storeExecutor.execute(() -> {
                 log.info("indel store: {}", indelPath);
                 try {
-                    geneSnpTask.parse(indelPath, sickId);
+                    geneIndelTask.parse(indelPath, sickId);
                     log.info("snp store: {}", snpPath);
-                    geneIndelTask.parse(snpPath, sickId);
+                    geneSnpTask.parse(snpPath, sickId);
                     sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
                     sampleEntity.setStoreFinishTime(new Date());
                     sampleService.update(sampleEntity);
