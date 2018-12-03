@@ -28,4 +28,6 @@ public interface SampleService {
 
     SampleEntity queryObjectBySickId(Long sickId);
 
+    void resetTriggerStatus(Long sampleId);
+
 }

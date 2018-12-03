@@ -98,7 +98,7 @@ public class UploadLargeFileController extends SaveFile {
                         try {
                             entity.setUploadStatus(SampleStatus.Merging.getStatus());
                             sampleService.update(entity);
-                            MergeFile.mergeFile(chunksNumber, ext, guid, uploadFolderPath);
+                            MergeFile.mergeFile(chunksNumber, ext, guid, fullPathNoFile);
                             entity.setUploadFinishTime(new Date());
                             entity.setUploadStatus(SampleStatus.Success.getStatus());
                             entity.setLocation(location);

@@ -135,6 +135,69 @@ var vm = new Vue({
                 content: 'modules/docker/more_log.html'
             });
         },
+        deleteRecord: function () {
+            var id = getSelectedRow();
+            if(id == null){
+                return ;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/sample/del_record/" + id,
+                contentType: "application/json",
+                data: JSON.stringify(vm.config),
+                success: function(r){
+                    if(r.code === 0){
+                        alert(r.msg || '操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        cleanDirectory: function () {
+            var id = getSelectedRow();
+            if(id == null){
+                return ;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/sample/del_file/" + id,
+                contentType: "application/json",
+                data: JSON.stringify(vm.config),
+                success: function(r){
+                    if(r.code === 0){
+                        alert(r.msg || '操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
+        deleteMidFile: function () {
+            var id = getSelectedRow();
+            if(id == null){
+                return ;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/sample/del_mid_file/" + id,
+                contentType: "application/json",
+                data: JSON.stringify(vm.config),
+                success: function(r){
+                    if(r.code === 0){
+                        alert(r.msg || '操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
         reload: function () {
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {

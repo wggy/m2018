@@ -11,19 +11,14 @@ public class TwoThreadWaitNotify {
     private boolean flag = false;
 
     public static void main(String[] args) {
-//        TwoThreadWaitNotify notify = new TwoThreadWaitNotify();
-//        Thread jiThread = new Thread(new JiNum(notify));
-//        jiThread.setName("A");
-//        Thread ouThread = new Thread(new OuNum(notify));
-//        ouThread.setName("B");
-//        jiThread.start();
-//        ouThread.start();
+        TwoThreadWaitNotify notify = new TwoThreadWaitNotify();
+        Thread jiThread = new Thread(new JiNum(notify));
+        jiThread.setName("A");
+        Thread ouThread = new Thread(new OuNum(notify));
+        ouThread.setName("B");
+        jiThread.start();
+        ouThread.start();
 
-        try {
-            join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private static void join() throws InterruptedException {

@@ -1,5 +1,13 @@
 package sw.melody.thread;
 
+import io.swagger.models.auth.In;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -12,18 +20,33 @@ public class SpinLock {
 
     private static AtomicReference<Thread> sign = new AtomicReference<>();
 
-    private static int counter = 1;
+    private static int counter = 0;
     public static void lock() {
-        boolean ret = false;
-        while (sign.compareAndSet(null, Thread.currentThread())) {
-            for (int i=0; i<10; i++) {
-                System.out.println(Thread.currentThread().getName() + ": " + (counter++));
+        File file = new File("E:/file/".concat("log.txt"));
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try {
+            fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (true) {
+            if (sign.compareAndSet(null, Thread.currentThread())) {
+                if (counter >= 100) {
+                    break;
+                }
+                System.out.println(counter);
+                try {
+                    bw.write(Thread.currentThread().getName()+" 获得锁, count=" + (counter++) + "\n");
+                    bw.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                unLock();
             }
-            ret = true;
         }
-        if (ret) {
-            unLock();
-        }
+
     }
 
     public static void unLock() {
@@ -31,7 +54,6 @@ public class SpinLock {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Executors.newFixedThreadPool(10);
         Thread t1 = new Thread(() -> lock());
         Thread t2 = new Thread(() -> lock());
         Thread t3 = new Thread(() -> lock());
@@ -65,7 +87,10 @@ public class SpinLock {
         t9.start();
         t10.start();
 
-        Thread.sleep(10*1000);
+        Thread.sleep(10000);
+
+        Set<Integer> set = new HashSet<>();
+        set.toString();
     }
 
 }

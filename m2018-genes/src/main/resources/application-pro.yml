@@ -38,4 +38,4 @@ spring:
                         multi-statement-allow: true
 
 system:
-    temppath: /home/gene_data/dydata
+    temppath: /data/gene_data/dydata

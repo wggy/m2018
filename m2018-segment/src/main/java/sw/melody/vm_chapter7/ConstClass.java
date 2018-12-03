@@ -6,4 +6,8 @@ package sw.melody.vm_chapter7;
  **/
 
 public class ConstClass {
+    static {
+        System.out.println("Const init");
+    }
+    public static final String Hi = "Hello World";
 }

@@ -174,4 +174,8 @@
 	<select id="queryObjectBySickId" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		SELECT * FROM tbl_sample t WHERE t.delete_flag=1 AND t.sick_id=${value} AND t.store_status='success' LIMIT 1
 	</select>
+
+	<update id="resetTriggerStatus">
+		update tbl_sample set trigger_status=NULL,trigger_start_time=NULL,trigger_finish_time=NULL WHERE id = {sampleId}
+	</update>
 </mapper>

@@ -82,4 +82,9 @@ public class SampleServiceImpl implements SampleService {
     public SampleEntity queryObjectBySickId(Long sickId) {
         return sampleDao.queryObjectBySickId(sickId);
     }
+
+    @Override
+    public void resetTriggerStatus(Long sampleId) {
+        sampleDao.resetTriggerStatus(sampleId);
+    }
 }

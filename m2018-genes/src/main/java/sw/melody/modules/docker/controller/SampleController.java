@@ -2,6 +2,7 @@ package sw.melody.modules.docker.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,13 @@ import sw.melody.modules.sys.service.SysConfigService;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -175,7 +178,8 @@ public class SampleController extends SaveFile {
         }
 
         String fullPathNoFile = sampleEntity.getLocation();
-        File targetBashFile = new File(addFileSeparator(fullPathNoFile) + ConfigConstant.Shell_Bwa_File);
+        String shellFileName = sysConfigService.getValue(ConfigConstant.Shell_Bwa_File);
+        File targetBashFile = new File(addFileSeparator(fullPathNoFile) + shellFileName);
         if (!targetBashFile.exists()) {
             Process cpFilePs = Runtime.getRuntime().exec("cp -pf " + bashFilePath + " " + fullPathNoFile);
             int cpFileStatus = cpFilePs.waitFor();
@@ -209,10 +213,11 @@ public class SampleController extends SaveFile {
     }
 
     private String getCommand(String fullPathNoFile, String targetFileName, String secFileName) {
+        String nohupShell = sysConfigService.getValue(ConfigConstant.Shell_Bwa);
         if (StringUtils.isBlank(secFileName)) {
-            return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " > " + targetFileName + ".out 2>&1 &";
+            return "cd " + fullPathNoFile + " &&  " + nohupShell + " " + targetFileName + " > " + targetFileName + ".out 2>&1 &";
         }
-        return "cd " + fullPathNoFile + " &&  " + ConfigConstant.Shell_Bwa + targetFileName + " " + secFileName + " > " + targetFileName + ".out 2>&1 &";
+        return "cd " + fullPathNoFile + " &&  " + nohupShell  + " " + targetFileName + " " + secFileName + " > " + targetFileName + ".out 2>&1 &";
     }
 
     @SysLog("样本入库")
@@ -303,7 +308,7 @@ public class SampleController extends SaveFile {
         }
         SampleEntity sampleEntity = sampleService.queryObject(id);
         if (sampleEntity == null) {
-            return R.error("改样本不存在");
+            return R.error("该样本不存在");
         }
         String logFileName = addFileSeparator(sampleEntity.getLocation()).concat(sampleEntity.getOriginName()).concat(".out");
         MoreLogUtil.LogResult logResult = MoreLogUtil.readLog(logFileName, fromLine);
@@ -314,6 +319,83 @@ public class SampleController extends SaveFile {
         return R.ok().put("log", logResult);
     }
 
+    @RequestMapping("/del_file/{id}")
+    public R deleteFile(@PathVariable("id") Long id) throws Exception {
+        if (id == null) {
+            return R.error("参数错误");
+        }
+        SampleEntity sampleEntity = sampleService.queryObject(id);
+        if (sampleEntity == null) {
+            return R.error("该样本不存在");
+        }
+        cleanUserDirectory(sampleEntity);
+        sampleService.resetTriggerStatus(sampleEntity.getId());
+        return R.ok();
+    }
+
+    @RequestMapping("/del_mid_file/{id}")
+    public R deleteMidFile(@PathVariable("id") Long id) throws Exception {
+        if (id == null) {
+            return R.error("参数错误");
+        }
+        SampleEntity sampleEntity = sampleService.queryObject(id);
+        if (sampleEntity == null) {
+            return R.error("该样本不存在");
+        }
+        if (StringUtils.isBlank(sampleEntity.getLocation())) {
+            return R.error("该样本文件不完整或未合并，请清空目录重新上传");
+        }
+        File directory = new File(sampleEntity.getLocation());
+        String originName = sampleEntity.getOriginName();
+        String secOriginName = sampleEntity.getSecOriginName();
+        boolean isSecFile = false;
+        if (StringUtils.isNotBlank(secOriginName)) {
+            isSecFile = true;
+        }
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            for (File item : files) {
+                if (isSecFile) {
+                    if (!originName.equals(item.getName()) && !secOriginName.equals(item.getName())) {
+                        FileUtils.forceDelete(item);
+                    }
+                } else {
+                    if (!originName.equals(item.getName())) {
+                        FileUtils.forceDelete(item);
+                    }
+                }
+
+            }
+        }
+        sampleService.resetTriggerStatus(sampleEntity.getId());
+        return R.ok();
+    }
+
+    @RequestMapping("/del_record/{id}")
+    public R deleteRecord(@PathVariable("id") Long id) throws Exception {
+        if (id == null) {
+            return R.error("参数错误");
+        }
+        SampleEntity sampleEntity = sampleService.queryObject(id);
+        if (sampleEntity == null) {
+            return R.error("该样本不存在");
+        }
+        cleanUserDirectory(sampleEntity);
+        sampleService.delete(id);
+        return R.ok();
+    }
+
+    private void cleanUserDirectory(SampleEntity sampleEntity) throws IOException {
+        String location = sampleEntity.getLocation();
+        if (StringUtils.isBlank(sampleEntity.getLocation())) {
+            SickEntity sick = sickService.queryObject(sampleEntity.getSickId());
+            if (sick == null) {
+                throw new RRException("该病人记录不存在");
+            }
+            location = addFileSeparator(sysConfigService.getValue(ConfigConstant.UPLOAD_FILE_PREFIX)) + sick.getSickCode();
+        }
+        FileUtils.deleteDirectory(new File(location));
+    }
 
     class TriggerThread extends Thread {
 
@@ -350,6 +432,31 @@ public class SampleController extends SaveFile {
             }
             sampleEntity.setTriggerFinishTime(new Date());
             sampleService.update(sampleEntity);
+        }
+    }
+
+    class StoreCall implements Callable<String> {
+        SampleEntity sampleEntity;
+        String indelPath;
+        String snpPath;
+        Long sickId;
+
+        public StoreCall(SampleEntity sampleEntity, String indelPath, String snpPath, Long sickId) {
+            this.sampleEntity = sampleEntity;
+            this.indelPath = indelPath;
+            this.snpPath = snpPath;
+            this.sickId = sickId;
+        }
+
+        @Override
+        public String call() throws Exception {
+            geneIndelTask.parse(indelPath, sickId);
+            log.info("snp store: {}", snpPath);
+            geneSnpTask.parse(snpPath, sickId);
+            sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
+            sampleEntity.setStoreFinishTime(new Date());
+            sampleService.update(sampleEntity);
+            return SampleStatus.Success.getStatus();
         }
     }
 }

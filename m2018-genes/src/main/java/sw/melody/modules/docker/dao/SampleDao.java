@@ -9,4 +9,5 @@ public interface SampleDao extends BaseDao<SampleEntity> {
     SampleEntity queryObjectByMd5(String md5);
     SampleEntity queryObjectBySickId(Long sickId);
     void deleteByFlag(Long id);
+    void resetTriggerStatus(Long sampleId);
 }
