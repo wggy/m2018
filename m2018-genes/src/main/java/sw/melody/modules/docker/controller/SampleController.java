@@ -31,9 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /****
  * 样本管理
@@ -55,7 +52,7 @@ public class SampleController extends SaveFile {
     @Autowired
     private GeneIndelTask geneIndelTask;
 
-    private ExecutorService storeExecutor = Executors.newSingleThreadExecutor();
+//    private ExecutorService storeExecutor = Executors.newSingleThreadExecutor();
 
     @RequestMapping("/list")
     @RequiresPermissions("docker:sample:query")
@@ -246,23 +243,7 @@ public class SampleController extends SaveFile {
         String snpPath = addFileSeparator(location).concat(fileName).concat(ConfigConstant.Result_Snp_File_Prefix);
         Long sickId = sampleEntity.getSickId();
         try {
-            storeExecutor.execute(() -> {
-                log.info("indel store: {}", indelPath);
-                try {
-                    geneIndelTask.parse(indelPath, sickId);
-                    log.info("snp store: {}", snpPath);
-                    geneSnpTask.parse(snpPath, sickId);
-                    sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
-                    sampleEntity.setStoreFinishTime(new Date());
-                    sampleService.update(sampleEntity);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
-                    sampleEntity.setStoreFinishTime(new Date());
-                    sampleService.update(sampleEntity);
-                }
-            });
-
+            new StoreThread(sampleEntity, indelPath, snpPath, sickId).start();
             return R.ok("开始入库成功...");
         } catch (Exception e) {
             sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
@@ -397,7 +378,7 @@ public class SampleController extends SaveFile {
         FileUtils.deleteDirectory(new File(location));
     }
 
-    class TriggerThread extends Thread {
+    private class TriggerThread extends Thread {
 
         private String command;
         private SampleEntity sampleEntity;
@@ -405,6 +386,7 @@ public class SampleController extends SaveFile {
         public TriggerThread(String command, SampleEntity sampleEntity) {
             this.command = command;
             this.sampleEntity = sampleEntity;
+            this.setName("trigger-thread-" + sampleEntity.getId());
         }
 
         @Override
@@ -435,28 +417,36 @@ public class SampleController extends SaveFile {
         }
     }
 
-    class StoreCall implements Callable<String> {
-        SampleEntity sampleEntity;
-        String indelPath;
-        String snpPath;
-        Long sickId;
+    private class StoreThread extends Thread {
+        private SampleEntity sampleEntity;
+        private String indelPath;
+        private String snpPath;
+        private Long sickId;
 
-        public StoreCall(SampleEntity sampleEntity, String indelPath, String snpPath, Long sickId) {
+        public StoreThread(SampleEntity sampleEntity, String indelPath, String snpPath, Long sickId) {
             this.sampleEntity = sampleEntity;
             this.indelPath = indelPath;
             this.snpPath = snpPath;
             this.sickId = sickId;
+            this.setName("store-thread-" + sampleEntity.getId());
         }
 
         @Override
-        public String call() throws Exception {
-            geneIndelTask.parse(indelPath, sickId);
-            log.info("snp store: {}", snpPath);
-            geneSnpTask.parse(snpPath, sickId);
-            sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
-            sampleEntity.setStoreFinishTime(new Date());
-            sampleService.update(sampleEntity);
-            return SampleStatus.Success.getStatus();
+        public void run() {
+            log.info("indel store: {}", indelPath);
+            try {
+                geneIndelTask.parse(indelPath, sickId);
+                log.info("snp store: {}", snpPath);
+                geneSnpTask.parse(snpPath, sickId);
+                sampleEntity.setStoreStatus(SampleStatus.Success.getStatus());
+                sampleEntity.setStoreFinishTime(new Date());
+                sampleService.update(sampleEntity);
+            } catch (Exception e) {
+                e.printStackTrace();
+                sampleEntity.setStoreStatus(SampleStatus.Fail.getStatus());
+                sampleEntity.setStoreFinishTime(new Date());
+                sampleService.update(sampleEntity);
+            }
         }
     }
 }

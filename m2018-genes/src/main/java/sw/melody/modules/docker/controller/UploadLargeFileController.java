@@ -3,6 +3,7 @@ package sw.melody.modules.docker.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +21,6 @@ import sw.melody.modules.docker.util.MergeFile;
 import sw.melody.modules.docker.util.SaveFile;
 
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author ping
@@ -37,7 +36,7 @@ public class UploadLargeFileController extends SaveFile {
     @Autowired
     private SickService sickService;
 
-    private final static ExecutorService mergeExecutor = Executors.newSingleThreadExecutor();
+//    private final static ExecutorService mergeExecutor = Executors.newFixedThreadPool(2);
 
 
     @RequestMapping(value = "/check_md5", method = RequestMethod.POST)
@@ -64,6 +63,7 @@ public class UploadLargeFileController extends SaveFile {
             String ext = name.substring(name.lastIndexOf("."));
             SampleEntity chunkInfo = new SampleEntity();
             index = chunk == null ? 0 : Integer.parseInt(chunk);
+            int chunksNumber = Integer.parseInt(chunks);
 
             if (index == 0) {
                 chunkInfo.setUploadStatus(SampleStatus.Running.getStatus());
@@ -71,6 +71,7 @@ public class UploadLargeFileController extends SaveFile {
                 chunkInfo.setOriginName(guid + ext);
                 chunkInfo.setSickId(sickId);
                 chunkInfo.setMd5(md5value);
+                chunkInfo.setChunksNumber(chunksNumber);
                 sampleService.save(chunkInfo);
             }
 
@@ -89,25 +90,11 @@ public class UploadLargeFileController extends SaveFile {
                 // 验证所有分块是否上传成功，成功的话进行合并
                 boolean allUploaded = IsAllUploaded.uploadedAll(md5value, guid, chunk, chunks, fullPathNoFile, fileName, ext);
                 if (allUploaded) {
-                    int chunksNumber = Integer.parseInt(chunks);
                     SampleEntity entity = sampleService.queryObjectByMd5(md5value);
                     if (entity == null) {
                         throw new RRException("服务器找不到文件");
                     }
-                    mergeExecutor.submit(() -> {
-                        try {
-                            entity.setUploadStatus(SampleStatus.Merging.getStatus());
-                            sampleService.update(entity);
-                            MergeFile.mergeFile(chunksNumber, ext, guid, fullPathNoFile);
-                            entity.setUploadFinishTime(new Date());
-                            entity.setUploadStatus(SampleStatus.Success.getStatus());
-                            entity.setLocation(location);
-                            entity.setMd5(md5value);
-                            sampleService.update(entity);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    new MergeThread(entity, fullPathNoFile, location).start();
                 }
             } else {
                 fileName = guid + ext;
@@ -128,5 +115,63 @@ public class UploadLargeFileController extends SaveFile {
             return R.error("上传失败");
         }
 
+    }
+
+    @RequestMapping(value = "/merge/{id}", method = RequestMethod.POST)
+    public R merge(@PathVariable("id") Long id) {
+        if (id == null) {
+            return R.error("参数id不能为空");
+        }
+        SampleEntity entity = sampleService.queryObject(id);
+        if (entity == null) {
+            return R.ok("this file is not exist");
+        }
+        if (!SampleStatus.Merging.getStatus().equals(entity.getUploadStatus())) {
+            return R.error("样本为merging状态才能执行该操作");
+        }
+        SickEntity sickEntity = sickService.queryObject(entity.getSickId());
+        if (sickEntity == null) {
+            return R.error("病人记录不存在");
+        }
+        String uploadFolderPath = getRealPath();
+        String guid = entity.getOriginName().substring(0, entity.getOriginName().lastIndexOf("."));
+        String fullPathNoFile = ConfigConstant.getFullPathNoFile(uploadFolderPath, sickEntity.getSickCode(), guid);
+        String location = ConfigConstant.getFullPath(uploadFolderPath, sickEntity.getSickCode());
+        new MergeThread(entity, fullPathNoFile, location).start();
+        return R.ok("文件合并中...");
+    }
+
+    private class MergeThread extends Thread {
+        private SampleEntity entity;
+        private String ext;
+        private String guid;
+        private String fullPathNoFile;
+        private String location;
+
+        public MergeThread(SampleEntity entity, String fullPathNoFile, String location) {
+            this.entity = entity;
+            this.fullPathNoFile = fullPathNoFile;
+            this.location = location;
+            this.guid = entity.getOriginName().substring(0, entity.getOriginName().lastIndexOf("."));
+            this.ext = entity.getOriginName().substring(entity.getOriginName().lastIndexOf("."));
+            this.setName("merge-thread-" + entity.getId());
+        }
+
+        @Override
+        public void run() {
+            try {
+                log.info("{}: 文件‘{}’开始合并", this.getName(), entity.getOriginName());
+                entity.setUploadStatus(SampleStatus.Merging.getStatus());
+                sampleService.update(entity);
+                MergeFile.mergeFileByNio(entity.getChunksNumber(), ext, guid, fullPathNoFile);
+                entity.setUploadFinishTime(new Date());
+                entity.setUploadStatus(SampleStatus.Success.getStatus());
+                entity.setLocation(location);
+                sampleService.update(entity);
+                log.info("{}: 文件‘{}’合并文件完成", this.getName(), entity.getOriginName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

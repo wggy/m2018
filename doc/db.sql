@@ -235,3 +235,7 @@ ADD COLUMN `department`  varchar(200) NULL AFTER `hospital`,
 ADD COLUMN `doctor`  varchar(200) NULL AFTER `department`;
 
 
+--- 2018-12-03
+ALTER TABLE `tbl_sample`
+ADD COLUMN `chunks_number`  int(8) NULL AFTER `delete_flag`;
+

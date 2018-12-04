@@ -50,5 +50,5 @@ public class SampleEntity implements Serializable {
 
     private Integer deleteFlag = 1;
     private String secOriginName;
-
+    private Integer chunksNumber;
 }

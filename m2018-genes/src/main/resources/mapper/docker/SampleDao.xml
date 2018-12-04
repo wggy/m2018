@@ -83,6 +83,9 @@
 			<if test="deleteFlag != null">
 				`delete_flag`,
 			</if>
+			<if test="chunksNumber != null">
+				`chunks_number`,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="sickId != null">
@@ -130,6 +133,9 @@
 			<if test="deleteFlag != null">
 				#{deleteFlag},
 			</if>
+			<if test="chunksNumber != null">
+				#{chunksNumber},
+			</if>
 		</trim>
 	</insert>
 	 
@@ -176,6 +182,6 @@
 	</select>
 
 	<update id="resetTriggerStatus">
-		update tbl_sample set trigger_status=NULL,trigger_start_time=NULL,trigger_finish_time=NULL WHERE id = {sampleId}
+		update tbl_sample set trigger_status=NULL,trigger_start_time=NULL,trigger_finish_time=NULL WHERE id = #{value}
 	</update>
 </mapper>

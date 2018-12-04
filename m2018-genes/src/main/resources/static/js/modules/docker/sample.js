@@ -121,6 +121,26 @@ var vm = new Vue({
                 }
             });
         },
+        mergeFile: function () {
+            var id = getSelectedRow();
+            if (id == null) {
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: baseURL + "docker/upload/merge/" + id,
+                contentType: "application/json",
+                success: function(r){
+                    if(r.code === 0){
+                        alert('操作成功', function(){
+                            vm.reload();
+                        });
+                    }else{
+                        alert(r.msg);
+                    }
+                }
+            });
+        },
         more: function () {
             var id = getSelectedRow();
             if (id == null) {
