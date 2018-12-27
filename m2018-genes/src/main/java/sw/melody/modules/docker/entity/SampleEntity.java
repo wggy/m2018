@@ -19,6 +19,7 @@ public class SampleEntity implements Serializable {
     // 病人编码，新增时自动生成，格式：HY+时间戳
 
     private Long sickId;
+    private Long fileId;
     private String originName;
     // 病人姓名
 
@@ -51,4 +52,5 @@ public class SampleEntity implements Serializable {
     private Integer deleteFlag = 1;
     private String secOriginName;
     private Integer chunksNumber;
+    private String uploadType;
 }

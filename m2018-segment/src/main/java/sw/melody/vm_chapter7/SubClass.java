@@ -9,4 +9,11 @@ public class SubClass extends SuperClass {
     static {
         System.out.println("SubClass init");
     }
+
+    {
+        System.out.println("this is SubClass normal block");
+    }
+    public SubClass(){
+        System.out.println("this is SubClass constructor");
+    }
 }

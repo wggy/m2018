@@ -13,6 +13,10 @@ public class NoInitialization {
 //        SuperClass[] sca = new SuperClass[10];
 //        System.out.println(sca);
 
-        System.out.println(ConstClass.Hi);
+//        System.out.println(ConstClass.Hi);
+
+        Bike1 bike3 = new MoBike();
+
+
     }
 }

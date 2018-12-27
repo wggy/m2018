@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sw.melody.modules.docker.dao.OSSFileDao">
+
+    <select id="queryObject" resultType="sw.melody.modules.docker.entity.OSSFileEntity">
+		select * from tbl_oss_file where id = #{value}
+	</select>
+
+    <select id="queryList" resultType="sw.melody.modules.docker.entity.OSSFileEntity">
+		select * from tbl_oss_file
+	</select>
+
+    <select id="queryTotal" resultType="int">
+		select count(*) from tbl_oss_file
+	</select>
+
+    <insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_oss_file
+        (
+        `parent_id`,
+        `file_name`,
+        `path`,
+        `file_size`,
+        `file_type`,
+        `bucket_name`,
+        `level`,
+        `create_time`,
+        `last_update_time`
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.parentId},
+            #{item.fileName},
+            #{item.path},
+            #{item.fileSize},
+            #{item.fileType},
+            #{item.bucketName},
+            #{item.level},
+            #{item.createTime},
+            #{item.lastUpdateTime}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="save" parameterType="sw.melody.modules.docker.entity.OSSFileEntity">
+        insert into tbl_oss_file
+        (
+            `parent_id`,
+            `file_name`,
+            `path`,
+            `file_size`,
+            `file_type`,
+            `bucket_name`,
+            `level`,
+            `create_time`,
+            `last_update_time`
+        ) values (
+            #{parentId},
+            #{fileName},
+            #{path},
+            #{fileSize},
+            #{bucketName},
+            #{level},
+            #{createTime},
+            #{lastUpdateTime}
+         )
+    </insert>
+
+    <delete id="delete">
+		delete from tbl_oss_file where id = #{value};
+	</delete>
+
+    <delete id="deleteAll">
+        truncate table tbl_oss_file
+    </delete>
+
+</mapper>

@@ -239,3 +239,26 @@ ADD COLUMN `doctor`  varchar(200) NULL AFTER `department`;
 ALTER TABLE `tbl_sample`
 ADD COLUMN `chunks_number`  int(8) NULL AFTER `delete_flag`;
 
+
+-- 2018-12-25
+CREATE TABLE `tbl_oss_file` (
+`id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+`parent_id`  int(11) NOT NULL ,
+`file_name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`path`  varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`file_size`  bigint(20) NULL ,
+`file_type`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`bucket_name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`level`  int(3) NULL ,
+`create_time`  datetime NULL ON UPDATE CURRENT_TIMESTAMP ,
+`last_update_time`  datetime NULL ON UPDATE CURRENT_TIMESTAMP ,
+PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `tbl_sample`
+ADD COLUMN `upload_type`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL AFTER `upload_finish_time`;
+ALTER TABLE `tbl_sample`
+ADD COLUMN `file_id`  int(11) NULL AFTER `sick_id`;
+
+
+

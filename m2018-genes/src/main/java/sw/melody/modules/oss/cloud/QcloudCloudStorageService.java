@@ -18,7 +18,7 @@ import java.io.InputStream;
  * @email sunlightcs@gmail.com
  * @date 2017-03-26 20:51
  */
-public class QcloudCloudStorageService extends CloudStorageService{
+public class QcloudCloudStorageService extends CloudStorageService {
     private COSClient client;
 
     public QcloudCloudStorageService(CloudStorageConfig config){
@@ -77,5 +77,10 @@ public class QcloudCloudStorageService extends CloudStorageService{
     @Override
     public String uploadSuffix(InputStream inputStream, String suffix) {
         return upload(inputStream, getPath(config.getQcloudPrefix(), suffix));
+    }
+
+    @Override
+    public void download(String location, String objectName) {
+
     }
 }

@@ -72,6 +72,7 @@ public class UploadLargeFileController extends SaveFile {
                 chunkInfo.setSickId(sickId);
                 chunkInfo.setMd5(md5value);
                 chunkInfo.setChunksNumber(chunksNumber);
+                chunkInfo.setUploadType("WEB");
                 sampleService.save(chunkInfo);
             }
 

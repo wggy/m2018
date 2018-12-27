@@ -17,7 +17,7 @@ import java.io.InputStream;
  * @email sunlightcs@gmail.com
  * @date 2017-03-25 15:41
  */
-public class QiniuCloudStorageService extends CloudStorageService{
+public class QiniuCloudStorageService extends CloudStorageService {
     private UploadManager uploadManager;
     private String token;
 
@@ -66,5 +66,10 @@ public class QiniuCloudStorageService extends CloudStorageService{
     @Override
     public String uploadSuffix(InputStream inputStream, String suffix) {
         return upload(inputStream, getPath(config.getQiniuPrefix(), suffix));
+    }
+
+    @Override
+    public void download(String location, String objectName) {
+
     }
 }

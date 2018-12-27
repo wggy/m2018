@@ -41,6 +41,9 @@
 			<if test="sickId != null">
 				`sick_id`,
 			</if>
+			<if test="fileId != null">
+				`file_id`,
+			</if>
 			<if test="originName != null">
 				`origin_name`,
 			</if>
@@ -55,6 +58,9 @@
 			</if>
 			<if test="uploadFinishTime != null">
 				`upload_finish_time`,
+			</if>
+			<if test="uploadType != null">
+				`upload_type`,
 			</if>
 			<if test="triggerStartTime != null">
 				`trigger_start_time`,
@@ -91,6 +97,9 @@
 			<if test="sickId != null">
 				#{sickId},
 			</if>
+			<if test="fileId != null">
+				#{fileId},
+			</if>
 			<if test="originName != null">
 				#{originName},
 			</if>
@@ -105,6 +114,9 @@
 			</if>
 			<if test="uploadFinishTime != null">
 				#{uploadFinishTime},
+			</if>
+			<if test="uploadType != null">
+				#{uploadType},
 			</if>
 			<if test="triggerStartTime != null">
 				#{triggerStartTime},

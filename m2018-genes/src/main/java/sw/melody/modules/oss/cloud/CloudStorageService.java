@@ -68,4 +68,6 @@ public abstract class CloudStorageService {
      */
     public abstract String uploadSuffix(InputStream inputStream, String suffix);
 
+    public abstract void download(String location, String objectName) throws Throwable;
+
 }
