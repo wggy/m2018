@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import sw.melody.modules.docker.dao.OSSFileDao;
 import sw.melody.modules.docker.entity.OSSFileEntity;
 import sw.melody.modules.docker.service.OSSFileService;
-import sw.melody.modules.docker.util.ConcurrentHashSet;
-import sw.melody.modules.docker.util.OSSFileCacheUtil;
+import sw.melody.modules.docker.task.OSSFileLoadTask;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +22,7 @@ public class OSSFileServiceImpl implements OSSFileService {
 
     @Override
     public List<OSSFileEntity> getList() {
-        List<OSSFileEntity> ossFileRepo = OSSFileCacheUtil.getOssFileRepo();
+        List<OSSFileEntity> ossFileRepo = OSSFileLoadTask.getOssFileRepo();
         if (ossFileRepo != null) {
             return ossFileRepo;
         }

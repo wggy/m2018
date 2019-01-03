@@ -63,9 +63,9 @@ public class UploadLargeFileController extends SaveFile {
             String ext = name.substring(name.lastIndexOf("."));
             SampleEntity chunkInfo = new SampleEntity();
             index = chunk == null ? 0 : Integer.parseInt(chunk);
-            int chunksNumber = Integer.parseInt(chunks);
 
             if (index == 0) {
+                int chunksNumber = chunks == null ? 0 : Integer.parseInt(chunks);
                 chunkInfo.setUploadStatus(SampleStatus.Running.getStatus());
                 chunkInfo.setUploadStartTime(new Date());
                 chunkInfo.setOriginName(guid + ext);

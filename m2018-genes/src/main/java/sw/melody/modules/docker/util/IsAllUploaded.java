@@ -37,6 +37,38 @@ public class IsAllUploaded {
         }
     }
 
+    public static boolean isAllUploadedGuid(@NotNull final String guid, @NotNull final String chunks) {
+        synchronized (uploadInfoList) {
+            int size = uploadInfoList.stream()
+                    .filter(item -> item.getGuid().equals(guid))
+                    .distinct()
+                    .collect(Collectors.toList())
+                    .size();
+            boolean bool = (size == Integer.parseInt(chunks));
+            if (bool) {
+                uploadInfoList.removeIf(item -> Objects.equals(item.getGuid(), guid));
+            }
+            return bool;
+        }
+    }
+
+    public static boolean uploadedAll(@NotNull final String guid,
+                                      @NotNull final String chunk,
+                                      @NotNull final String chunks,
+                                      @NotNull final String uploadFolderPath,
+                                      @NotNull final String fileName,
+                                      @NotNull final String ext)
+            throws Exception {
+        synchronized (uploadInfoList) {
+            uploadInfoList.add(new UploadInfo(null, chunks, chunk, uploadFolderPath, fileName, ext, guid));
+        }
+        boolean allUploaded = isAllUploadedGuid(guid, chunks);
+        if (allUploaded) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param md5         MD5
      * @param guid        随机生成的文件名

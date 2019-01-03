@@ -24,6 +24,11 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
+    public List<SampleEntity> queryListSickId(Long sickId) {
+        return sampleDao.queryListSickId(sickId);
+    }
+
+    @Override
     public SampleEntity queryObjectByLocationSick(String location, Long sickId) {
         Map<String, Object> map = new HashMap<>();
         map.put("location", location);
@@ -71,6 +76,11 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public SampleEntity queryObjectByMd5(String md5) {
         return sampleDao.queryObjectByMd5(md5);
+    }
+
+    @Override
+    public SampleEntity queryObjectByGuid(String guid) {
+        return sampleDao.queryObjectByGuid(guid);
     }
 
     @Override

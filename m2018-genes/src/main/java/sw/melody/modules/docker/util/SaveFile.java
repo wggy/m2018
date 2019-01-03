@@ -2,16 +2,24 @@ package sw.melody.modules.docker.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.multipart.MultipartFile;
 import sw.melody.common.exception.RRException;
 import sw.melody.common.utils.ConfigConstant;
+import sw.melody.common.utils.Constant;
+import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.sys.service.SysConfigService;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,14 +28,12 @@ import java.util.zip.ZipOutputStream;
 /**
  * @author wange
  */
-public class SaveFile {
+public class SaveFile implements ApplicationContextAware {
 
-//    private File uploadDirectory = new File(getRealPath());
+    private static final Logger log = LoggerFactory.getLogger(SaveFile.class);
+    protected Object lockObj = new Object();
 
-    private Object lockObj = new Object();
-
-    @Autowired
-    private SysConfigService sysConfigService;
+    private static SysConfigService sysConfigService;
 
     /**
      * @param savePath
@@ -96,6 +102,23 @@ public class SaveFile {
         return path + ConfigConstant.File_Separator;
     }
 
+    public static String linkFileSeparator(String path) {
+        if (StringUtils.isBlank(path)) {
+            throw new RRException("路径为空");
+        }
+        if (path.endsWith(ConfigConstant.File_Separator)) {
+            return path;
+        }
+        return path + ConfigConstant.File_Separator;
+    }
+
+    public static String callShellCommand(String fullPathNoFile, String targetFileName, String secFileName) {
+        String nohupShell = sysConfigService.getValue(ConfigConstant.Shell_Bwa);
+        if (StringUtils.isBlank(secFileName)) {
+            return "cd " + fullPathNoFile + " &&  " + nohupShell + " " + targetFileName + " > " + targetFileName + ".out 2>&1 &";
+        }
+        return "cd " + fullPathNoFile + " &&  " + nohupShell  + " " + targetFileName + " " + secFileName + " > " + targetFileName + ".out 2>&1 &";
+    }
 
     /**
      * 根据文件路径获取File
@@ -135,5 +158,26 @@ public class SaveFile {
             in.close();
         }
         out.close();
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        sysConfigService = applicationContext.getBean(SysConfigService.class);
+    }
+
+    protected void triggerShell(String command) throws Exception {
+        Process ps = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});
+        int status = ps.waitFor();
+        log.info("status: {}", status);
+        if (status != 0) {
+            log.error("Failed to call shell's command ");
+        } else {
+            BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+            String line;
+            while ((line = br.readLine()) != null) {
+                log.info(line);
+            }
+            br.close();
+        }
     }
 }

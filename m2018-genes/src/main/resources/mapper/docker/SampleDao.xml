@@ -6,6 +6,9 @@
 	<select id="queryObject" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select * from tbl_sample where id = #{value}
 	</select>
+	<select id="queryListSickId" resultType="sw.melody.modules.docker.entity.SampleEntity">
+		select * from tbl_sample where sick_id = #{value} and delete_flag=1
+	</select>
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select t.*, s.sick_code, s.sick_name from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
@@ -183,6 +186,10 @@
 
 	<select id="queryObjectByMd5" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select * from tbl_sample where md5 = #{value} limit 1
+	</select>
+
+	<select id="queryObjectByGuid" resultType="sw.melody.modules.docker.entity.SampleEntity">
+		select * from tbl_sample where origin_name = #{value} limit 1
 	</select>
 
 	<delete id="deleteByFlag">

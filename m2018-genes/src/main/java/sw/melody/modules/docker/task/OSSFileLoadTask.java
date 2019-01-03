@@ -1,4 +1,4 @@
-package sw.melody.modules.docker.util;
+package sw.melody.modules.docker.task;
 
 import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.ListObjectsRequest;
@@ -16,10 +16,8 @@ import org.springframework.stereotype.Component;
 import sw.melody.common.exception.RRException;
 import sw.melody.common.utils.ConfigConstant;
 import sw.melody.common.utils.Constant;
-import sw.melody.common.utils.R;
 import sw.melody.modules.docker.entity.OSSFileEntity;
 import sw.melody.modules.docker.entity.SampleEntity;
-import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.OSSFileService;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
@@ -37,8 +35,8 @@ import java.util.stream.Collectors;
  * @create 2018-12-24 18:02
  **/
 @Component
-public class OSSFileCacheUtil implements InitializingBean, ApplicationContextAware {
-    private static final Logger log = LoggerFactory.getLogger(OSSFileCacheUtil.class);
+public class OSSFileLoadTask extends Thread implements InitializingBean, ApplicationContextAware {
+    private static final Logger log = LoggerFactory.getLogger(OSSFileLoadTask.class);
     private static final List<OSSFileEntity> ossFileRepo = Collections.synchronizedList(new ArrayList<>());
     private static final int rootId = 0;
     private static final String catalogFile = "D";
@@ -52,6 +50,43 @@ public class OSSFileCacheUtil implements InitializingBean, ApplicationContextAwa
 
     private static final LinkedBlockingDeque<Long> ossFileReqDeque = new LinkedBlockingDeque<>();
 
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Long reqId = ossFileReqDeque.take();
+                if (reqId != null) {
+                    long start = System.currentTimeMillis();
+                    SampleEntity sampleEntity = sampleService.queryObject(reqId);
+                    if (sampleEntity == null) {
+                        log.error("{} 该样本id无记录", reqId);
+                        throw new Exception("查无样本记录");
+                    }
+                    OSSFileEntity ossFileEntity = ossFileService.queryObject(sampleEntity.getFileId());
+                    if (ossFileEntity == null) {
+                        log.error("{} 该文件id无记录", sampleEntity.getFileId());
+                        throw new Exception("查无文件记录");
+                    }
+                    File fileDirectory = new File(sampleEntity.getLocation());
+                    synchronized (lockObj) {
+                        if (!fileDirectory.exists()) {
+                            if (!fileDirectory.mkdirs()) {
+                                throw new Exception("文件夹创建失败！路径为：" + sampleEntity.getLocation());
+                            }
+                        }
+                    }
+                    OSSFactory.build().download(addFileSeparator(sampleEntity.getLocation()) + sampleEntity.getOriginName(), ossFileEntity.getPath());
+                    sampleEntity.setUploadStatus(Constant.SampleStatus.Success.getStatus());
+                    sampleEntity.setUploadFinishTime(new Date());
+                    sampleService.update(sampleEntity);
+                    long end = System.currentTimeMillis();
+                    log.info("{} 耗时：{}", sampleEntity.getOriginName(), (end - start));
+                }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
+    }
 
     public static void pushReq(Long reqId) {
         ossFileReqDeque.add(reqId);
@@ -93,43 +128,6 @@ public class OSSFileCacheUtil implements InitializingBean, ApplicationContextAwa
         ossFileService.saveBatch(rootList);
         saveChildren(repoMap, rootList);
         ossFileRepo.addAll(list);
-
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Long reqId = ossFileReqDeque.take();
-                    if (reqId != null) {
-                        long start = System.currentTimeMillis();
-                        SampleEntity sampleEntity = sampleService.queryObject(reqId);
-                        if (sampleEntity == null) {
-                            log.error("{} 该样本id无记录", reqId);
-                            throw new Exception("查无样本记录");
-                        }
-                        OSSFileEntity ossFileEntity = ossFileService.queryObject(sampleEntity.getFileId());
-                        if (ossFileEntity == null) {
-                            log.error("{} 该文件id无记录", sampleEntity.getFileId());
-                            throw new Exception("查无文件记录");
-                        }
-                        File fileDirectory = new File(sampleEntity.getLocation());
-                        synchronized (lockObj) {
-                            if (!fileDirectory.exists()) {
-                                if (!fileDirectory.mkdirs()) {
-                                    throw new Exception("文件夹创建失败！路径为：" + sampleEntity.getLocation());
-                                }
-                            }
-                        }
-                        OSSFactory.build().download(addFileSeparator(sampleEntity.getLocation()) + sampleEntity.getOriginName(), ossFileEntity.getPath());
-                        sampleEntity.setUploadStatus(Constant.SampleStatus.Success.getStatus());
-                        sampleEntity.setUploadFinishTime(new Date());
-                        sampleService.update(sampleEntity);
-                        long end = System.currentTimeMillis();
-                        log.info("{} 耗时：{}", sampleEntity.getOriginName(), (end - start));
-                    }
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                }
-            }
-        }).start();
 
     }
 

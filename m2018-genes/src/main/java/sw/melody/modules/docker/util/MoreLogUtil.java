@@ -2,6 +2,8 @@ package sw.melody.modules.docker.util;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -11,6 +13,8 @@ import java.io.*;
  **/
 
 public class MoreLogUtil {
+
+    private static final Logger log = LoggerFactory.getLogger(MoreLogUtil.class);
 
     public static LogResult readLog(String logFileName, int fromLineNum) {
         if (logFileName == null || logFileName.trim().length() == 0) {
@@ -49,7 +53,54 @@ public class MoreLogUtil {
         return logResult;
     }
 
-    @Setter
+    public static String getLastLine(String logFileName, String charset) {
+        if (logFileName == null || logFileName.trim().length() == 0) {
+            log.error("文件不能为空");
+            return null;
+        }
+        File file = new File(logFileName);
+        if (!file.exists() || file.isDirectory() || !file.canRead()) {
+            log.error("{} 文件不存在或是目录或不可读", logFileName);
+            return null;
+        }
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
+            long len = raf.length();
+            if (len == 0L) {
+                return "";
+            } else {
+                long pos = len - 1;
+                while (pos > 0) {
+                    pos--;
+                    raf.seek(pos);
+                    if (raf.readByte() == '\n') {
+                        break;
+                    }
+                }
+                if (pos == 0) {
+                    raf.seek(0);
+                }
+                byte[] bytes = new byte[(int) (len - pos)];
+                raf.read(bytes);
+                if (charset == null) {
+                    return new String(bytes);
+                } else {
+                    return new String(bytes, charset);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getLastLine(String logFileName) {
+        return getLastLine(logFileName, null);
+    }
+
+        @Setter
     @Getter
     public static class LogResult {
         private int fromLineNum;
@@ -65,5 +116,9 @@ public class MoreLogUtil {
         }
     }
 
+    public static void main(String[] args) {
+        String line = getLastLine("E:\\funnel.txt", null);
+        System.out.println(line);
+    }
 
 }

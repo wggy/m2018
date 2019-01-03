@@ -405,7 +405,7 @@ public class SampleController extends SaveFile {
                     while ((line = br.readLine()) != null) {
                         log.info(line);
                     }
-                    sampleEntity.setTriggerStatus(Constant.SampleStatus.Success.getStatus());
+                    sampleEntity.setTriggerStatus(SampleStatus.Running.getStatus());
                     br.close();
                 }
             } catch (Exception e) {

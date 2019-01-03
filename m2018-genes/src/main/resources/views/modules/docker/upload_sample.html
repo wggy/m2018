@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>长传样本文件</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <script src="../../libs/jquery.min.js"></script>
+    <script src="../../plugins/layer/layer.js"></script>
+    <script src="../../libs/bootstrap.min.js"></script>
+    <script src="../../libs/vue.min.js"></script>
+    <script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+    <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="../../plugins/webuploader/webuploader.nolog.min.js"></script>
+    <script src="../../js/common.js"></script>
+
+    <style>
+        .container {
+            width: 100%;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div style="margin-top: 20px">
+    <div class="alert alert-info">可以一次上传多个大文件</div>
+</div>
+
+<div style="margin-top: 20px">
+    <div class="grid-btn">
+        <div class="form-group col-sm-4">
+            <input type="text" class="form-control" placeholder="姓名或编码" id="keyVal">
+        </div>
+        <a class="btn btn-default" style="margin-right: 20px;" id="queryBtn">查询</a>
+        <div class="form-group col-sm-4">
+            <input type="text" class="form-control" style="cursor:pointer;" placeholder="请选择病人" readonly="readonly"
+                   id="sickSelect">
+            <input type="hidden" name="sickId" id="sickId">
+        </div>
+
+    </div>
+
+    <div id="uploader" style="margin-top: 20px;" class="container">
+        <div class="container">
+            <div id="fileList" class="uploader-list"></div>
+        </div>
+        <div style="margin-top: 20px;" class="container">
+            <div id="picker" class="webuploader-container" style="float: left; margin-right: 10px">
+                <div>
+                    选择文件
+                    <input type="file" name="file" class="webuploader-element-invisible" multiple="multiple">
+                </div>
+            </div>
+
+            <div id="UploadBtn" class="webuploader-pick" style="float: left; margin-right: 10px">开始上传</div>
+            <div id="StopBtn" class="webuploader-pick" style="float: left; margin-right: 10px" status="suspend">暂停上传
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px">
+        <table id="jqGrid1"></table>
+        <div id="jqGridPager1"></div>
+    </div>
+
+    <div id="sickLayer" style="display: none;padding:10px;">
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+</div>
+<script src="../../js/modules/docker/upload_sample.js"></script>
+</body>
+</html>

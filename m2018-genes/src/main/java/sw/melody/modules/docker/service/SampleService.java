@@ -9,6 +9,7 @@ public interface SampleService {
     SampleEntity queryObject(Long id);
 
     List<SampleEntity> queryList(Map<String, Object> map);
+    List<SampleEntity> queryListSickId(Long sickId);
 
     SampleEntity queryObjectByLocationSick(String location, Long sickId);
 
@@ -23,6 +24,8 @@ public interface SampleService {
     void deleteBatch(Long[] ids);
 
     SampleEntity queryObjectByMd5(String md5);
+
+    SampleEntity queryObjectByGuid(String guid);
 
     void deleteByFlag(Long id);
 

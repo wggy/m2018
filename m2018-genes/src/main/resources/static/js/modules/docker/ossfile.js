@@ -62,18 +62,18 @@ var vm = new Vue({
         reload: function () {
             OSSFile.table.refresh();
         },
-        copy: function () {
+        trigger: function () {
             if (!vm.q.sickId) {
                 alert("请选择关联的病人");
                 return;
             }
-            var fileId = getOssFileId();
-            if (!fileId) {
+            var fileSelected = getOssFileSelected();
+            if (!fileSelected) {
                 return;
             }
-            $.post(baseURL + 'docker/ossfile/download/' + vm.q.sickId, {fileId: fileId}, function (r) {
+            $.post(baseURL + 'docker/ossfile/trigger/' + vm.q.sickId, {id1: fileSelected[0].id, id2: fileSelected[1].id}, function (r) {
                 if (r.code === 0) {
-                    alert('加入下载队列成功');
+                    alert('处理成功，请查询状态获取进度');
                     // layer.open({
                     //     type: 1,
                     //     offset: '50px',
@@ -99,7 +99,7 @@ var vm = new Vue({
                     //     });
                     // }, 2000);
                 } else {
-                    alert('下载失败');
+                    alert('处理失败');
                 }
             });
         }
@@ -118,7 +118,7 @@ var OSSFile = {
  */
 OSSFile.initColumn = function () {
     var columns = [
-        {field: 'selectItem', radio: true, align: 'center', valign: 'middle', sortable: true, width: '80px'},
+        {field: 'selectItem', checkbox: true, align: 'center', valign: 'middle', sortable: true, width: '80px'},
         {title: '文件名称', field: 'fileName', align: 'center', valign: 'middle', sortable: true, width: '230px'},
         {title: '文件ID', field: 'id', visible: false, align: 'center', valign: 'middle', width: '80px'},
         {title: '类型', field: 'fileType', align: 'center', valign: 'middle', sortable: true, width: '80px', formatter: function(item, index){
@@ -139,13 +139,13 @@ OSSFile.initColumn = function () {
 };
 
 
-function getOssFileId () {
+function getOssFileSelected () {
     var selected = $('#fileTable').bootstrapTreeTable('getSelections');
-    if (selected.length == 0) {
-        alert("请选择文件一条记录");
+    if (selected.length != 2) {
+        alert("请选择一对样本！");
         return false;
     } else {
-        return selected[0].id;
+        return selected;
     }
 }
 
