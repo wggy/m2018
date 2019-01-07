@@ -15,6 +15,7 @@ import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
 import sw.melody.modules.docker.task.MergeFileTask;
+import sw.melody.modules.docker.task.MergeRecordTask;
 import sw.melody.modules.docker.util.IsAllUploaded;
 import sw.melody.modules.docker.util.SaveFile;
 
@@ -95,6 +96,7 @@ public class UploadSampleController extends SaveFile {
                 entity.setUploadStatus(Constant.SampleStatus.Success.getStatus());
                 entity.setLocation(location);
                 sampleService.update(entity);
+                MergeRecordTask.pushReq(entity.getSickId());
             }
             return R.ok("{chunk: " + chunk + "}");
         } catch (Exception ex) {

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ping
@@ -15,6 +16,18 @@ import java.io.*;
 public class MoreLogUtil {
 
     private static final Logger log = LoggerFactory.getLogger(MoreLogUtil.class);
+    private static final ConcurrentHashMap<String, RandomAccessFile> RafRepo = new ConcurrentHashMap<>();
+
+    public synchronized static RandomAccessFile getRaf(String logFileName) throws FileNotFoundException {
+        RandomAccessFile raf = RafRepo.get(logFileName);
+        if (raf == null) {
+            raf = new RandomAccessFile(new File(logFileName), "r");
+            RafRepo.put(logFileName, raf);
+            return raf;
+        } else {
+            return raf;
+        }
+    }
 
     public static LogResult readLog(String logFileName, int fromLineNum) {
         if (logFileName == null || logFileName.trim().length() == 0) {
@@ -64,7 +77,7 @@ public class MoreLogUtil {
             return null;
         }
         try {
-            RandomAccessFile raf = new RandomAccessFile(file, "r");
+            RandomAccessFile raf = getRaf(logFileName);
             long len = raf.length();
             if (len == 0L) {
                 return "";
@@ -100,7 +113,19 @@ public class MoreLogUtil {
         return getLastLine(logFileName, null);
     }
 
-        @Setter
+    public static void closeRaf(String logName) {
+        RandomAccessFile file = RafRepo.get(logName);
+        if (file != null) {
+            try {
+                file.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            RafRepo.remove(logName);
+        }
+    }
+
+    @Setter
     @Getter
     public static class LogResult {
         private int fromLineNum;

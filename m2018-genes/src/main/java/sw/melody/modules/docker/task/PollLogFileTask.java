@@ -16,11 +16,12 @@ import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.util.MoreLogUtil;
 import sw.melody.modules.docker.util.SaveFile;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author ping
@@ -34,13 +35,15 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
     private static final String success = SampleStatus.Success.getStatus();
     private static final String running = SampleStatus.Running.getStatus();
     private static final String successMsg = "##########全部执行完成";
+    private static final ReentrantLock takeLock = new ReentrantLock();
+    private static final Condition notEmpty = takeLock.newCondition();
+    private static final int waitSeconds = 60;
     private static SampleService sampleService;
-
     @Override
     public void run() {
         while (true) {
             try {
-                Long sickId = triggerDeque.poll(10, TimeUnit.SECONDS);
+                Long sickId = triggerDeque.take();
                 if (sickId != null) {
                     List<SampleEntity> entityList = sampleService.queryListSickId(sickId);
                     if (CollectionUtils.isEmpty(entityList)) {
@@ -53,23 +56,30 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
                             && running.equals(entity.getTriggerStatus())) {
 
                         String logFileName = SaveFile.linkFileSeparator(entity.getLocation()).concat(entity.getOriginName()).concat(".out");
-                        File logFile = new File(logFileName);
-                        if (!logFile.exists()) {
-                            log.error("日志文件：{} 暂未生成，继续轮询", logFileName);
-                            pushReq(sickId);
-                            continue;
-                        }
                         String logResult = MoreLogUtil.getLastLine(logFileName);
                         log.info("最后一行数据：{}", logResult);
 
-                        if (logResult.startsWith(successMsg)) {
+                        if (StringUtils.isNotBlank(logResult) && logResult.startsWith(successMsg)) {
                             entity.setTriggerFinishTime(new Date());
                             entity.setTriggerStatus(success);
                             sampleService.update(entity);
                             log.info("病人：{} 的样本解析完成", sickId);
-
+                            MoreLogUtil.closeRaf(logFileName);
                             StoreResultTask.pushReq(entity.getId());
                         } else {
+                            takeLock.lockInterruptibly();
+                            try {
+                                long start = System.currentTimeMillis();
+                                long nanos = TimeUnit.SECONDS.toNanos(waitSeconds);
+                                while (nanos > 0) {
+                                    nanos = notEmpty.awaitNanos(nanos);
+                                }
+                                long end = System.currentTimeMillis();
+                                notEmpty.signal();
+                                log.info("等待时间：{}毫秒", (end - start));
+                            } finally {
+                                takeLock.unlock();
+                            }
                             pushReq(sickId);
                         }
                     } else {

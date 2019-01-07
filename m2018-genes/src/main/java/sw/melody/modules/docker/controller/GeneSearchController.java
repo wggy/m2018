@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sw.melody.common.annotation.SysLog;
 import sw.melody.common.exception.RRException;
 import sw.melody.common.utils.DateUtils;
 import sw.melody.common.utils.Query;
@@ -49,11 +50,13 @@ public class GeneSearchController {
     @Autowired
     private SampleService sampleService;
 
+    @SysLog("病人信息")
     @RequestMapping("/sick_info")
     public R sickInfo(@RequestParam Map<String, Object> params) {
         return R.ok().put("info", geneSearchService.querySickRelation(params));
     }
 
+    @SysLog("基因列表查询")
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
         Query query = new Query(params);
@@ -96,6 +99,7 @@ public class GeneSearchController {
         return R.ok().put("page", returnMap);
     }
 
+    @SysLog("导出基因信息")
     @RequestMapping("/report")
     public void report(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpServletResponse response) {
         if (params.get("ids") == null || params.get("productId") == null || params.get("sickCode") == null) {

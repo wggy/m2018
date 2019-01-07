@@ -5,6 +5,7 @@ import com.aliyun.oss.model.DownloadFileRequest;
 import com.aliyun.oss.model.DownloadFileResult;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import sw.melody.common.exception.RRException;
 
 import java.io.ByteArrayInputStream;
@@ -19,6 +20,7 @@ import java.io.InputStream;
  * @email sunlightcs@gmail.com
  * @date 2017-03-26 16:22
  */
+@Slf4j
 @Setter
 @Getter
 public class AliyunCloudStorageService extends CloudStorageService implements Closeable {
@@ -64,17 +66,17 @@ public class AliyunCloudStorageService extends CloudStorageService implements Cl
 
     @Override
     public void download(String location, String objectName) throws Throwable {
+        log.info("文件：{} >>>>>>>>>>>>开始下载", location);
         // 下载请求，10个任务并发下载，启动断点续传。
         DownloadFileRequest downloadFileRequest = new DownloadFileRequest(config.getAliyunBucketName(), objectName);
         downloadFileRequest.setDownloadFile(location);
         downloadFileRequest.setPartSize(5 * 1024 * 1024);
         downloadFileRequest.setTaskNum(5);
         downloadFileRequest.setEnableCheckpoint(true);
-//        downloadFileRequest.setCheckpointFile(location + ".txt");
-        // 下载文件。
         DownloadFileResult downloadRes = client.downloadFile(downloadFileRequest);
         // 下载成功时，会返回文件元信息。
         downloadRes.getObjectMetadata();
+        log.info("文件：{} >>>>>>>>>>>>下载完成", location);
     }
 
     @Override
