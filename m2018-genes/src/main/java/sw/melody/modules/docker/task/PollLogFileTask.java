@@ -34,7 +34,7 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
     private static final LinkedBlockingQueue<Long> triggerDeque = new LinkedBlockingQueue <>();
     private static final String success = SampleStatus.Success.getStatus();
     private static final String running = SampleStatus.Running.getStatus();
-    private static final String successMsg = "##########全部执行完成";
+    private static final String successMsg = "##########所有程序执行完成";
     private static final ReentrantLock takeLock = new ReentrantLock();
     private static final Condition notEmpty = takeLock.newCondition();
     private static final int waitSeconds = 60;
@@ -59,7 +59,7 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
                         String logResult = MoreLogUtil.getLastLine(logFileName);
                         log.info("最后一行数据：{}", logResult);
 
-                        if (StringUtils.isNotBlank(logResult) && logResult.startsWith(successMsg)) {
+                        if (StringUtils.isNotBlank(logResult) && (logResult.startsWith(successMsg) || logResult.contains(success))) {
                             entity.setTriggerFinishTime(new Date());
                             entity.setTriggerStatus(success);
                             sampleService.update(entity);

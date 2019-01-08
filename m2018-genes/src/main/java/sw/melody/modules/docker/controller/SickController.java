@@ -1,6 +1,5 @@
 package sw.melody.modules.docker.controller;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sw.melody.common.annotation.SysLog;
@@ -28,7 +27,6 @@ public class SickController {
 
     @SysLog("病人列表查询")
     @RequestMapping("/list")
-//    @RequiresPermissions("docker:sick:query")
     public R list(@RequestParam Map<String, Object> params){
         //查询列表数据
         Query query = new Query(params);
@@ -43,7 +41,6 @@ public class SickController {
      */
     @SysLog("病人信息查询")
     @RequestMapping("/info/{id}")
-    @RequiresPermissions("docker:sick:query")
     public R info(@PathVariable("id") Long id){
         SickEntity sick = sickService.queryObject(id);
         List<Long> productIdList = sickProductService.queryProductIdList(id);
@@ -53,7 +50,6 @@ public class SickController {
 
     @SysLog("新增病人信息")
     @RequestMapping("/save")
-//    @RequiresPermissions("docker:sick:edit")
     public R save(@RequestBody SickEntity entity){
         ValidatorUtils.validateEntity(entity);
         // 生成病人编码
@@ -67,7 +63,6 @@ public class SickController {
 
     @SysLog("修改病人信息")
     @RequestMapping("/update")
-//    @RequiresPermissions("docker:sick:edit")
     public R update(@RequestBody SickEntity entity){
         ValidatorUtils.validateEntity(entity);
         entity.setUpdateTime(new Date());
@@ -80,7 +75,6 @@ public class SickController {
      */
     @SysLog("参数病人记录")
     @RequestMapping("/delete")
-//    @RequiresPermissions("docker:sick:edit")
     public R delete(@RequestBody Long[] ids){
         sickService.deleteBatch(ids);
         return R.ok();

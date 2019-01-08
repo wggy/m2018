@@ -33,4 +33,6 @@ public interface SampleService {
 
     void resetTriggerStatus(Long sampleId);
 
+    int queryTotalBySickId(Long sampleId);
+
 }

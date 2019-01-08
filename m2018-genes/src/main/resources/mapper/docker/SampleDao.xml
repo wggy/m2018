@@ -12,30 +12,37 @@
 
 	<select id="queryList" resultType="sw.melody.modules.docker.entity.SampleEntity">
 		select t.*, s.sick_code, s.sick_name from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
-		<where>
-			<if test="key != null and key.trim() != ''">
-				(s.sick_code = concat('%', #{key}, '%')
-				or
-				s.sick_name like concat('%', #{key}, '%'))
-			</if>
-			and t.delete_flag=1
-		</where>
-		order by id desc
+		WHERE 1=1
+		<if test="key != null and key.trim() != ''">
+			AND (s.sick_code = concat('%', #{key}, '%')
+			OR
+			s.sick_name like concat('%', #{key}, '%'))
+		</if>
+		<if test="type != null and type.trim() != ''">
+			AND t.upload_type = #{type}
+		</if>
+		AND t.delete_flag=1
+		ORDER BY id DESC
 		<if test="offset != null and limit != null">
 			limit #{offset}, #{limit}
 		</if>
 	</select>
 	
  	<select id="queryTotal" resultType="int">
-		select count(1) from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id
-		<where>
-			<if test="key != null and key.trim() != ''">
-				(s.sick_code = concat('%', #{key}, '%')
-				or
-				s.sick_name like concat('%', #{key}, '%'))
-			</if>
-			and t.delete_flag=1
-		</where>
+		select count(1) from tbl_sample t LEFT JOIN tbl_sick s ON t.sick_id=s.id WHERE 1=1
+		<if test="key != null and key.trim() != ''">
+			AND (s.sick_code = concat('%', #{key}, '%')
+			or
+			s.sick_name like concat('%', #{key}, '%'))
+		</if>
+		<if test="type != null and type.trim() != ''">
+			AND t.upload_type = #{type}
+		</if>
+		AND t.delete_flag=1
+	</select>
+
+	<select id="queryTotalBySickId" resultType="int">
+		select count(1) from tbl_sample t WHERE t.sick_id = #{value}
 	</select>
 	 
 	<insert id="save" parameterType="sw.melody.modules.docker.entity.SampleEntity" useGeneratedKeys="true" keyProperty="id">

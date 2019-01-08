@@ -53,7 +53,7 @@ $(function () {
     });
 
     $("#jqGrid1").jqGrid({
-        url: baseURL + 'docker/sample/list',
+        url: baseURL + 'docker/sample/list?type=WEB',
         datatype: "json",
         colModel: [
             {label: 'ID', name: 'id', width: 30, key: true},
@@ -70,8 +70,7 @@ $(function () {
             {label: '入库开始时间', name: 'storeStartTime', width: 90},
             {label: '入库状态', name: 'storeStatus', width: 60},
             {label: '入库完成时间', name: 'storeFinishTime', width: 90},
-            {label: '第二文件', name: 'secOriginName', width: 90},
-            {label: 'MD5', name: 'md5', width: 90}
+            {label: '第二文件', name: 'secOriginName', width: 90}
         ],
         viewrecords: true,
         height: 385,
@@ -129,9 +128,37 @@ $(function () {
                     return;
                 }
                 var rowData = grid.jqGrid('getRowData', rowKey);
-                $('#sickId').val(rowData.id);
-                $('#sickSelect').val(rowData.sickName);
-                layer.close(index);
+                $.ajax({
+                    cache: false,
+                    type: "post",
+                    dataType: "json",
+                    url: "/docker/sample/count/" + rowData.id,
+                    success: function (result) {
+                        if (result.code == 0) {
+                            if (result.count >= 2) {
+                                var msg = "该病人已经关联两个样本，请重新选择！";
+                                alert(msg);
+                                $('.alert-danger').text(msg);
+                            } else if (result.count === 1) {
+                                var msg = "该病人已经关联一个样本，请上传一个文件！";
+                                alert(msg);
+                                $('.alert-danger').text(msg);
+                                $('#sickId').val(rowData.id);
+                                $('#sickSelect').val(rowData.sickName);
+                                layer.close(index);
+                            } else {
+                                var msg = "该病人未关联样本，请一次性选择两个文件并上传！";
+                                $('.alert-danger').text(msg);
+                                $('#sickId').val(rowData.id);
+                                $('#sickSelect').val(rowData.sickName);
+                                layer.close(index);
+                            }
+                        } else {
+                            console.log("获取病人样本失败！");
+                        }
+                    }
+                });
+
             }
         });
     });
@@ -141,18 +168,19 @@ $(function () {
         console.log(block);
         console.log(data);
         var file = block.file;
-        // var fileMd5 = file.wholeMd5;
         data.guid = file.guid;
         data.sickId = file.sickId;
     });
 
-    uploader.on('fileQueued', function (file) {
-
+    uploader.on('beforeFileQueued', function (file) {
         var sickId = $('#sickId').val();
         if (!sickId) {
             alert("未选择病人");
-            return;
+            return false;
         }
+    });
+
+    uploader.on('fileQueued', function (file) {
 
         $list.append('<div id="' + file.id + '" class="item">' +
             '<h4 class="info">' + file.name + '<button type="button" fileId="' + file.id + '" class="btn btn-danger btn-delete"><span class="glyphicon glyphicon-trash"></span></button></h4>' +
@@ -164,7 +192,7 @@ $(function () {
             $(this).parent().parent().remove();
         });
         file.guid = WebUploader.guid();
-        file.sickId = sickId;
+        file.sickId = $('#sickId').val();
         /*
 
                 var index = parent.layer.load(1, {shade: [0.38, '#fff']});
@@ -244,8 +272,8 @@ $(function () {
     });
 
     uploader.on('uploadComplete', function (file) {//上传完成后回调
-//            $('#' + file.id).find('.progress').fadeOut();//上传完删除进度条
-//            $('#' + file.id + 'btn').fadeOut('slow')//上传完后删除"删除"按钮
+           // $('#' + file.id).find('.progress').fadeOut();//上传完删除进度条
+           // $('#' + file.id + 'btn').fadeOut('slow')//上传完后删除"删除"按钮
     });
 
     uploader.on('uploadFinished', function () {
@@ -295,7 +323,7 @@ $(function () {
     function reload() {
         var page = $("#jqGrid1").jqGrid('getGridParam', 'page');
         $("#jqGrid1").jqGrid('setGridParam', {
-            postData: {'key': $('#keyVal').val()},
+            postData: {'key': null},
             page: page
         }).trigger("reloadGrid");
     }

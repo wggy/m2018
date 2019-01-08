@@ -15,4 +15,7 @@ public interface SampleDao extends BaseDao<SampleEntity> {
     void resetTriggerStatus(Long sampleId);
 
     List<SampleEntity> queryListSickId(Long sickId);
+
+    int queryTotalBySickId(Long sickId);
+
 }

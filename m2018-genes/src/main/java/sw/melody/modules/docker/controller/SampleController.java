@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,10 +51,7 @@ public class SampleController extends SaveFile {
     @Autowired
     private GeneIndelTask geneIndelTask;
 
-//    private ExecutorService storeExecutor = Executors.newSingleThreadExecutor();
-
     @RequestMapping("/list")
-    @RequiresPermissions("docker:sample:query")
     public R list(@RequestParam Map<String, Object> params) {
         //查询列表数据
         Query query = new Query(params);
@@ -69,10 +65,14 @@ public class SampleController extends SaveFile {
      * 病人信息
      */
     @RequestMapping("/info/{id}")
-    @RequiresPermissions("docker:sample:query")
     public R info(@PathVariable("id") Long id) {
         SampleEntity sampleEntity = sampleService.queryObject(id);
         return R.ok().put("info", sampleEntity);
+    }
+
+    @RequestMapping("/count/{id}")
+    public R count(@PathVariable("id") Long id) {
+        return R.ok().put("count", sampleService.queryTotalBySickId(id));
     }
 
 
@@ -143,7 +143,6 @@ public class SampleController extends SaveFile {
 
     @SysLog("调度样本")
     @RequestMapping("/execute/{id}")
-    @RequiresPermissions("docker:sample:edit")
     public R execute(@PathVariable("id") Long id) throws Exception {
 
         if (id == null) {
@@ -219,7 +218,6 @@ public class SampleController extends SaveFile {
 
     @SysLog("样本入库")
     @RequestMapping("/store/{id}")
-    @RequiresPermissions("docker:sample:edit")
     public R store(@PathVariable("id") Long id) throws Exception {
         SampleEntity sampleEntity = sampleService.queryObject(id);
         if (sampleEntity == null) {
@@ -256,7 +254,6 @@ public class SampleController extends SaveFile {
 
     @SysLog("调度样本")
     @RequestMapping("/merge")
-    @RequiresPermissions("docker:sample:edit")
     public R merge(@RequestBody Long[] ids) throws Exception {
         if (ids == null || ids.length != 2) {
             return R.error("参数错误，请传入两条记录");

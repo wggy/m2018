@@ -97,4 +97,9 @@ public class SampleServiceImpl implements SampleService {
     public void resetTriggerStatus(Long sampleId) {
         sampleDao.resetTriggerStatus(sampleId);
     }
+
+    @Override
+    public int queryTotalBySickId(Long sickId) {
+        return sampleDao.queryTotalBySickId(sickId);
+    }
 }

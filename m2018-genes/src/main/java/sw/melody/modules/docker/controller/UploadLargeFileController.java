@@ -36,8 +36,6 @@ public class UploadLargeFileController extends SaveFile {
     @Autowired
     private SickService sickService;
 
-//    private final static ExecutorService mergeExecutor = Executors.newFixedThreadPool(2);
-
 
     @RequestMapping(value = "/check_md5", method = RequestMethod.POST)
     public R bigFileUpload(String fileMd5, String fileName, String fileID) {
