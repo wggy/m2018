@@ -67,7 +67,7 @@ public class AliyunCloudStorageService extends CloudStorageService implements Cl
     @Override
     public void download(String location, String objectName) throws Throwable {
         log.info("文件：{} >>>>>>>>>>>>开始下载", location);
-        // 下载请求，10个任务并发下载，启动断点续传。
+        // 下载请求，5个任务并发下载，启动断点续传。
         DownloadFileRequest downloadFileRequest = new DownloadFileRequest(config.getAliyunBucketName(), objectName);
         downloadFileRequest.setDownloadFile(location);
         downloadFileRequest.setPartSize(5 * 1024 * 1024);

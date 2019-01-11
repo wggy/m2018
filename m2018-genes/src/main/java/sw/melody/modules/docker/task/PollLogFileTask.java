@@ -15,6 +15,7 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.util.MoreLogUtil;
 import sw.melody.modules.docker.util.SaveFile;
+import sw.melody.modules.sys.service.SysConfigService;
 
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
     private static final Condition notEmpty = takeLock.newCondition();
     private static final int waitSeconds = 60;
     private static SampleService sampleService;
+    private static SysConfigService sysConfigService;
     @Override
     public void run() {
         while (true) {
@@ -63,20 +65,22 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
                             entity.setTriggerFinishTime(new Date());
                             entity.setTriggerStatus(success);
                             sampleService.update(entity);
-                            log.info("病人：{} 的样本解析完成", sickId);
                             MoreLogUtil.closeRaf(logFileName);
                             StoreResultTask.pushReq(entity.getId());
+                            log.info("病人：{} 的样本解析完成", sickId);
+                            if (sysConfigService.updateKeyUnLock(TriggerScriptTask.triggerScriptSampleId) > 0) {
+                                log.info("样本：【{}】解析完成，释放锁成功", entity.getId());
+                            } else {
+                                log.info("样本：【{}】解析完成，释放锁失败", entity.getId());
+                            }
                         } else {
                             takeLock.lockInterruptibly();
                             try {
-                                long start = System.currentTimeMillis();
                                 long nanos = TimeUnit.SECONDS.toNanos(waitSeconds);
                                 while (nanos > 0) {
                                     nanos = notEmpty.awaitNanos(nanos);
                                 }
-                                long end = System.currentTimeMillis();
                                 notEmpty.signal();
-                                log.info("等待时间：{}毫秒", (end - start));
                             } finally {
                                 takeLock.unlock();
                             }
@@ -105,6 +109,7 @@ public class PollLogFileTask extends Thread implements ApplicationContextAware, 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         sampleService = applicationContext.getBean(SampleService.class);
+        sysConfigService = applicationContext.getBean(SysConfigService.class);
     }
 
     @Override

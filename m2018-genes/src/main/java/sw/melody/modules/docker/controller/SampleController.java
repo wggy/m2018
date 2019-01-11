@@ -15,6 +15,7 @@ import sw.melody.modules.docker.entity.SampleEntity;
 import sw.melody.modules.docker.entity.SickEntity;
 import sw.melody.modules.docker.service.SampleService;
 import sw.melody.modules.docker.service.SickService;
+import sw.melody.modules.docker.task.TriggerScriptTask;
 import sw.melody.modules.docker.util.MoreLogUtil;
 import sw.melody.modules.docker.util.SaveFile;
 import sw.melody.modules.job.task.GeneIndelTask;
@@ -404,6 +405,7 @@ public class SampleController extends SaveFile {
                     }
                     sampleEntity.setTriggerStatus(SampleStatus.Running.getStatus());
                     br.close();
+                    TriggerScriptTask.pushReq(sampleEntity.getId());
                 }
             } catch (Exception e) {
                 sampleEntity.setTriggerStatus(Constant.SampleStatus.Fail.getStatus());

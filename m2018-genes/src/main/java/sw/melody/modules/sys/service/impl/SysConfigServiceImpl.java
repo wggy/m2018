@@ -78,7 +78,17 @@ public class SysConfigServiceImpl implements SysConfigService {
 
 		return config == null ? null : config.getValue();
 	}
-	
+
+	@Override
+	public SysConfigEntity getObjectByKey(String key) {
+		SysConfigEntity config = sysConfigRedis.get(key);
+		if(config == null){
+			config = sysConfigDao.queryByKey(key);
+			sysConfigRedis.saveOrUpdate(config);
+		}
+		return config;
+	}
+
 	@Override
 	public <T> T getConfigObject(String key, Class<T> clazz) {
 		String value = getValue(key);
@@ -91,5 +101,15 @@ public class SysConfigServiceImpl implements SysConfigService {
 		} catch (Exception e) {
 			throw new RRException("获取参数失败");
 		}
+	}
+
+	@Override
+	public int updateKeyLock(String key) {
+		return this.sysConfigDao.updateStatusByKey(key, 0, 1);
+	}
+
+	@Override
+	public int updateKeyUnLock(String key) {
+		return this.sysConfigDao.updateStatusByKey(key, 1, 0);
 	}
 }

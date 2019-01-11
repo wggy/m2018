@@ -67,7 +67,7 @@ public class Arith {
      * @param v2 除数
      * @return 两个参数的商
      */
-    public static double div(double v1, double v2) {
+    public static String div(double v1, double v2) {
         return div(v1, v2, DEF_DIV_SCALE);
     }
 
@@ -80,14 +80,14 @@ public class Arith {
      * @param scale 表示表示需要精确到小数点以后几位。
      * @return 两个参数的商
      */
-    public static double div(double v1, double v2, int scale) {
+    public static String div(double v1, double v2, int scale) {
         if (scale < 0) {
             throw new IllegalArgumentException(
                     "The scale must be a positive integer or zero");
         }
         BigDecimal b1 = new BigDecimal(Double.toString(v1));
         BigDecimal b2 = new BigDecimal(Double.toString(v2));
-        return b1.divide(b2, scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return b1.divide(b2, scale, BigDecimal.ROUND_HALF_UP).toString();
     }
 
     /**

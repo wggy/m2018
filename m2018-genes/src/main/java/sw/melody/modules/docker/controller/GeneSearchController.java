@@ -49,6 +49,7 @@ public class GeneSearchController {
     private ProductService productService;
     @Autowired
     private SampleService sampleService;
+    private static final double tenThousand = 10000D;
 
     @SysLog("病人信息")
     @RequestMapping("/sick_info")
@@ -70,16 +71,16 @@ public class GeneSearchController {
         query.remove("a1000gAll");
         query.remove("exacEas");
         if (StringUtils.isNotBlank(popfreqmax)) {
-            query.put("popfreqmax", Arith.div(Double.valueOf(popfreqmax), 100d, 4) + "");
+            query.put("popfreqmax", Arith.div(Double.valueOf(popfreqmax), tenThousand, 4) + "");
         }
         if (StringUtils.isNotBlank(exacAll)) {
-            query.put("exacAll", Arith.div(Double.valueOf(exacAll), 100d, 4) + "");
+            query.put("exacAll", Arith.div(Double.valueOf(exacAll), tenThousand, 4) + "");
         }
         if (StringUtils.isNotBlank(a1000gAll)) {
-            query.put("a1000gAll", Arith.div(Double.valueOf(a1000gAll), 100d, 4) + "");
+            query.put("a1000gAll", Arith.div(Double.valueOf(a1000gAll), tenThousand, 4) + "");
         }
         if (StringUtils.isNotBlank(exacEas)) {
-            query.put("exacEas", Arith.div(Double.valueOf(exacEas), 100d, 4) + "");
+            query.put("exacEas", Arith.div(Double.valueOf(exacEas), tenThousand, 4) + "");
         }
         List<GeneSearchEntity> list = geneSearchService.queryList(query);
         int totalCount = geneSearchService.queryTotal(query);

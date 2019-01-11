@@ -48,6 +48,8 @@
 			#{id}
 		</foreach>
 	</delete>
-	
-	
+
+	<update id="updateStatusByKey" parameterType="map">
+		update sys_config set `status` = #{newStatus} where `key` = #{key} and `status` = #{oldStatus}
+	</update>
 </mapper>
