@@ -18,7 +18,6 @@ import sw.melody.modules.sys.service.SysConfigService;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -39,6 +38,7 @@ public class TriggerScriptTask extends Thread implements ApplicationContextAware
     private static SysConfigService sysConfigService;
     static final int showStatus = 1;
     static final int hideStatus = 0;
+    private static final String success = Constant.SampleStatus.Success.getStatus();
 
     private static final LinkedBlockingDeque<Long> queue = new LinkedBlockingDeque<>();
     private static final ReentrantLock lock = new ReentrantLock();
@@ -110,6 +110,9 @@ public class TriggerScriptTask extends Thread implements ApplicationContextAware
                         SampleEntity sampleEntity = sampleService.queryObject(Long.parseLong(config.getValue()));
                         if (sampleEntity == null) {
                             log.error("样本：【{}】查无记录", config.getValue());
+                            sysConfigService.updateKeyUnLock(triggerScriptSampleId);
+                        } else if (success.equals(sampleEntity.getTriggerStatus())) {
+                            log.info("最后一个样本：>>>>>>>>>【{}】已经调度完成<<<<<<<<<<<<", sampleEntity.getId());
                             sysConfigService.updateKeyUnLock(triggerScriptSampleId);
                         } else {
                             if (triggerScript(sampleEntity)) {
