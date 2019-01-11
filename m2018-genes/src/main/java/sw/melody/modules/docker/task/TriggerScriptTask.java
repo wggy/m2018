@@ -84,7 +84,7 @@ public class TriggerScriptTask extends Thread implements ApplicationContextAware
                                 pushReq(sampleId);
                             }
                         }
-                        log.info("线程>>>>>>>>>>>>>【】睡眠30秒<<<<<<<<<<<<<<<<", this.getName());
+                        log.info("线程>>>>>>>>>>>>>【{}】睡眠30秒<<<<<<<<<<<<<<<<", this.getName());
                         Thread.sleep(releaseWaitSeconds * 1000);
                     }
                 } catch (Exception e) {
@@ -104,17 +104,15 @@ public class TriggerScriptTask extends Thread implements ApplicationContextAware
                 if (config.getStatus() == showStatus) {
                     log.info("样本：【{}】 运行中...", config.getValue());
                 } else if (config.getStatus() == hideStatus) {
-                    if (sysConfigService.updateKeyLock(triggerScriptSampleId) > 0) {
-                        // 成功获取锁
-                        config = sysConfigService.getObjectByKey(triggerScriptSampleId);
-                        SampleEntity sampleEntity = sampleService.queryObject(Long.parseLong(config.getValue()));
-                        if (sampleEntity == null) {
-                            log.error("样本：【{}】查无记录", config.getValue());
-                            sysConfigService.updateKeyUnLock(triggerScriptSampleId);
-                        } else if (success.equals(sampleEntity.getTriggerStatus())) {
-                            log.info("最后一个样本：>>>>>>>>>【{}】已经调度完成<<<<<<<<<<<<", sampleEntity.getId());
-                            sysConfigService.updateKeyUnLock(triggerScriptSampleId);
-                        } else {
+                    SampleEntity sampleEntity = sampleService.queryObject(Long.parseLong(config.getValue()));
+                    if (sampleEntity == null) {
+                        log.error("样本：【{}】查无记录", config.getValue());
+                    } else if (success.equals(sampleEntity.getTriggerStatus())) {
+                        log.info("最后一个样本：>>>>>>>>>【{}】已经调度完成<<<<<<<<<<<<", sampleEntity.getId());
+                    } else {
+                        if (sysConfigService.updateKeyLock(triggerScriptSampleId) > 0) {
+                            // 成功获取锁
+                            config = sysConfigService.getObjectByKey(triggerScriptSampleId);
                             if (triggerScript(sampleEntity)) {
                                 log.info("样本：【{}】调用成功", config.getValue());
                                 PollLogFileTask.pushReq(sampleEntity.getSickId());
@@ -122,15 +120,15 @@ public class TriggerScriptTask extends Thread implements ApplicationContextAware
                                 log.info("脚本调用失败，样本：【{}】", config.getValue());
                                 sysConfigService.updateKeyUnLock(triggerScriptSampleId);
                             }
+                        } else {
+                            log.info("线程：【{}】获取锁失败", this.getName());
                         }
-                    } else {
-                        log.info("线程：【{}】获取锁失败", this.getName());
                     }
                 } else {
                     log.error("互斥锁错误的状态：【{}】", config.getStatus());
                 }
             }
-            log.info("线程>>>>>>>>>>>>>【】等待60秒<<<<<<<<<<<<<<<<", this.getName());
+            log.info("线程>>>>>>>>>>>>>【{}】等待60秒<<<<<<<<<<<<<<<<", this.getName());
             waitMinute();
         }
     }
