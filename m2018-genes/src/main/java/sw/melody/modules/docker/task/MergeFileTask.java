@@ -56,7 +56,6 @@ public class MergeFileTask extends Thread implements ApplicationContextAware, In
                         String location = ConfigConstant.getFullPath(uploadFolderPath, sick.getSickCode());
 
 
-
                         log.info("{}: 文件‘{}’开始合并", this.getName(), entity.getOriginName());
                         entity.setUploadStatus(Constant.SampleStatus.Merging.getStatus());
                         sampleService.update(entity);
