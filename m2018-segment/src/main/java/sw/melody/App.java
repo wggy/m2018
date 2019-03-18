@@ -1,5 +1,7 @@
 package sw.melody;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Hello world!
  *
@@ -34,5 +36,11 @@ public class App
     public static void main( String[] args )
     {
         System.out.println( "Hello World!" );
+        String s = "/1553/";
+        String[] sArray = StringUtils.split(s,"/");
+        System.out.println(sArray.length);
+        for (String ss : sArray) {
+            System.out.println(ss + "\t" + ".");
+        }
     }
 }
