@@ -142,8 +142,11 @@ public class MoreLogUtil {
     }
 
     public static void main(String[] args) {
-        String line = getLastLine("E:\\funnel.txt", null);
-        System.out.println(line);
+//        String line = getLastLine("E:\\funnel.txt", null);
+        File file = new File("E:\\data\\logs\\nubia-shop-show\\nubia-shop-show.log");
+        System.out.println(file.getName());
+        System.out.println(file.getAbsolutePath());
+        System.out.println(file.getPath());
     }
 
 }

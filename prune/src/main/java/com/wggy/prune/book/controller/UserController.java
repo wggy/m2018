@@ -1,7 +1,7 @@
 package com.wggy.prune.book.controller;
 
-import com.wggy.prune.book.model.UserEntity;
-import com.wggy.prune.book.service.UserService;
+import com.wggy.prune.rbac.model.UserEntity;
+import com.wggy.prune.rbac.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -33,10 +34,6 @@ public class UserController {
                                @PathVariable String idCard,
                                @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         UserEntity user = new UserEntity();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setIdCard(idCard);
-        user.setDateOfBirth(date);
         return userService.save(user);
     }
 
@@ -77,8 +74,8 @@ public class UserController {
 
     @RequestMapping(value = "/findByDateOfBirth/{date}", method = RequestMethod.GET)
     public List<UserEntity> findByDateOfBirth(@PathVariable(name = "date")
-                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return userService.findByDateOfBirth(date);
+                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        return userService.findByCreateTime(date);
     }
 
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)

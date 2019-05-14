@@ -1,6 +1,6 @@
-package com.wggy.prune.book.repository;
+package com.wggy.prune.rbac.repository;
 
-import com.wggy.prune.book.model.UserEntity;
+import com.wggy.prune.rbac.model.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -21,8 +21,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     /******************************read***************************************/
 
 
-    @Query(value = "select * from user u where u.username = ?1 limit 1", nativeQuery = true)
-    UserEntity findByUsername(String username);
+    @Query(value = "select * from pru_user u where u.username = ?1 limit 1", nativeQuery = true)
+    UserEntity findByUsername2(String username);
 
     /**
      * Using sort
@@ -30,60 +30,59 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
      * @param sort
      * @return
      */
-    @Query("select u from UserEntity u where u.lastName like ?1%")
+    @Query("select u from UserEntity u where u.createTime like ?1%")
     List<UserEntity> findByAndSort(String lastName, Sort sort);
 
     /**
      * Query creation
      * this translates into the following query:
-     * select u from UserEntity u where u.idCard = ?1
+     * select u from UserEntity u where u.username = ?1
      */
-    List<UserEntity> findByIdCard(String idCard);
+    List<UserEntity> findByUsername(String username);
 
     /**
      * Native Queries
      * The @Query annotation allows for running native queries by setting the nativeQuery flag to true
-     * @param idCard
+     * @param email
      * @return
      */
-    @Query(value = "select * from user u where u.id_card = ?1 limit 1", nativeQuery = true)
-    UserEntity findByIdCard2(String idCard);
+    @Query(value = "select * from pru_user u where u.email = ?1 limit 1", nativeQuery = true)
+    UserEntity findByIdCard2(String email);
 
     /**
      * Using @Query
-     * @param idCard
+     * @param email
      * @return
      */
-    @Query("select u from UserEntity u where u.idCard = ?1")
-    List<UserEntity> findByIdCard3(String idCard);
+    @Query("select u from UserEntity u where u.email = ?1")
+    List<UserEntity> findByIdCard3(String email);
 
     /**
      * Declare native count queries for pagination at the query method by using @Query
-     * @param lastName
+     * @param email
      * @param pageable
      * @return
      */
-    @Query(value = "SELECT * FROM user u WHERE u.last_name = ?1",
-            countQuery = "SELECT count(*) FROM user u WHERE u.last_name = ?1",
+    @Query(value = "SELECT * FROM pru_user u WHERE u.email = ?1",
+            countQuery = "SELECT count(*) FROM pru_user u WHERE u.email = ?1",
             nativeQuery = true)
-    Page<UserEntity> findByLastNameWithPageable(String lastName, Pageable pageable);
+    Page<UserEntity> findByLastNameWithPageable(String email, Pageable pageable);
 
     /**
      * Using Named Parameters
      * @param firstName
-     * @param lastName
+     * @param email
      * @return
      */
-    @Query("select u from UserEntity u where u.firstName = :firstName or u.lastName = :lastName")
-    List<UserEntity> findByFirstNameOrLastName(@Param("firstName") String firstName,
-                                         @Param("lastName") String lastName);
+    @Query("select u from UserEntity u where u.username = :username or u.email = :email")
+    List<UserEntity> findByFirstNameOrLastName(@Param("username") String firstName, @Param("email") String email);
 
     /**
-     * findByDateOfBirth
+     * findByCreateTime
      * @param date
      * @return
      */
-    List<UserEntity> findByDateOfBirth(@Param("date") LocalDate date);
+    List<UserEntity> findByCreateTime(@Param("date") LocalDateTime date);
 
     /**
      * find all UserEntitys
@@ -95,26 +94,26 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     /****************************update*****************************************/
     /**
      * update a usr by Modifying Queries
-     * @param firstName
-     * @param idCard
+     * @param username
+     * @param email
      * @return
      */
     @Modifying
-    @Query("update UserEntity u set u.firstName = ?1 where u.idCard = ?2")
-    int updateUserEntity(String firstName, String idCard);
+    @Query("update UserEntity u set u.username = ?1 where u.email = ?2")
+    int updateUserEntity(String username, String email);
     /****************************delete*****************************************/
     /**
      * delete a UserEntity by idCard
-     * @param idCard
+     * @param email
      */
-    void deleteByIdCard(String idCard);
+    void deleteByEmail(String email);
 
     /**
      * Using a derived delete query
      * @param idCard
      */
     @Modifying
-    @Query("delete from UserEntity u where u.idCard = ?1")
+    @Query("delete from UserEntity u where u.email = ?1")
     void deleteByIdCard2(String idCard);
 
     /**
@@ -123,6 +122,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
      */
     @Override
     @Modifying
-    @Query(value = "delete from user where id = ?1", nativeQuery = true)
+    @Query(value = "delete from pru_user where id = ?1", nativeQuery = true)
     void deleteById(Long id);
 }

@@ -1,0 +1,36 @@
+#端口设置
+server:
+  port: 8090
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test
+    username: sa
+    password: sa
+    schema: classpath:db/schema.sql
+    data: classpath:db/data.sql
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+  h2:
+    console:
+      path: /h2-console
+      enabled: true
+
+error:
+  whitelabel:
+    enabled: false
+
+amazon:
+  associate_id: habuma-20
+
+
+#开启日志记录（日志文件会在10Mb大小的时候被截断，产生新的日志文件）
+logging:
+  file: logs/my.log
+  level:
+    org:
+      hiberate: debug

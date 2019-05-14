@@ -1,16 +1,17 @@
-package com.wggy.prune.book.service.impl;
+package com.wggy.prune.rbac.service.impl;
 
-import com.wggy.prune.book.model.UserEntity;
-import com.wggy.prune.book.repository.UserRepository;
-import com.wggy.prune.book.service.UserService;
+import com.wggy.prune.PruneApplication;
+import com.wggy.prune.rbac.model.UserEntity;
+import com.wggy.prune.rbac.repository.UserRepository;
+import com.wggy.prune.rbac.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,8 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> findByIdCard(String idCard) {
-        return userRepository.findByIdCard(idCard);
+    public List<UserEntity> findByIdCard(String username) {
+        return userRepository.findByUsername(username);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername2(username);
     }
 
     @Override
@@ -64,8 +65,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> findByDateOfBirth(LocalDate date) {
-        return userRepository.findByDateOfBirth(date);
+    public List<UserEntity> findByCreateTime(LocalDateTime date) {
+        return userRepository.findByCreateTime(date);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteByIdCard(String idCard) {
-        userRepository.deleteByIdCard(idCard);
+        userRepository.deleteByEmail(idCard);
     }
 
     @Override

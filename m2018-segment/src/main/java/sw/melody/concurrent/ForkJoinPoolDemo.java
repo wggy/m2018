@@ -24,7 +24,8 @@ public class ForkJoinPoolDemo {
     static final int INITIAL_QUEUE_CAPACITY = 1 << 13;
 
     public static void main(String[] args) {
-        int c = Runtime.getRuntime().availableProcessors();
-        System.out.println(c);
+        int i = 1<<16;
+        System.out.println(i);
+        System.out.println(SMASK);
     }
 }

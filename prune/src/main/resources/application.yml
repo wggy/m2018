@@ -1,24 +1,22 @@
-#端口设置
 server:
   port: 8090
 
 spring:
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/test
-    username: sa
-    password: sa
-    schema: classpath:db/schema.sql
-    data: classpath:db/data.sql
-  jpa:
-    database: h2
-    hibernate:
-      ddl-auto: update
-    open-in-view: true
-  h2:
-    console:
-      path: /h2-console
-      enabled: true
+  profiles:
+    active: local
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+  resources:
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths: /**
 
 error:
   whitelabel:
@@ -26,6 +24,16 @@ error:
 
 amazon:
   associate_id: habuma-20
+
+jpa:
+    # 配置 DBMS 类型
+    database: MYSQL
+    # 配置是否将执行的 SQL 输出到日志
+    show-sql: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          # 配置开启自动更新表结构
 
 
 #开启日志记录（日志文件会在10Mb大小的时候被截断，产生新的日志文件）

@@ -1,12 +1,13 @@
-package com.wggy.prune.book.service;
+package com.wggy.prune.rbac.service;
 
-import com.wggy.prune.book.model.UserEntity;
+import com.wggy.prune.rbac.model.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserService {
@@ -27,7 +28,7 @@ public interface UserService {
 
     List<UserEntity> findByFirstNameOrLastName(String firstName, String lastName);
 
-    List<UserEntity> findByDateOfBirth(@Param("date") LocalDate date);
+    List<UserEntity> findByCreateTime(@Param("date") LocalDateTime date);
 
     List<UserEntity> findAll(Sort sort);
 
