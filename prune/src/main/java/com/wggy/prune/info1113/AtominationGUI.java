@@ -14,6 +14,7 @@ public class AtominationGUI extends PApplet {
     private static final int LINE_X = 15;
     private static final int LINE_Y = 10;
     private static Grid[][] GRIDS = null;
+    private static PImage[][] IMAGES_REPO = null;
     private static int STEPS = 0;
     private static final int PLAYER_NUMS = 2;
     private static final String[] colors = new String[]{"red", "blue"};
@@ -25,6 +26,7 @@ public class AtominationGUI extends PApplet {
     private static PImage BLUE1 = null;
     private static PImage BLUE2 = null;
     private static PImage EMPTY = null;
+    private static final String IMAGE_PREFIX = "G:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\";
 
 
     public AtominationGUI() {
@@ -53,7 +55,7 @@ public class AtominationGUI extends PApplet {
 
         initGrids();
         initPlayers();
-        blendMode(REPLACE);
+//        blendMode(REPLACE);
 
         noLoop();
     }
@@ -62,17 +64,20 @@ public class AtominationGUI extends PApplet {
     public void settings() {
         /// DO NOT MODIFY SETTINGS
         size(IMAGE_WIDTH * LINE_X + 2, IMAGE_HEIGHT * LINE_Y + 2);
-        RED1 = loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\red1.png");
-        RED2 = loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\red2.png");
-        BLUE1 = loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\blue1.png");
-        BLUE2 = loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\blue2.png");
-        EMPTY = loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\empty.png");
+        RED1 = loadImage(IMAGE_PREFIX + "red1.png");
+        RED2 = loadImage(IMAGE_PREFIX + "red2.png");
+        BLUE1 = loadImage(IMAGE_PREFIX + "blue1.png");
+        BLUE2 = loadImage(IMAGE_PREFIX + "blue2.png");
+        EMPTY = loadImage(IMAGE_PREFIX + "empty.png");
     }
 
     @Override
     public void draw() {
         // PImage p = new PImage(Atomination.width, Atomination.height);
         // image(PImage image, int x, int y, int width, int height);
+        if (STEPS++ == 0) {
+            return;
+        }
         int x = this.mouseX;
         int y = this.mouseY;
         int grid_x = x / IMAGE_WIDTH;
@@ -100,13 +105,16 @@ public class AtominationGUI extends PApplet {
 
     void initGrids() {
         GRIDS = new Grid[LINE_Y][];
+        IMAGES_REPO = new PImage[LINE_Y][];
         for (int i = 0; i < LINE_Y; i++) {
             GRIDS[i] = new Grid[LINE_X];
+            IMAGES_REPO[i] = new PImage[LINE_X];
         }
         //create grid objects
         for (int i = 0; i < LINE_Y; i++) {
             for (int j = 0; j < LINE_X; j++) {
                 GRIDS[i][j] = new Grid(null, 0);
+                IMAGES_REPO[i][j] = RED1;
                 image(EMPTY, i * IMAGE_HEIGHT, j * IMAGE_WIDTH);
             }
         }
@@ -122,15 +130,23 @@ public class AtominationGUI extends PApplet {
         int gridNum = grid.getAtomCount();
         if (gridNum == 1) {
             PImage newImage = TURN_RED ? RED1 : BLUE1;
+            IMAGES_REPO[grid_x][grid_y] = newImage;
             image(newImage, locate_x, locate_y);
         } else if (gridNum == 2) {
             PImage newImage = TURN_RED ? RED2 : BLUE2;
-            PImage oldImage = TURN_RED ? RED1 : BLUE1;
-            oldImage = null;
+            IMAGES_REPO[grid_x][grid_y] = newImage;
             image(newImage, locate_x, locate_y);
+            PImage oldImage = IMAGES_REPO[grid_x][grid_y];
+            for (int i=0; i<oldImage.pixels.length; i++) {
+                oldImage.pixels[i] = color(60, 82, 132, 255);
+            }
         } else {
             log.info("该格子【{}】【{}】将达到3个点，需要爆炸", grid_x, grid_y);
             image(EMPTY, locate_x, locate_y);
+            PImage oldImage = IMAGES_REPO[grid_x][grid_y];
+            for (int i=0; i<oldImage.pixels.length; i++) {
+                oldImage.pixels[i] = color(60, 82, 132, 255);
+            }
             grid.revert();
         }
     }
@@ -156,12 +172,14 @@ public class AtominationGUI extends PApplet {
                 setGrid(grid, locate_x, locate_y, grid_x, grid_y);
             } else {
                 log.error("蓝方：该格子【{}】【{}】是红方的，你不能设点", grid_x, grid_y);
+                return;
             }
         }
         // 该格子被蓝方占有
         else if (colors[1].equalsIgnoreCase(player.getColour())) {
             if (TURN_RED) {
                 log.error("红方：该格子【{}】【{}】是蓝方的，你不能设点", grid_x, grid_y);
+                return;
             } else {
                 setGrid(grid, locate_x, locate_y, grid_x, grid_y);
             }
@@ -169,6 +187,7 @@ public class AtominationGUI extends PApplet {
         // 该格子即没有被任何一方占有，也不属于红蓝双方，则异常
         else {
             log.error("该格子【{}】【{}】异常", grid_x, grid_y);
+            return;
         }
         TURN_RED = !TURN_RED;
     }
