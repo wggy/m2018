@@ -10,8 +10,11 @@ public class AtominationGUI extends PApplet {
 
     private static final int IMAGE_WIDTH = 64;
     private static final int IMAGE_HEIGHT = 64;
+    // 列数
     private static final int GRID_X = 10;
+    // 行数
     private static final int GRID_Y = 7;
+    // 线宽
     private static final int STOKE_WEIGHT = 1;
     private static Grid[][] GRIDS = null;
     private static int STEPS = -1;
@@ -19,6 +22,7 @@ public class AtominationGUI extends PApplet {
     private static int BLUE_NUMS = 0;
     private static final String[] colors = new String[]{"red", "blue"};
     private static boolean TURN_RED = true;
+    private static boolean START = false;
     private static Player RED_PLAYER = null;
     private static Player BLUE_PLAYER = null;
     private static PImage RED1 = null;
@@ -28,13 +32,15 @@ public class AtominationGUI extends PApplet {
     private static PImage BLUE2 = null;
     private static PImage BLUE3 = null;
     private static PImage EMPTY = null;
+    private static boolean GAME_OVER = false;
+    private static String RESULTS = "Waiting For Game !";
     private static final String IMAGE_PREFIX = AtominationGUI.class.getClassLoader().getResource("").getPath() + "assets/";
 
     private static class Padding {
-        static int top = 10;
-        static int left = 10;
-        static int right = 10;
-        static int bottom = 10;
+        static int top = 120;
+        static int left = 1;
+        static int right = 1;
+        static int bottom = 1;
     }
 
     public AtominationGUI() {
@@ -42,7 +48,7 @@ public class AtominationGUI extends PApplet {
     }
 
     @Override
-    public void mouseClicked(MouseEvent event) {
+    public void mousePressed(MouseEvent event) {
         redraw();
     }
 
@@ -51,18 +57,10 @@ public class AtominationGUI extends PApplet {
         background(60, 82, 132);
         stroke(245, 255, 250);
         strokeWeight(STOKE_WEIGHT);
-        for (int m = Padding.left, n = 0; m <= this.width && n <= GRID_X; n++) {
-            line(m, Padding.top, m, this.height - STOKE_WEIGHT - Padding.bottom);
-            m = m + IMAGE_WIDTH + STOKE_WEIGHT;
-        }
-        for (int m = Padding.top, n = 0; m < this.height && n <= GRID_Y; n++) {
-            line(Padding.left, m, this.width - STOKE_WEIGHT - Padding.right, m);
-            m = m + IMAGE_HEIGHT + STOKE_WEIGHT;
-        }
+        textSize(14);
 
-        initGrids();
-        initPlayers();
-        noLoop();
+        initTable();
+//        noLoop();
     }
 
     @Override
@@ -84,8 +82,9 @@ public class AtominationGUI extends PApplet {
     public void draw() {
         // PImage p = new PImage(Atomination.width, Atomination.height);
         // image(PImage image, int x, int y, int width, int height);
-
-        if (STEPS++ == -1) {
+        stat();
+        drawTexts();
+        if (!START || GAME_OVER || STEPS++ == -1) {
             return;
         }
         int x = this.mouseX;
@@ -111,10 +110,48 @@ public class AtominationGUI extends PApplet {
         log.info("Steps: {}", STEPS);
         stat();
         log.info("Red: {}, Blue: {}", RED_NUMS, BLUE_NUMS);
-        if (STEPS == RED_NUMS) {
-            log.info("Red wins !!!");
-        } else if (STEPS == BLUE_NUMS) {
-            log.info("Blue wins !!!");
+
+        if (!START) {
+        } else {
+            if (STEPS == RED_NUMS && STEPS > 1) {
+                GAME_OVER = true;
+                RESULTS = "Red wins !";
+                log.info("Red wins !");
+            } else if (STEPS == BLUE_NUMS && STEPS > 1) {
+                GAME_OVER = true;
+                RESULTS = "Blue wins !";
+                log.info("Blue wins !");
+            } else {
+                RESULTS = "In Game !";
+            }
+        }
+        drawTexts();
+    }
+
+    @Override
+    public void keyTyped() {
+        if (key == 's' || key == 'S') {
+            if (!START) {
+                START = !START;
+                RESULTS = "Waiting For Game !";
+                drawTexts();
+            }
+        } else if (key == 'r' || key == 'R') {
+            if (START && GAME_OVER) {
+                STEPS = 0;
+                GAME_OVER = false;
+                revertTable();
+                RESULTS = "In Game !";
+                drawTexts();
+            }
+        } else if (key == 'p' || key == 'P') {
+            if (START && !GAME_OVER) {
+                START = !START;
+                RESULTS = "Paused !";
+                drawTexts();
+            }
+        } else {
+            log.error("Error input !");
         }
     }
 
@@ -128,6 +165,50 @@ public class AtominationGUI extends PApplet {
 
 
     //////////////////////////////////////////以下自定义方法///////////////////////////////////////////////////////////
+
+    void initTable() {
+        initLines();
+        initGrids();
+        initPlayers();
+    }
+
+    void revertTable() {
+        for (int i = 0; i < GRID_X; i++) {
+            for (int j = 0; j < GRID_Y; j++) {
+                Grid grid = GRIDS[i][j];
+                if (grid.getOwner() == null) {
+
+                } else {
+                    grid.revert();
+                    int locateX = Padding.left + (i + 1) * STOKE_WEIGHT + i * IMAGE_WIDTH;
+                    int locateY = Padding.top + (j + 1) * STOKE_WEIGHT + j * IMAGE_HEIGHT;
+                    revertToBg(locateX, locateY);
+                    image(EMPTY, locateX, locateY);
+                }
+            }
+        }
+    }
+
+    void initLines() {
+        for (int m = Padding.left, n = 0; m <= this.width && n <= GRID_X; n++) {
+            line(m, Padding.top, m, this.height - STOKE_WEIGHT - Padding.bottom);
+            m = m + IMAGE_WIDTH + STOKE_WEIGHT;
+        }
+        for (int m = Padding.top, n = 0; m < this.height && n <= GRID_Y; n++) {
+            line(Padding.left, m, this.width - STOKE_WEIGHT - Padding.right, m);
+            m = m + IMAGE_HEIGHT + STOKE_WEIGHT;
+        }
+    }
+
+    void drawTexts() {
+        PImage statImage = this.get(0, 10, width, Padding.top);
+        revertToBg(statImage, 0, 0);
+        text("Press 's' to Start, Press 'p' to Pause, Press 'r' to Restart!", 10, 20);
+        text("Red's Ball : " + RED_NUMS, 10, 60);
+        text("Blue's Ball : " + BLUE_NUMS, 200, 60);
+        text("Steps : " + (STEPS == -1 ? 0 : STEPS), 10, 100);
+        text("Results : " + RESULTS, 200, 100);
+    }
 
     void initGrids() {
         GRIDS = new Grid[GRID_X][];
@@ -256,6 +337,10 @@ public class AtominationGUI extends PApplet {
 
     void revertToBg(int locate_x, int locate_y) {
         PImage oldImage = get(locate_x, locate_y, IMAGE_WIDTH, IMAGE_HEIGHT);
+        revertToBg(oldImage, locate_x, locate_y);
+    }
+
+    void revertToBg(PImage oldImage, int locate_x, int locate_y) {
         for (int i = 0; i < oldImage.pixels.length; i++) {
             oldImage.pixels[i] = color(60, 82, 132, 255);
         }
