@@ -23,6 +23,7 @@ public class AtominationGUI extends PApplet {
     private static final String[] colors = new String[]{"red", "blue"};
     private static boolean TURN_RED = true;
     private static boolean START = false;
+    private static boolean RESTART = false;
     private static Player RED_PLAYER = null;
     private static Player BLUE_PLAYER = null;
     private static PImage RED1 = null;
@@ -60,7 +61,7 @@ public class AtominationGUI extends PApplet {
         textSize(14);
 
         initTable();
-//        noLoop();
+        noLoop();
     }
 
     @Override
@@ -82,6 +83,11 @@ public class AtominationGUI extends PApplet {
     public void draw() {
         // PImage p = new PImage(Atomination.width, Atomination.height);
         // image(PImage image, int x, int y, int width, int height);
+        gameOver();
+        if (RESTART) {
+            revertTable();
+            RESTART = !RESTART;
+        }
         stat();
         drawTexts();
         if (!START || GAME_OVER || STEPS++ == -1) {
@@ -106,25 +112,11 @@ public class AtominationGUI extends PApplet {
 
         Grid grid = GRIDS[grid_x][grid_y];
         Player player = grid.getOwner();
-        petGrid(player, grid, locate_x, locate_y, grid_x, grid_y);
+        putGrid(player, grid, locate_x, locate_y, grid_x, grid_y);
         log.info("Steps: {}", STEPS);
         stat();
         log.info("Red: {}, Blue: {}", RED_NUMS, BLUE_NUMS);
-
-        if (!START) {
-        } else {
-            if (STEPS == RED_NUMS && STEPS > 1) {
-                GAME_OVER = true;
-                RESULTS = "Red wins !";
-                log.info("Red wins !");
-            } else if (STEPS == BLUE_NUMS && STEPS > 1) {
-                GAME_OVER = true;
-                RESULTS = "Blue wins !";
-                log.info("Blue wins !");
-            } else {
-                RESULTS = "In Game !";
-            }
-        }
+        gameOver();
         drawTexts();
     }
 
@@ -134,21 +126,23 @@ public class AtominationGUI extends PApplet {
             if (!START) {
                 START = !START;
                 RESULTS = "Waiting For Game !";
-                drawTexts();
+                redraw();
             }
         } else if (key == 'r' || key == 'R') {
             if (START && GAME_OVER) {
-                STEPS = 0;
-                GAME_OVER = false;
-                revertTable();
+                STEPS = -1;
+                GAME_OVER = !GAME_OVER;
+                RESTART = !RESTART;
+                RED_NUMS = 0;
+                BLUE_NUMS = 0;
                 RESULTS = "In Game !";
-                drawTexts();
+                redraw();
             }
         } else if (key == 'p' || key == 'P') {
             if (START && !GAME_OVER) {
                 START = !START;
                 RESULTS = "Paused !";
-                drawTexts();
+                redraw();
             }
         } else {
             log.error("Error input !");
@@ -231,7 +225,7 @@ public class AtominationGUI extends PApplet {
         BLUE_PLAYER = new Player(colors[1], 0);
     }
 
-    void petGrid(Player player, Grid grid, int locate_x, int locate_y, int grid_x, int grid_y) {
+    void putGrid(Player player, Grid grid, int locate_x, int locate_y, int grid_x, int grid_y) {
         // 该格子未被占据
         if (player == null) {
             place(grid_x, grid_y);
@@ -362,6 +356,23 @@ public class AtominationGUI extends PApplet {
                         BLUE_NUMS = BLUE_NUMS + grid.getAtomCount();
                     }
                 }
+            }
+        }
+    }
+
+    void gameOver() {
+        if (!START) {
+        } else {
+            if (STEPS == RED_NUMS && STEPS > 1) {
+                GAME_OVER = true;
+                RESULTS = "Red wins !";
+                log.info("Red wins !");
+            } else if (STEPS == BLUE_NUMS && STEPS > 1) {
+                GAME_OVER = true;
+                RESULTS = "Blue wins !";
+                log.info("Blue wins !");
+            } else {
+                RESULTS = "In Game !";
             }
         }
     }
