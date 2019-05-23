@@ -4,17 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.event.MouseEvent;
-import java.util.List;
 
 @Slf4j
 public class AtominationGUI extends PApplet {
 
     private static final int IMAGE_WIDTH = 64;
     private static final int IMAGE_HEIGHT = 64;
-    private static final int LINE_X = 15;
-    private static final int LINE_Y = 10;
+    private static final int GRID_X = 8;
+    private static final int GRID_Y = 5;
+    private static final int STOKE_WEIGHT = 1;
     private static Grid[][] GRIDS = null;
-    private static PImage[][] IMAGES_REPO = null;
     private static int STEPS = 0;
     private static final int PLAYER_NUMS = 2;
     private static final String[] colors = new String[]{"red", "blue"};
@@ -26,8 +25,14 @@ public class AtominationGUI extends PApplet {
     private static PImage BLUE1 = null;
     private static PImage BLUE2 = null;
     private static PImage EMPTY = null;
-    private static final String IMAGE_PREFIX = "G:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\";
+    private static final String IMAGE_PREFIX = AtominationGUI.class.getClassLoader().getResource("").getPath() + "assets/";
 
+    private static class Padding {
+        static int top = 10;
+        static int left = 20;
+        static int right = 30;
+        static int bottom = 300;
+    }
 
     public AtominationGUI() {
 
@@ -41,29 +46,28 @@ public class AtominationGUI extends PApplet {
     @Override
     public void setup() {
         background(60, 82, 132);
-        int w = this.width;
-        int h = this.height;
         stroke(245, 255, 250);
-        for (int m=0; m<=w;) {
-            line(m+1, 1, m+1, h);
-            m = m+IMAGE_WIDTH;
+        strokeWeight(STOKE_WEIGHT);
+        for (int m = Padding.left, n = 0; m <= this.width && n <= GRID_X; n++) {
+            line(m, Padding.top, m, this.height - STOKE_WEIGHT - Padding.bottom);
+            m = m + IMAGE_WIDTH + STOKE_WEIGHT;
         }
-        for (int m=0; m<h;) {
-            line(1, m+1, w, m+1);
-            m = m+IMAGE_HEIGHT;
+        for (int m = Padding.top, n = 0; m < this.height && n <= GRID_Y; n++) {
+            line(Padding.left, m, this.width - STOKE_WEIGHT - Padding.right, m);
+            m = m + IMAGE_HEIGHT + STOKE_WEIGHT;
         }
 
         initGrids();
         initPlayers();
-//        blendMode(REPLACE);
-
         noLoop();
     }
 
     @Override
     public void settings() {
         /// DO NOT MODIFY SETTINGS
-        size(IMAGE_WIDTH * LINE_X + 2, IMAGE_HEIGHT * LINE_Y + 2);
+        int frameWidth = Padding.left + IMAGE_WIDTH * GRID_X + STOKE_WEIGHT * (GRID_X + 1) + Padding.right;
+        int frameHeight = Padding.top + IMAGE_HEIGHT * GRID_Y + STOKE_WEIGHT * (GRID_Y + 1) + Padding.bottom;
+        size(frameWidth, frameHeight);
         RED1 = loadImage(IMAGE_PREFIX + "red1.png");
         RED2 = loadImage(IMAGE_PREFIX + "red2.png");
         BLUE1 = loadImage(IMAGE_PREFIX + "blue1.png");
@@ -75,15 +79,23 @@ public class AtominationGUI extends PApplet {
     public void draw() {
         // PImage p = new PImage(Atomination.width, Atomination.height);
         // image(PImage image, int x, int y, int width, int height);
+        int x = this.mouseX;
+        int y = this.mouseY;
+        if (Padding.left > this.mouseX || this.mouseX > (this.width - Padding.right)) {
+            log.error("横坐标不在表格区域");
+            return;
+        }
+        if (Padding.top > this.mouseY || this.mouseY > (this.height - Padding.bottom)) {
+            log.error("竖坐标不在表格区域");
+            return;
+        }
         if (STEPS++ == 0) {
             return;
         }
-        int x = this.mouseX;
-        int y = this.mouseY;
-        int grid_x = x / IMAGE_WIDTH;
-        int grid_y = y / IMAGE_HEIGHT;
-        int locate_x = grid_x * IMAGE_WIDTH;
-        int locate_y = grid_y * IMAGE_HEIGHT;
+        int grid_x = (x - Padding.left) / (IMAGE_WIDTH + STOKE_WEIGHT);
+        int grid_y = (y - Padding.top) / (IMAGE_HEIGHT + STOKE_WEIGHT);
+        int locate_x = grid_x * IMAGE_WIDTH + STOKE_WEIGHT * (grid_x + 1) + Padding.left;
+        int locate_y = grid_y * IMAGE_HEIGHT + STOKE_WEIGHT * (grid_y + 1) + Padding.top;
 
         Grid grid = GRIDS[grid_x][grid_y];
         Player player = grid.getOwner();
@@ -100,22 +112,20 @@ public class AtominationGUI extends PApplet {
     }
 
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////以下自定义方法///////////////////////////////////////////////////////////
 
     void initGrids() {
-        GRIDS = new Grid[LINE_Y][];
-        IMAGES_REPO = new PImage[LINE_Y][];
-        for (int i = 0; i < LINE_Y; i++) {
-            GRIDS[i] = new Grid[LINE_X];
-            IMAGES_REPO[i] = new PImage[LINE_X];
+        GRIDS = new Grid[GRID_X][];
+        for (int i = 0; i < GRID_X; i++) {
+            GRIDS[i] = new Grid[GRID_Y];
         }
         //create grid objects
-        for (int i = 0; i < LINE_Y; i++) {
-            for (int j = 0; j < LINE_X; j++) {
+        for (int i = 0; i < GRID_X; i++) {
+            for (int j = 0; j < GRID_Y; j++) {
                 GRIDS[i][j] = new Grid(null, 0);
-                IMAGES_REPO[i][j] = RED1;
-                image(EMPTY, i * IMAGE_HEIGHT, j * IMAGE_WIDTH);
+                int locateX = Padding.left + (i + 1) * STOKE_WEIGHT + i * IMAGE_WIDTH;
+                int locateY = Padding.top + (j + 1) * STOKE_WEIGHT + j * IMAGE_HEIGHT;
+                image(RED1, locateX, locateY);
             }
         }
     }
@@ -130,21 +140,21 @@ public class AtominationGUI extends PApplet {
         int gridNum = grid.getAtomCount();
         if (gridNum == 1) {
             PImage newImage = TURN_RED ? RED1 : BLUE1;
-            IMAGES_REPO[grid_x][grid_y] = newImage;
             image(newImage, locate_x, locate_y);
         } else if (gridNum == 2) {
-            PImage newImage = TURN_RED ? RED2 : BLUE2;
-            IMAGES_REPO[grid_x][grid_y] = newImage;
-            image(newImage, locate_x, locate_y);
-            PImage oldImage = IMAGES_REPO[grid_x][grid_y];
-            for (int i=0; i<oldImage.pixels.length; i++) {
+            PImage oldImage = get(locate_x, locate_y, IMAGE_WIDTH, IMAGE_HEIGHT);
+            for (int i = 0; i < oldImage.pixels.length; i++) {
                 oldImage.pixels[i] = color(60, 82, 132, 255);
             }
+            image(oldImage, locate_x, locate_y);
+            PImage newImage = TURN_RED ? RED2 : BLUE2;
+            image(newImage, locate_x, locate_y);
+
         } else {
             log.info("该格子【{}】【{}】将达到3个点，需要爆炸", grid_x, grid_y);
             image(EMPTY, locate_x, locate_y);
-            PImage oldImage = IMAGES_REPO[grid_x][grid_y];
-            for (int i=0; i<oldImage.pixels.length; i++) {
+            PImage oldImage = get(locate_x, locate_y, IMAGE_WIDTH, IMAGE_HEIGHT);
+            for (int i = 0; i < oldImage.pixels.length; i++) {
                 oldImage.pixels[i] = color(60, 82, 132, 255);
             }
             grid.revert();
@@ -192,14 +202,56 @@ public class AtominationGUI extends PApplet {
         TURN_RED = !TURN_RED;
     }
 
-//    PImage getImage(int idx) {
-//        if (idx == -1) {
-//            return loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\green1.png");
-//        }
-//        if (TURN_RED) {
-//            return loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\red" + idx + ".png");
-//        } else {
-//            return loadImage("E:\\workspace\\m2018\\m2018\\prune\\src\\main\\resources\\assets\\blue" + idx + ".png");
-//        }
-//    }
+    void place(int grid_x, int grid_y) {
+        // 递推退出条件
+        if (grid_x < 0 || grid_x >= GRID_X || grid_y < 0 || grid_y >= GRID_Y) {
+            return;
+        }
+        Grid grid = GRIDS[grid_x][grid_y];
+        grid.setOwner(TURN_RED ? RED_PLAYER : BLUE_PLAYER);
+        int locate_x = grid_x * IMAGE_WIDTH + STOKE_WEIGHT * (grid_x + 1) + Padding.left;
+        int locate_y = grid_y * IMAGE_HEIGHT + STOKE_WEIGHT * (grid_y + 1) + Padding.top;
+
+        // 放在棋盘的四个角
+        if ((grid_x == 0 && grid_y == 0)
+                || (grid_x == GRID_X - 1 && grid_y == 0)
+                || (grid_x == 0 && grid_y == GRID_Y - 1)
+                || (grid_x == GRID_X - 1 && grid_y == GRID_Y - 1)) {
+            if (grid.getAtomCount() == 0) {
+                PImage newImage = TURN_RED ? RED1 : BLUE1;
+                image(newImage, locate_x, locate_y);
+                grid.setAtomCount(1);
+            } else {
+                boom(grid, grid_x, grid_y);
+            }
+        }
+        // 放在棋盘的四条边
+        else if (grid_x == 0 || grid_y == 0 || grid_x == GRID_X - 1 || grid_y == GRID_Y - 1) {
+            if (grid.getAtomCount() <= 1) {
+                PImage newImage = TURN_RED ? RED1 : BLUE1;
+                image(newImage, locate_x, locate_y);
+                grid.inc();
+            } else {
+                boom(grid, grid_x, grid_y);
+            }
+        }
+        // 放在棋盘中间位置
+        else {
+            if (grid.getAtomCount() <= 2) {
+                PImage newImage = TURN_RED ? RED1 : BLUE1;
+                image(newImage, locate_x, locate_y);
+                grid.inc();
+            } else {
+                boom(grid, grid_x, grid_y);
+            }
+        }
+    }
+
+    void boom(Grid grid, int grid_x, int grid_y) {
+        grid.revert();
+        place(grid_x - 1, grid_y);
+        place(grid_x, grid_y - 1);
+        place(grid_x + 1, grid_y);
+        place(grid_x, grid_y + 1);
+    }
 }
