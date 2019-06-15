@@ -16,6 +16,11 @@ public class PruneApplicationTests {
 	@Test
 	public void contextLoads() {
 		System.out.println(amazonProperties.getAssociateId());
+		System.out.println("testA");
 	}
 
+	@Test
+	public void testB() {
+		System.out.println("testB");
+	}
 }
